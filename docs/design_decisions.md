@@ -56,27 +56,63 @@ even locally. Fetched with `make sources`, pinned to page revisions, credited in
   voltage stabilisers or direct-cool single-door units, no fan "squeal" noise.
   These rows stay uniform rather than being filled from memory.
 
-## 4. Fault schema changes in Phase 1 (await review)
+## 4. Fault schema changes (await review)
 
-`data/schema/fault_schema.yaml` v0.2 has 15 faults (13 proposed + 2):
+`data/schema/fault_schema.yaml` v0.3: 15 faults (13 proposed + 2), 20 attributes (18 proposed + 2).
 
 | Change | Reason |
 |---|---|
 | Added `excess_frost_manual_defrost` (safe) | iFixit separates "defrost a manual-defrost freezer" from "thick ice in an auto-defrost unit means the defrost cycle failed" (`ifx-505020-excessive-frost-buildup`); the first is the common direct-cool complaint in India |
 | Split `hot_surroundings` (safe) out of `blocked_airflow` | Separate iFixit causes ("Extreme External Temperatures" vs "Incorrectly Loaded"); one naive-Bayes class for both would expect both signs in every case |
-| `control_board_wiring` now names thermostat, thermistor, damper, boards and wiring | Matches the iFixit sections assigned to it; kept as one class because all its parts are unsafe (always REFER) |
+| `control_board_wiring` names thermostat, thermistor, damper, boards and wiring | Matches the iFixit sections assigned to it; one class because all parts are unsafe (always REFER) |
 | `drain_blockage` includes a cracked drain pan | iFixit lists both under "Refrigerator Leaking Water" |
+| Added `noise_location` (inside / back-bottom / none) | Both iFixit noise pages diagnose by where the sound comes from ("Sounds from down low in the rear ... condenser fan or compressor"; "from the freezer area ... evaporator fan") |
+| Added `works_in_other_socket` | iFixit's own test separates supply from appliance faults ("Run an extension to another outlet ... Still no power? Your fridge has an electrical issue"); without it every power case was indistinguishable from wiring leakage |
+| `ice_buildup` vs `frost_buildup` defined | ice_buildup = solid ice at the bottom (drain); frost_buildup = frost/ice on walls (the "Freezer Ice Building Up" page) |
 
 ## 5. Hypothesis model
 
-- Rows in `data/hypothesis_model.yaml` follow the tagging protocol in its header.
-  Of 270 (fault, attribute) rows: 67 cite passages, 19 are definitional (each
-  with a rationale), 184 are uniform (no evidence).
-- Sanity check: `make heatmap` prints provenance counts, I(Z; A) per attribute
-  and writes `results/sanity/hypothesis_heatmap.png`.
+- `data/hypothesis_model.yaml` v0.4 follows the tagging protocol in its header.
+  Of 300 (fault, attribute) rows: 79 cite passages, 17 are definitional (each
+  with a rationale), 173 use the single-fault healthy default, 31 are uniform.
+- **Single-fault healthy default.** A (fault, attribute) pair without a row
+  takes the working-unit value as typical: components a fault does not
+  involve behave normally. Without it, a healthy door seal was 50/50 under
+  every non-door fault and nothing could be ruled out.
+- **Closed world for symptom pages.** For the six symptoms with an iFixit page
+  that enumerates its causes, a fault the page does not list gets the
+  `unlisted` level (weight 0.05) instead of `possible`.
+- **Hedged sources.** Where a passage says a fault *may* cause a sign, or the
+  fault has several presentations (stopped vs noisy fan), the unaffected value
+  is tagged typical as well.
+- Sanity check: `make heatmap` prints provenance counts and I(Z; A) per attribute.
 - Sensitivity: weight sets `base`, `flat`, `sharp`, `soft_atypical`,
-  `hard_atypical` in `configs/hypothesis.yaml`; Phase 5 reruns Q2D and B3 on
-  each and reports the spread.
+  `hard_atypical` in `configs/hypothesis.yaml`; Phase 5 reruns Q2D and B3 on each.
+
+## 5b. Benchmark construction
+
+- **Scenarios, not model samples.** 47 scenarios (`data/benchmark/scenarios.yaml`),
+  each citing one passage with a verbatim quote (tested), fix the
+  fault-specific attributes; every other attribute takes its healthy value.
+  Cases are never sampled from the hypothesis model the systems use.
+- **Model-free gold labels.** REFER if the fault is unsafe, or if a scenario
+  of another fault can produce exactly the same full attribute vector
+  (`confusable_faults`). Result: 179 identifiable, 41 underdetermined, 80
+  unsafe; 121 of 300 gold actions are REFER.
+- **Model ceiling** (diagnostic, not a label): with every attribute known, the
+  hypothesis model reaches τ = 0.75 on the true fault for 106 / 179
+  identifiable cases with the base weights, 150 with `sharp`, 31 with `flat`.
+  The weight choice caps Q2D/B3 accuracy more than question selection can;
+  the sensitivity experiment measures this.
+- **Omission** (`incomplete`, `combined_*`): keep the symptom; remove a random
+  non-empty subset of the scenario-specific mentions, other mentions with
+  probability 0.4, the compartment half the time.
+- **Spelling noise**: phonetic respellings, keyboard-adjacent substitutions,
+  dropped / doubled / swapped letters (`bench/noise.py`).
+- **Circularity caveat.** Templates, lexicons and the normaliser were written
+  by the same team, so normalisation is likely to help more on synthetic
+  variants than on real messages. Lexicons are seeded from external
+  resources (below) and results on `genuine` variants are reported separately.
 
 ## 6. Language pairs
 
@@ -92,11 +128,17 @@ results group by noise type and by language.
 splits (~100–150 cases); train follows if time allows. Kannada and Hindi
 variants share underlying cases, so kn-en vs hi-en is a paired comparison.
 
-**Lexicons.** `data/lexicon/kn_en.yaml` and `data/lexicon/hi_en.yaml`
-(Romanized Hindi such as "nahi ho raha", "thanda nahi", "awaaz aa rahi hai",
-"band nahi ho raha", "bahut", "paani tapak raha", with spellings like
-"nai / nahin / nhi"). Each entry records its provenance: `hand`,
-`aksharantar` or `comi-lingua`.
+**Lexicons.** `data/lexicon/kn_en.yaml` (64 entries) and
+`data/lexicon/hi_en.yaml` (80 entries) are hand-written (Romanized Hindi such
+as "nahi ho raha", "thanda nahi", "awaaz aa rahi hai", "band nahi ho raha",
+"bahut", "paani tapak raha", with spellings like "nai / nahin / nhi").
+`bench/seed_lexicon.py` adds attested spellings to `data/lexicon/seeds.json`,
+each with its source and count: 19 new Kannada spellings (Aksharantar) and
+334 new Hindi spellings (259 COMI-LINGUA, 75 Aksharantar), e.g. "nehi",
+"nhin", "bohut", "bhaut", "aavaaz", "hamesa". Filters: at least 3 letters;
+within 2 edits of a hand form of the same entry (1 edit for words of 4 letters
+or fewer); not a hand form of another entry; not an English word in the
+domain vocabulary; COMI-LINGUA alignments seen at least 3 times.
 
 **Seed resources (2022–2026), licences checked 2026-10-28.**
 

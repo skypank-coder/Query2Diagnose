@@ -1,0 +1,85 @@
+# English phrase templates for clean descriptions (synthetic provenance).
+# {where} is replaced by the compartment phrase; templates without {where}
+# cannot express the compartment.
+lang: en
+style: sentences
+where:
+  _none: ""
+  fridge: " in the fridge section"
+  freezer: " in the freezer"
+  both: " in both the fridge and the freezer"
+
+phrases:
+  primary_symptom:
+    not_cooling: ["my fridge is not cooling{where}", "it has stopped cooling properly{where}",
+                  "nothing is getting cold{where}", "the cooling is very weak{where}"]
+    over_cooling: ["everything is freezing{where}", "it is cooling far too much{where}",
+                   "food keeps getting frozen{where}"]
+    noise: ["my fridge is making a strange noise", "there is a lot of noise coming from the fridge",
+            "the fridge has become very noisy"]
+    leaking_water: ["water is leaking{where}", "there is water coming out{where}"]
+    ice_buildup: ["a block of ice keeps forming at the bottom{where}", "water is freezing into ice at the bottom{where}"]
+    frost_buildup: ["thick frost keeps forming on the walls{where}", "the walls are covered in frost{where}"]
+    not_powering_on: ["my fridge is completely dead", "the fridge will not turn on at all"]
+    runs_constantly: ["it runs all the time and never switches off", "the motor never stops running"]
+  cooling_type:
+    direct_cool: ["it is a single-door direct-cool model", "I have to defrost it by hand"]
+    frost_free: ["it is a frost-free model", "it is a frost-free double-door fridge"]
+  compressor_running:
+    "yes": ["I can hear the compressor running", "the motor at the back is humming"]
+    "no": ["the compressor is not running", "the motor at the back is silent"]
+  noise_type:
+    none: ["it makes no sound at all", "it is completely silent"]
+    normal_hum: ["it only makes the usual soft hum"]
+    loud_hum_or_buzz: ["there is a loud humming sound", "it makes a loud buzzing noise"]
+    clicking: ["there is a clicking sound every few minutes", "I hear a click and then nothing"]
+    knocking_or_rattling: ["there is a knocking sound", "something is rattling inside"]
+    squealing_or_chirping: ["there is a squealing noise", "it makes a chirping sound"]
+  noise_location:
+    inside_compartment: ["the sound seems to come from inside the freezer", "the noise is coming from inside"]
+    back_bottom: ["the sound comes from the back near the bottom", "the noise is from the lower back of the fridge"]
+    not_applicable: ["there is no unusual noise"]
+  condenser_fan_running:
+    "yes": ["the fan near the bottom at the back is spinning"]
+    "no": ["the fan near the bottom at the back is not spinning"]
+    not_applicable: ["there is no fan at the back"]
+  evaporator_fan_running:
+    "yes": ["I can hear the fan inside the freezer"]
+    "no": ["the fan inside the freezer is not running"]
+    not_applicable: ["there is no fan inside"]
+  condenser_coils_dusty:
+    "yes": ["the coils at the back are covered in dust"]
+    "no": ["the coils at the back look clean"]
+  door_seal_condition:
+    good: ["the door seal looks fine", "the door closes properly"]
+    damaged_or_gap: ["the door does not seal properly and there is a gap", "the rubber seal on the door is torn"]
+  vents_blocked_or_overloaded:
+    "yes": ["the fridge is packed full of food", "food is blocking the vents inside"]
+    "no": ["it is not overloaded"]
+  placement_clearance:
+    adequate: ["it has plenty of space around it"]
+    too_close_or_hot: ["it is right next to the stove", "it is pushed against the wall in a very hot room"]
+  recent_relocation:
+    "yes": ["we moved it recently", "we shifted house last week and moved the fridge"]
+    "no": ["it has not been moved"]
+  power_supply_ok:
+    "yes": ["the light inside comes on"]
+    "no": ["the light inside does not come on", "there is no light and no display"]
+  works_in_other_socket:
+    "yes": ["it works when I plug it into another socket", "it powers on from a different socket"]
+    "no": ["it does not work in another socket either", "even in a different socket it stays dead"]
+  thermostat_setting:
+    too_warm: ["the temperature knob is on the warmest setting", "the dial is turned to the lowest cooling"]
+    normal: ["the temperature setting is normal"]
+    too_cold: ["the knob is turned to maximum cold"]
+  frost_on_back_wall:
+    "yes": ["there is frost on the back wall inside"]
+    "no": ["there is no frost on the back wall"]
+  water_leak_location:
+    none: ["there is no water anywhere"]
+    inside_compartment: ["water collects at the bottom inside"]
+    under_unit: ["there is a puddle under the fridge"]
+  error_code:
+    none: ["there is no error code on the display"]
+    displayed: ["the display shows an error code"]
+    no_display: ["it does not have a display"]

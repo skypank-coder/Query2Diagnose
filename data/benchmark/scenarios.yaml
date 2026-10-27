@@ -1,0 +1,252 @@
+# Case scenarios: one situation described by one source passage.
+# `quote` is copied verbatim from the passage (tests check it is a substring).
+# `attributes` fixes the values the passage implies; a list means "sample one".
+# Every other attribute takes the healthy value in configs/benchmark.yaml, so
+# cases are NOT sampled from the hypothesis model the systems use.
+
+thermostat_setting:
+  - id: ts-fridge-warm
+    passage: ifx-505025-incorrect-thermostat-setting
+    quote: Verify it is set on cold
+    attributes: {primary_symptom: not_cooling, thermostat_setting: too_warm, compartment_affected: [fridge, both]}
+  - id: ts-freezer-warm
+    passage: ifx-505020-incorrect-thermostat-setting
+    quote: Your freezer should be set at zero degrees Fahrenheit
+    attributes: {primary_symptom: not_cooling, thermostat_setting: too_warm, compartment_affected: freezer}
+
+door_seal:
+  - id: ds-gasket-warm
+    passage: ifx-505025-failing-door-seals
+    quote: cool air escapes through the cracks in door seals
+    attributes: {primary_symptom: not_cooling, door_seal_condition: damaged_or_gap,
+                 compartment_affected: [fridge, freezer, both]}
+  - id: ds-gasket-frost
+    passage: ifx-505021-failing-door-seals
+    quote: cool air escapes through the cracks in door seals
+    attributes: {primary_symptom: frost_buildup, door_seal_condition: damaged_or_gap,
+                 frost_on_back_wall: "yes", compartment_affected: freezer}
+  - id: ds-door-blocked
+    passage: ifx-506960-door-blocked
+    quote: Overcrowded shelves can prevent doors from closing properly.
+    attributes: {primary_symptom: not_cooling, door_seal_condition: damaged_or_gap,
+                 vents_blocked_or_overloaded: "yes", compartment_affected: freezer}
+  - id: ds-misaligned
+    passage: ifx-515719-cause-2-misaligned-doors
+    quote: they may not seal tightly
+    attributes: {primary_symptom: frost_buildup, door_seal_condition: damaged_or_gap,
+                 frost_on_back_wall: "yes", compartment_affected: freezer}
+
+blocked_airflow:
+  - id: ba-overloaded
+    passage: ifx-505025-incorrectly-loaded-or-overloaded-fridge
+    quote: too much food or incorrectly placed food will block the vents
+    attributes: {primary_symptom: not_cooling, vents_blocked_or_overloaded: "yes", cooling_type: frost_free,
+                 compartment_affected: [fridge, freezer]}
+  - id: ba-warm-contents
+    passage: ifx-505021-hot-or-wet-contents
+    quote: Ice buildup happens when warm and humid air contacts cold evaporator coils in the freezer.
+    attributes: {primary_symptom: frost_buildup, frost_on_back_wall: "yes", cooling_type: frost_free,
+                 compartment_affected: freezer}
+
+hot_surroundings:
+  - id: hs-near-heat
+    passage: ifx-505025-extreme-external-temperatures
+    quote: near hot appliances like the dishwasher, range, and oven
+    attributes: {primary_symptom: not_cooling, placement_clearance: too_close_or_hot,
+                 compartment_affected: [fridge, both]}
+  - id: hs-hot-room
+    passage: ifx-506845-extreme-external-temperatures
+    quote: the fridge may not cool sufficiently
+    attributes: {primary_symptom: not_cooling, placement_clearance: too_close_or_hot, compartment_affected: fridge}
+
+dirty_condenser_coils:
+  - id: dc-warm
+    passage: ifx-505025-dirty-condenser-coils
+    quote: As dust and debris pile onto the coils
+    attributes: {primary_symptom: not_cooling, condenser_coils_dusty: "yes", compartment_affected: [fridge, both]}
+  - id: dc-constant
+    passage: ifx-509172-dirty-condenser-coils
+    quote: the compressor may be running constantly in an attempt to cool the fridge
+    attributes: {primary_symptom: runs_constantly, condenser_coils_dusty: "yes", compressor_running: "yes"}
+  - id: dc-shutdown
+    passage: ifx-505022-dirty-condenser-coils
+    quote: If these coils are very dirty the compressor can overheat and shut down.
+    attributes: {primary_symptom: not_cooling, condenser_coils_dusty: "yes", compressor_running: "no",
+                 noise_type: none}
+
+condenser_fan_failure:
+  - id: cf-stopped
+    passage: ifx-505022-failed-condenser-fan-motor
+    quote: the compressor can overheat with no air to cool it
+    attributes: {primary_symptom: not_cooling, condenser_fan_running: "no", cooling_type: frost_free,
+                 compressor_running: ["yes", "no"], compartment_affected: [both, fridge]}
+  - id: cf-loud
+    passage: ifx-506958-condenser-fan-failure
+    quote: the fan becomes much louder
+    attributes: {noise_location: back_bottom, primary_symptom: noise, noise_type: loud_hum_or_buzz, cooling_type: frost_free}
+  - id: cf-knock
+    passage: ifx-505030-condenser-fan
+    quote: The condenser fan might make a knocking if a part has come loose
+    attributes: {noise_location: back_bottom, primary_symptom: noise, noise_type: knocking_or_rattling, cooling_type: frost_free}
+
+evaporator_fan_failure:
+  - id: ef-fridge-warm
+    passage: ifx-506845-failed-condenser-or-evaporator-fan-motor
+    quote: the freezer may still get cold while the refrigerator stays warm
+    attributes: {primary_symptom: not_cooling, compartment_affected: fridge, evaporator_fan_running: "no",
+                 compressor_running: "yes", cooling_type: frost_free}
+  - id: ef-hum
+    passage: ifx-506958-evaporator-fan-failure
+    quote: The sound of failed bearings on the motor will make a very audible hum.
+    attributes: {noise_location: inside_compartment, primary_symptom: noise, noise_type: loud_hum_or_buzz, cooling_type: frost_free,
+                 compartment_affected: [freezer, fridge], evaporator_fan_running: ["yes", "no"]}
+  - id: ef-compressor-runs
+    passage: ifx-509172-intro
+    quote: a stuck or broken evaporator fan
+    attributes: {primary_symptom: not_cooling, compressor_running: "yes", evaporator_fan_running: "no",
+                 cooling_type: frost_free, compartment_affected: [fridge, both]}
+
+defrost_system_failure:
+  - id: df-iced-cover
+    passage: ifx-505021-defrost-system-malfunction
+    quote: covered in ice crystals
+    attributes: {primary_symptom: frost_buildup, frost_on_back_wall: "yes", compartment_affected: freezer,
+                 cooling_type: frost_free}
+  - id: df-heater
+    passage: ifx-509172-faulty-defrost-heater
+    quote: the entire evaporator eventually becomes ice
+    attributes: {primary_symptom: not_cooling, frost_on_back_wall: "yes", compressor_running: "yes",
+                 cooling_type: frost_free, compartment_affected: [fridge, both]}
+  - id: df-hum
+    passage: ifx-506958-compressor-failure--excessive-frost
+    quote: If you see frost building on the rear panel of your freezer, it suggests a failure in the defrost system.
+    attributes: {noise_location: back_bottom, primary_symptom: noise, noise_type: loud_hum_or_buzz, frost_on_back_wall: "yes",
+                 cooling_type: frost_free}
+  - id: df-fan-ice
+    passage: ifx-505030-evaporator-fan
+    quote: the evaporator fan blades may be hitting ice buildup
+    attributes: {noise_location: inside_compartment, primary_symptom: noise, noise_type: knocking_or_rattling, frost_on_back_wall: "yes",
+                 cooling_type: frost_free, compartment_affected: freezer}
+
+excess_frost_manual_defrost:
+  - id: mf-frost
+    passage: ifx-505020-excessive-frost-buildup
+    quote: perform a forced defrost or manual defrost
+    attributes: {primary_symptom: frost_buildup, cooling_type: direct_cool, frost_on_back_wall: "yes",
+                 compartment_affected: freezer}
+  - id: mf-efficiency
+    passage: ifx-505069-defrost-freezer-or-fresh-food-compartment
+    quote: A buildup of interior frost and ice can affect your unit
+    attributes: {primary_symptom: not_cooling, cooling_type: direct_cool, frost_on_back_wall: "yes",
+                 compartment_affected: [freezer, both]}
+  - id: mf-door
+    passage: ifx-515719-cause-4-excessive-frost-or-ice-buildup
+    quote: it can prevent the door from sealing properly
+    attributes: {primary_symptom: frost_buildup, cooling_type: direct_cool, frost_on_back_wall: "yes",
+                 door_seal_condition: damaged_or_gap, compartment_affected: freezer}
+
+drain_blockage:
+  - id: db-inside
+    passage: ifx-505027-plugged-defrost-drain
+    quote: Generally, the leak will show up inside the freezer and fresh food compartments.
+    attributes: {primary_symptom: leaking_water, water_leak_location: inside_compartment, cooling_type: frost_free,
+                 compartment_affected: [fridge, both]}
+  - id: db-ice
+    passage: ifx-505027-plugged-defrost-drain
+    quote: You may find ice building up in the bottom of your freezer.
+    attributes: {primary_symptom: ice_buildup, compartment_affected: freezer, cooling_type: frost_free}
+  - id: db-tray
+    passage: ifx-505027-cracked-or-warped-defrost-water-tray
+    quote: You may notice a puddle on the floor
+    attributes: {primary_symptom: leaking_water, water_leak_location: under_unit, cooling_type: frost_free}
+
+power_supply:
+  - id: ps-no-power
+    passage: ifx-505025-no-power
+    quote: Your fridge will not work if its power has gone out.
+    attributes: {primary_symptom: not_powering_on, power_supply_ok: "no", compressor_running: "no",
+                 noise_type: none, compartment_affected: both, works_in_other_socket: "yes"}
+  - id: ps-shared-circuit
+    passage: ifx-505029-overloaded-outlet
+    quote: An electric heater sharing a circuit with a fridge can easily cause this.
+    attributes: {primary_symptom: not_powering_on, power_supply_ok: "no", compressor_running: "no",
+                 noise_type: none, compartment_affected: both, works_in_other_socket: "yes"}
+  - id: ps-faulty-outlet
+    passage: ifx-505029-faulty-gfci-outlet
+    quote: a relatively cheap fix may be replacing the GFCI unit
+    attributes: {primary_symptom: not_powering_on, power_supply_ok: "no", compressor_running: "no",
+                 noise_type: none, compartment_affected: both, works_in_other_socket: "yes"}
+
+start_relay_capacitor:
+  - id: sr-click
+    passage: ifx-505022-faulty-overload-relay
+    quote: if you hear a clicking sound from the unit
+    attributes: {noise_location: back_bottom, primary_symptom: [not_cooling, noise], compressor_running: "no", noise_type: clicking,
+                 cooling_type: frost_free, compartment_affected: both}
+  - id: sr-silent
+    passage: ifx-505022-intro
+    quote: If you hear no sounds and the compressor
+    attributes: {primary_symptom: not_cooling, compressor_running: "no", noise_type: none,
+                 compartment_affected: both}
+  - id: sr-relay
+    passage: ifx-505025-faulty-start-relay
+    quote: the compressor may run intermittently or not at all
+    attributes: {noise_location: back_bottom, primary_symptom: not_cooling, compressor_running: "no", noise_type: [clicking, none],
+                 compartment_affected: both}
+
+compressor_failure:
+  - id: cp-loud-hum
+    passage: ifx-505022-intro
+    quote: a constant, loud humming noise
+    attributes: {noise_location: back_bottom, primary_symptom: noise, noise_type: loud_hum_or_buzz, compressor_running: "yes"}
+  - id: cp-transit
+    passage: ifx-505025-faulty-compressor
+    quote: it may have been damaged in transit
+    attributes: {noise_location: back_bottom, primary_symptom: noise, noise_type: loud_hum_or_buzz, recent_relocation: "yes",
+                 compressor_running: "yes"}
+  - id: cp-knock
+    passage: ifx-505030-compressor
+    quote: If the knocking is frequent and lasts for more than an hour
+    attributes: {noise_location: back_bottom, primary_symptom: noise, noise_type: knocking_or_rattling, compressor_running: "yes"}
+  - id: cp-dead
+    passage: ifx-505022-faulty-compressor
+    quote: running at all
+    attributes: {primary_symptom: not_cooling, compressor_running: "no", noise_type: none,
+                 compartment_affected: both}
+
+sealed_system_refrigerant:
+  - id: ss-leak
+    passage: ifx-509172-refrigerant-leaks
+    quote: Your compressor is likely running non-stop.
+    attributes: {primary_symptom: [not_cooling, runs_constantly], compressor_running: "yes",
+                 compartment_affected: both}
+  - id: ss-moved
+    passage: ifx-505020-leaking-coolant-system
+    quote: A blockage can be caused by tilting or transporting a fridge on its side.
+    attributes: {primary_symptom: not_cooling, recent_relocation: "yes", compressor_running: "yes",
+                 compartment_affected: both}
+  - id: ss-hum
+    passage: ifx-509172-intro
+    quote: your compressor may be broken or have a refrigerant leak
+    attributes: {noise_location: back_bottom, primary_symptom: noise, noise_type: loud_hum_or_buzz, compressor_running: "yes"}
+
+control_board_wiring:
+  - id: cb-thermistor
+    passage: ifx-505022-thermistor-failure
+    quote: can cool continuously until the compressor overheats
+    attributes: {primary_symptom: [over_cooling, runs_constantly], compressor_running: "yes"}
+  - id: cb-board
+    passage: ifx-505022-temperature-control-board-failure
+    quote: if the switches or relays on them fail
+    attributes: {primary_symptom: not_cooling, compressor_running: "no", condenser_fan_running: "no",
+                 evaporator_fan_running: "no", noise_type: none, cooling_type: frost_free}
+  - id: cb-damper
+    passage: ifx-506845-damper-failure
+    quote: If it fails in the shut position, your fresh food compartment will warm up.
+    attributes: {primary_symptom: not_cooling, compartment_affected: fridge, compressor_running: "yes",
+                 cooling_type: frost_free}
+  - id: cb-wiring
+    passage: ifx-505029-appliance-leakage-current--damaged-appliance-wiring
+    quote: Damaged wires on appliances, especially at door hinges on refrigerators, can cause an inadvertent ground.
+    attributes: {primary_symptom: not_powering_on, power_supply_ok: "no", compressor_running: "no",
+                 noise_type: none, compartment_affected: both, works_in_other_socket: "no"}

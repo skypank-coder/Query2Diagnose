@@ -1,0 +1,87 @@
+# Romanized Hindi -> English lexicon for core/normalize.py (hand-built).
+# `native` (Devanagari) lets bench/seed_lexicon.py add attested spellings from
+# Aksharantar, and COMI-LINGUA text-normalisation pairs add real Hinglish
+# misspellings (data/lexicon/seeds.json). Longest form wins. Forms that are
+# also common English words (me, he, main) are deliberately left out.
+lang: hi
+entries:
+  - {id: not, en: not, native: [नहीं, नही], forms: [nahi, nahin, nhi, nai, nahee, nahii]}
+  - {id: happening, en: is happening, forms: [ho raha, ho rha, ho rahi, ho rhi, ho rahe, hora]}
+  - {id: cold, en: cold, native: [ठंडा, ठंडी, ठंडे], forms: [thanda, thandaa, tanda, thnda, thande, thandi]}
+  - {id: sound, en: sound, native: [आवाज़, आवाज], forms: [awaaz, awaz, aawaz, avaaz, awaj, aawaaz]}
+  - {id: coming, en: is coming, forms: [aa rahi hai, aa rhi hai, aa rahi he, aa rahi h, aati hai]}
+  - {id: "off", en: "off", native: [बंद], forms: [band, bandh, bnd]}
+  - {id: very, en: very, native: [बहुत], forms: [bahut, bohot, bahot, bhut, boht, bhot, bahoot]}
+  - {id: water, en: water, native: [पानी], forms: [paani, pani]}
+  - {id: dripping, en: is dripping, forms: [tapak raha, tapak rha, tapakta]}
+  - {id: ice, en: ice, native: [बर्फ़, बर्फ], forms: [barf, baraf, barff]}
+  - {id: frozen, en: frozen, native: [जम, जमी, जमा], forms: [jam, jami, jama]}
+  - {id: running, en: running, forms: [chal raha, chal rha, chal rahi, chalta]}
+  - {id: rotating, en: rotating, forms: [ghoom raha, ghum raha, ghoom rha, ghoomta]}
+  - {id: behind, en: behind, native: [पीछे], forms: [peeche, piche, pichhe, peechhe]}
+  - {id: below, en: below, native: [नीचे], forms: [neeche, niche, nichhe, neechhe]}
+  - {id: inside, en: inside, native: [अंदर, अन्दर], forms: [andar, ander, andr]}
+  - {id: door, en: door, native: [दरवाज़ा, दरवाजा, दरवाज़े], forms: [darwaza, darwaja, darvaja, darwaaza, darwaze, darwaje]}
+  - {id: damaged, en: damaged, native: [ख़राब, खराब], forms: [kharab, khraab, kharaab, khrab]}
+  - {id: hot, en: hot, native: [गरम, गर्म], forms: [garam, garm]}
+  - {id: stove, en: stove, native: [चूल्हा, चूल्हे], forms: [chulha, chulhe, chulhaa]}
+  - {id: too_much, en: too much, native: [ज़्यादा, ज्यादा], forms: [zyada, jyada, zada, jada, jyaada, zyaada]}
+  - {id: dust, en: dust, native: [धूल], forms: [dhool, dhul]}
+  - {id: clean, en: clean, native: [साफ़, साफ], forms: [saaf, saf]}
+  - {id: fine, en: fine, native: [ठीक], forms: [theek, thik, theekh, thk]}
+  - {id: space, en: space, native: [जगह], forms: [jagah, jgh, jageh]}
+  - {id: always, en: always, native: [हमेशा], forms: [hamesha, humesha, hmesha]}
+  - {id: both, en: both, native: [दोनों], forms: [dono, donon]}
+  - {id: is, en: is, native: [है], forms: [hai, hain]}
+  - {id: in, en: in, native: [में], forms: [mein, mai, mei]}
+  - {id: and, en: and, native: [और], forms: [aur, aor]}
+  - {id: switched_on, en: switched on, native: [चालू], forms: [chalu, chaalu]}
+  - {id: any, en: any, native: [कोई], forms: [koi, koyi]}
+  - {id: anywhere, en: anywhere, native: [कहीं], forms: [kahin, kahi, kahee]}
+  - {id: noise, en: noise, native: [शोर], forms: [shor, shoor]}
+  - {id: stops, en: stops, native: [रुकता], forms: [rukta, rukhta]}
+  - {id: low, en: low, native: [कम], forms: [kam]}
+  - {id: ourselves, en: ourselves, native: [खुद, ख़ुद], forms: [khud]}
+  - {id: have_to, en: have to, forms: [karna padta, karna padta hai]}
+  - {id: everything, en: everything, native: [सब], forms: [sab]}
+  - {id: something, en: something, native: [कुछ], forms: [kuch, kuchh, kch]}
+  - {id: lit, en: lit, forms: [jalti, jal rahi, jal rhi]}
+  - {id: near, en: near, native: [पास], forms: [paas, pas]}
+  - {id: wall, en: wall, native: [दीवार], forms: [deewar, diwar, deewaar]}
+  - {id: walls, en: walls, native: [दीवारों], forms: [deewaron, diwaron]}
+  - {id: room, en: room, native: [कमरा], forms: [kamra, kamre]}
+  - {id: recently, en: recently, forms: [abhi haal mein, haal mein]}
+  - {id: shifted, en: moved, forms: [shift kiya, shift kia]}
+  - {id: moved, en: moved, native: [हिलाया], forms: [hilaya, hilaaya]}
+  - {id: house, en: house, native: [घर], forms: [ghar]}
+  - {id: changed, en: changed, native: [बदला], forms: [badla, badala]}
+  - {id: other, en: other, native: [दूसरे, दूसरा], forms: [doosre, dusre, doosra]}
+  - {id: on_plugging, en: when plugged, forms: [lagane par, lagane pe]}
+  - {id: also, en: also, native: [भी], forms: [bhi, bhee]}
+  - {id: gets, en: becomes, forms: [ho jaata, ho jata, hota]}
+  - {id: strange, en: strange, native: [अजीब], forms: [ajeeb, ajib]}
+  - {id: faint, en: faint, native: [हल्की, हल्का], forms: [halki, halka]}
+  - {id: only, en: only, native: [बस], forms: [bas]}
+  - {id: full, en: full, forms: [bhara hua, bhara]}
+  - {id: things, en: things, native: [सामान], forms: [saaman, saman]}
+  - {id: fan, en: fan, native: [पंखा], forms: [pankha, pankhaa]}
+  - {id: doing, en: doing, forms: [kar raha, kar rha]}
+  - {id: piece, en: piece, native: [टुकड़ा], forms: [tukda, tukra]}
+  - {id: solid, en: solid, native: [ठोस], forms: [thos]}
+  - {id: formed, en: formed, forms: [ban gaya, ban gya]}
+  - {id: most, en: most, native: [सबसे], forms: [sabse]}
+  - {id: "on", en: "on", native: [पे, पर], forms: [pe, par]}
+  - {id: from, en: from, native: [से], forms: [se]}
+  - {id: ever, en: ever, native: [कभी], forms: [kabhi, kbhi]}
+  - {id: completely, en: completely, native: [बिल्कुल], forms: [bilkul]}
+  - {id: lying, en: lying, native: [पड़ा], forms: [pada]}
+  - {id: kept, en: kept, native: [रखा], forms: [rakha]}
+  - {id: stuck, en: stuck to, native: [चिपका], forms: [chipka]}
+  - {id: loudly, en: loudly, forms: [zor se, jor se]}
+  - {id: loud, en: loud, native: [तेज़, तेज], forms: [tez, tej]}
+  - {id: buzzing, en: buzzing, forms: [bhinbhinahat]}
+  - {id: rattling, en: rattling, forms: [khadkhada]}
+  - {id: knocking, en: knocking, forms: [khat khat]}
+  - {id: clicking, en: clicking, forms: [tik tik]}
+  - {id: humming, en: humming, forms: [ghoon ghoon]}
+  - {id: squealing, en: squealing, forms: [cheen cheen]}

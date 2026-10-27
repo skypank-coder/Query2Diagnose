@@ -1,0 +1,82 @@
+# Romanized Kannada-English phrase templates (synthetic provenance; to be
+# corrected by native speakers via the annotation CSV).
+lang: kn
+style: chat
+where:
+  _none: "fridge "
+  fridge: "fridge alli "
+  freezer: "freezer alli "
+  both: "fridge mattu freezer eradralloo "
+
+phrases:
+  primary_symptom:
+    not_cooling: ["{where}cooling agalla", "{where}cooling aagtilla", "{where}tannage aagta illa",
+                  "{where}cool aagtane illa"]
+    over_cooling: ["{where}tumba cold aagtide, ella freeze aagtide", "{where}jaasti tannage aagtide"]
+    noise: ["fridge inda tumba sound bartide", "fridge tumba galate maadtide"]
+    leaking_water: ["{where}neeru leak aagtide", "{where}neeru sortide"]
+    ice_buildup: ["{where}kelage ice gadde aagide", "{where}kelage neeru ice aagi katkondide"]
+    frost_buildup: ["{where}gode mele tumba frost katkondide", "{where}frost jaasti aagide"]
+    not_powering_on: ["fridge on aagtane illa", "fridge full dead aagide"]
+    runs_constantly: ["motor nilsilla, yavaglu run aagtane ide", "compressor nilta illa"]
+  cooling_type:
+    direct_cool: ["single door direct cool fridge", "naave defrost maadbeku"]
+    frost_free: ["frost free fridge", "double door frost free model"]
+  compressor_running:
+    "yes": ["compressor sound ide", "compressor run aagtide"]
+    "no": ["compressor run aagtilla", "compressor sound illa"]
+  noise_type:
+    none: ["yenu sound illa"]
+    normal_hum: ["normal sound ashte bartide"]
+    loud_hum_or_buzz: ["joragi humming sound bartide", "jor aagi buzz sound bartide"]
+    clicking: ["tick tick anta click sound bartide"]
+    knocking_or_rattling: ["dhak dhak anta knocking sound bartide", "olage yeno rattle aagtide"]
+    squealing_or_chirping: ["keech keech anta sound bartide"]
+  noise_location:
+    inside_compartment: ["sound olagadinda bartide", "freezer olagadinda sound bartide"]
+    back_bottom: ["sound hinde kelagininda bartide"]
+    not_applicable: ["vichitra sound yenu illa"]
+  condenser_fan_running:
+    "yes": ["hinde kelage fan tirugtide"]
+    "no": ["hinde kelage fan tirugtilla"]
+    not_applicable: ["hinde fan illa"]
+  evaporator_fan_running:
+    "yes": ["freezer olage fan sound ide"]
+    "no": ["freezer olage fan run aagtilla"]
+    not_applicable: ["olage fan illa"]
+  condenser_coils_dusty:
+    "yes": ["hinde coil full dust ide"]
+    "no": ["hinde coil clean ide"]
+  door_seal_condition:
+    good: ["door rubber sari ide", "door sariyagi close aagtide"]
+    damaged_or_gap: ["door rubber haalagide, gap ide", "door sariyagi close aagtilla"]
+  vents_blocked_or_overloaded:
+    "yes": ["fridge full tumbide", "food inda vents block aagide"]
+    "no": ["jaasti items illa"]
+  placement_clearance:
+    adequate: ["suttalu jaaga ide"]
+    too_close_or_hot: ["stove pakkadalle ide", "gode ge tagulide, room tumba bisi"]
+  recent_relocation:
+    "yes": ["ittichege fridge move maadidvi", "mane shift maadidvi, fridge kooda tandvi"]
+    "no": ["fridge move maadilla"]
+  power_supply_ok:
+    "yes": ["olage light bartide"]
+    "no": ["light bartilla", "light illa, display kooda illa"]
+  works_in_other_socket:
+    "yes": ["bere socket alli haakidre on aagtide"]
+    "no": ["bere socket alli haakidroo on aagtilla"]
+  thermostat_setting:
+    too_warm: ["temperature knob kadime alli ide"]
+    normal: ["temperature setting normal ide"]
+    too_cold: ["knob full cold alli ide"]
+  frost_on_back_wall:
+    "yes": ["hinde gode mele frost ide"]
+    "no": ["hinde gode mele frost illa"]
+  water_leak_location:
+    none: ["elloo neeru illa"]
+    inside_compartment: ["olage kelage neeru nintide"]
+    under_unit: ["fridge kelage neeru ide"]
+  error_code:
+    none: ["display alli error illa"]
+    displayed: ["display alli error code bartide"]
+    no_display: ["display ne illa"]

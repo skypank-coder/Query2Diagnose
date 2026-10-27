@@ -1,0 +1,3219 @@
+{
+ "generated_by": "bench/seed_lexicon.py",
+ "sources": {
+  "aksharantar": "ai4bharat/Aksharantar (CC-BY manual data, CC0 mined data)",
+  "comi-lingua": "LingoIITGN/COMI-LINGUA TN split (CC-BY-4.0)"
+ },
+ "filters": {
+  "min_count_comi": 3,
+  "max_edit_to_hand_form": 2,
+  "min_len": 3,
+  "english_guard": "core.lexicon.english_vocabulary"
+ },
+ "kn": {
+  "accumulated": [
+   {
+    "form": "kattikondide",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "always": [
+   {
+    "form": "yavaagalu",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "yaavaagaloo",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "yaavaagalu",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "yavagalu",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "yaavagalu",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "anywhere": [
+   {
+    "form": "ellu",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "ello",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "around": [
+   {
+    "form": "suttalu",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "suttaloo",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "behind": [
+   {
+    "form": "hinde",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "below": [
+   {
+    "form": "kelage",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "kelege",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "coming": [
+   {
+    "form": "baruttide",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "baruttidde",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "did_not": [
+   {
+    "form": "maadilla",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "madilla",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "everything": [
+   {
+    "form": "ellaa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "from": [
+   {
+    "form": "inda",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "enda",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "from_below": [
+   {
+    "form": "kelagininda",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "from_inside": [
+   {
+    "form": "olagadeyinda",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "has_become": [
+   {
+    "form": "aagide",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "agide",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "hot": [
+   {
+    "form": "bisi",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "if_plugged": [
+   {
+    "form": "hakidare",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "haakidare",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "in": [
+   {
+    "form": "ally",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "in_both": [
+   {
+    "form": "eradaralloo",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "eradarallu",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "inside": [
+   {
+    "form": "olage",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "is_full": [
+   {
+    "form": "tumbide",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "leaking": [
+   {
+    "form": "soruttide",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "like": [
+   {
+    "form": "anta",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "loudly": [
+   {
+    "form": "joragi",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "low": [
+   {
+    "form": "kadime",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "lump": [
+   {
+    "form": "gadde",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "making": [
+   {
+    "form": "madthide",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "maadtide",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "madtide",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "maadthide",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "must_do": [
+   {
+    "form": "madabeku",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "maadabeku",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "not_coming": [
+   {
+    "form": "baruttilla",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "barutthilla",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "not_happening": [
+   {
+    "form": "agtilla",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "not_rotating": [
+   {
+    "form": "tiruguttilla",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "not_stopping": [
+   {
+    "form": "nilluttilla",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "niltilla",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "not_there": [
+   {
+    "form": "illa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "nothing": [
+   {
+    "form": "enoo",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "on_top": [
+   {
+    "form": "meele",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "only": [
+   {
+    "form": "ashte",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "ashtee",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "other": [
+   {
+    "form": "bere",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "properly": [
+   {
+    "form": "sariyagi",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "sariyaagi",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "recently": [
+   {
+    "form": "itteechege",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "ittichege",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "rotating": [
+   {
+    "form": "tiruguttide",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "something": [
+   {
+    "form": "eno",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "yeno",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "space": [
+   {
+    "form": "jaaga",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "strange": [
+   {
+    "form": "vichitra",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "too_much": [
+   {
+    "form": "jasthi",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jaasti",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "jaasthi",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "touching": [
+   {
+    "form": "tagulide",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "very": [
+   {
+    "form": "tumba",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "tumbaa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "we_did": [
+   {
+    "form": "madidvi",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ]
+ },
+ "hi": {
+  "also": [
+   {
+    "form": "bhii",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bhe",
+    "source": "comi-lingua",
+    "count": 48,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bhee",
+    "source": "comi-lingua",
+    "count": 41,
+    "already_hand_listed": true
+   },
+   {
+    "form": "bhii",
+    "source": "comi-lingua",
+    "count": 18,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bahi",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bbi",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bhir",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nbhi",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bhiii",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bht",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bee",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "always": [
+   {
+    "form": "hamesa",
+    "source": "comi-lingua",
+    "count": 56,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hmesha",
+    "source": "comi-lingua",
+    "count": 47,
+    "already_hand_listed": true
+   },
+   {
+    "form": "humesha",
+    "source": "comi-lingua",
+    "count": 28,
+    "already_hand_listed": true
+   },
+   {
+    "form": "hmesa",
+    "source": "comi-lingua",
+    "count": 14,
+    "already_hand_listed": false
+   },
+   {
+    "form": "humesa",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hamesha",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": true
+   },
+   {
+    "form": "hemesha",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hamasa",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hmaesha",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hameysha",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hameshe",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "and": [
+   {
+    "form": "aavur",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "aaur",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "aor",
+    "source": "comi-lingua",
+    "count": 40,
+    "already_hand_listed": true
+   },
+   {
+    "form": "aaur",
+    "source": "comi-lingua",
+    "count": 16,
+    "already_hand_listed": false
+   },
+   {
+    "form": "aour",
+    "source": "comi-lingua",
+    "count": 16,
+    "already_hand_listed": false
+   },
+   {
+    "form": "oor",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "aurr",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "avr",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "auro",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "aoor",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "aut",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "aar",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "any": [
+   {
+    "form": "khoyi",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "coi",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "khoye",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "koye",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "koe",
+    "source": "comi-lingua",
+    "count": 84,
+    "already_hand_listed": false
+   },
+   {
+    "form": "koyi",
+    "source": "comi-lingua",
+    "count": 53,
+    "already_hand_listed": true
+   },
+   {
+    "form": "koy",
+    "source": "comi-lingua",
+    "count": 20,
+    "already_hand_listed": false
+   },
+   {
+    "form": "koii",
+    "source": "comi-lingua",
+    "count": 8,
+    "already_hand_listed": false
+   },
+   {
+    "form": "koie",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kon",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kvi",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "khoi",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kai",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "khi",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "koim",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "koye",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kohi",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "koai",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "anywhere": [
+   {
+    "form": "kahi",
+    "source": "comi-lingua",
+    "count": 79,
+    "already_hand_listed": true
+   },
+   {
+    "form": "khi",
+    "source": "comi-lingua",
+    "count": 20,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kahin",
+    "source": "comi-lingua",
+    "count": 15,
+    "already_hand_listed": true
+   },
+   {
+    "form": "khin",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kahn",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kaahi",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kaha",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kahina",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kanhi",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "behind": [
+   {
+    "form": "piche",
+    "source": "comi-lingua",
+    "count": 37,
+    "already_hand_listed": true
+   },
+   {
+    "form": "peeche",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": true
+   },
+   {
+    "form": "pichhe",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": true
+   },
+   {
+    "form": "pichche",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "peche",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "below": [
+   {
+    "form": "neeche",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "niche",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "niiche",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nich",
+    "source": "comi-lingua",
+    "count": 9,
+    "already_hand_listed": false
+   },
+   {
+    "form": "neche",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "niche",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": true
+   },
+   {
+    "form": "neeche",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": true
+   },
+   {
+    "form": "nicche",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nachi",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "both": [
+   {
+    "form": "dodoan",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "donon",
+    "source": "comi-lingua",
+    "count": 11,
+    "already_hand_listed": true
+   },
+   {
+    "form": "doonoo",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "clean": [
+   {
+    "form": "saf",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": true
+   }
+  ],
+  "cold": [
+   {
+    "form": "thundey",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "thunde",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "thande",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "thunday",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "thandee",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "thanday",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "thhande",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "thaanda",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "completely": [
+   {
+    "form": "bilkul",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "belkul",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bikul",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "balkol",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bilkol",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "damaged": [
+   {
+    "form": "karaab",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "khrab",
+    "source": "comi-lingua",
+    "count": 47,
+    "already_hand_listed": true
+   },
+   {
+    "form": "kharap",
+    "source": "comi-lingua",
+    "count": 9,
+    "already_hand_listed": false
+   },
+   {
+    "form": "khrb",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "khraab",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": true
+   },
+   {
+    "form": "kharab",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": true
+   },
+   {
+    "form": "karab",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kaharb",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "door": [
+   {
+    "form": "darwaza",
+    "source": "aksharantar",
+    "count": 2,
+    "already_hand_listed": true
+   },
+   {
+    "form": "darawaaja",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "darvaaze",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "darvaze",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "darwaje",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "darwaaze",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "darwaaja",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "darwaaza",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "daravaaza",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "darwaja",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "darvaajaa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "darvaja",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   }
+  ],
+  "dust": [
+   {
+    "form": "dhul",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": true
+   }
+  ],
+  "ever": [
+   {
+    "form": "kabhi",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "kabhie",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kahbi",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kbhi",
+    "source": "comi-lingua",
+    "count": 97,
+    "already_hand_listed": true
+   },
+   {
+    "form": "kabi",
+    "source": "comi-lingua",
+    "count": 16,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kbi",
+    "source": "comi-lingua",
+    "count": 12,
+    "already_hand_listed": false
+   },
+   {
+    "form": "khi",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kobhi",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "khabhi",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "everything": [
+   {
+    "form": "sabh",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sub",
+    "source": "comi-lingua",
+    "count": 53,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sob",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": false
+   },
+   {
+    "form": "saab",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sabb",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sarab",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sabh",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "shb",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "faint": [
+   {
+    "form": "halkii",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "fine": [
+   {
+    "form": "thik",
+    "source": "comi-lingua",
+    "count": 206,
+    "already_hand_listed": true
+   },
+   {
+    "form": "theek",
+    "source": "comi-lingua",
+    "count": 37,
+    "already_hand_listed": true
+   },
+   {
+    "form": "tik",
+    "source": "comi-lingua",
+    "count": 14,
+    "already_hand_listed": false
+   },
+   {
+    "form": "thk",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": true
+   },
+   {
+    "form": "teek",
+    "source": "comi-lingua",
+    "count": 9,
+    "already_hand_listed": false
+   },
+   {
+    "form": "thek",
+    "source": "comi-lingua",
+    "count": 9,
+    "already_hand_listed": false
+   }
+  ],
+  "from": [
+   {
+    "form": "sey",
+    "source": "comi-lingua",
+    "count": 57,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sae",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sea",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "seh",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sse",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "frozen": [
+   {
+    "form": "jma",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jamaa",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "full": [
+   {
+    "form": "bhra",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   }
+  ],
+  "gets": [
+   {
+    "form": "hote",
+    "source": "comi-lingua",
+    "count": 21,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hoti",
+    "source": "comi-lingua",
+    "count": 13,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hotha",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hotah",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hotaa",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hata",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hotta",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "house": [
+   {
+    "form": "ghr",
+    "source": "comi-lingua",
+    "count": 93,
+    "already_hand_listed": false
+   },
+   {
+    "form": "gar",
+    "source": "comi-lingua",
+    "count": 12,
+    "already_hand_listed": false
+   },
+   {
+    "form": "gher",
+    "source": "comi-lingua",
+    "count": 12,
+    "already_hand_listed": false
+   },
+   {
+    "form": "ghare",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "ghor",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "ice": [
+   {
+    "form": "barf",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "burf",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "in": [
+   {
+    "form": "mai",
+    "source": "comi-lingua",
+    "count": 927,
+    "already_hand_listed": true
+   },
+   {
+    "form": "mei",
+    "source": "comi-lingua",
+    "count": 196,
+    "already_hand_listed": true
+   },
+   {
+    "form": "mey",
+    "source": "comi-lingua",
+    "count": 44,
+    "already_hand_listed": false
+   },
+   {
+    "form": "men",
+    "source": "comi-lingua",
+    "count": 38,
+    "already_hand_listed": false
+   },
+   {
+    "form": "mein",
+    "source": "comi-lingua",
+    "count": 27,
+    "already_hand_listed": true
+   },
+   {
+    "form": "meh",
+    "source": "comi-lingua",
+    "count": 25,
+    "already_hand_listed": false
+   },
+   {
+    "form": "mee",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": false
+   },
+   {
+    "form": "man",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "maii",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "mea",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "meen",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "meena",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "inside": [
+   {
+    "form": "ander",
+    "source": "comi-lingua",
+    "count": 39,
+    "already_hand_listed": true
+   },
+   {
+    "form": "andr",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": true
+   },
+   {
+    "form": "aandar",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "anndar",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "is": [
+   {
+    "form": "ahain",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hae",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hai",
+    "source": "comi-lingua",
+    "count": 4700,
+    "already_hand_listed": true
+   },
+   {
+    "form": "hain",
+    "source": "comi-lingua",
+    "count": 1995,
+    "already_hand_listed": true
+   },
+   {
+    "form": "hay",
+    "source": "comi-lingua",
+    "count": 124,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hein",
+    "source": "comi-lingua",
+    "count": 69,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hei",
+    "source": "comi-lingua",
+    "count": 52,
+    "already_hand_listed": false
+   },
+   {
+    "form": "haii",
+    "source": "comi-lingua",
+    "count": 35,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hae",
+    "source": "comi-lingua",
+    "count": 27,
+    "already_hand_listed": false
+   },
+   {
+    "form": "han",
+    "source": "comi-lingua",
+    "count": 15,
+    "already_hand_listed": false
+   },
+   {
+    "form": "haiii",
+    "source": "comi-lingua",
+    "count": 15,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hsi",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": false
+   },
+   {
+    "form": "haa",
+    "source": "comi-lingua",
+    "count": 8,
+    "already_hand_listed": false
+   },
+   {
+    "form": "haai",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "ham",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hao",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hau",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hah",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "gai",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "haina",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hii",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "haen",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bhai",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "hal",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jai",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "kept": [
+   {
+    "form": "rakha",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "rakhaa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "rakkha",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "rkha",
+    "source": "comi-lingua",
+    "count": 20,
+    "already_hand_listed": false
+   },
+   {
+    "form": "rakhe",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "rakka",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "raka",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "loud": [
+   {
+    "form": "tez",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "tezz",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "tej",
+    "source": "comi-lingua",
+    "count": 15,
+    "already_hand_listed": true
+   }
+  ],
+  "low": [
+   {
+    "form": "kum",
+    "source": "comi-lingua",
+    "count": 26,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kaam",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kamm",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kmm",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kom",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   }
+  ],
+  "lying": [
+   {
+    "form": "padaa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "pada",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "pda",
+    "source": "comi-lingua",
+    "count": 15,
+    "already_hand_listed": false
+   }
+  ],
+  "most": [
+   {
+    "form": "sabse",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "sabsey",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sabase",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sbse",
+    "source": "comi-lingua",
+    "count": 70,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sabase",
+    "source": "comi-lingua",
+    "count": 8,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sabsy",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sabsay",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "sabs",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "moved": [
+   {
+    "form": "hilaaya",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "hilaya",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "hilaayaa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "near": [
+   {
+    "form": "pas",
+    "source": "comi-lingua",
+    "count": 134,
+    "already_hand_listed": true
+   },
+   {
+    "form": "paad",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "pss",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "pasaa",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "noise": [
+   {
+    "form": "shohr",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "not": [
+   {
+    "form": "nhi",
+    "source": "comi-lingua",
+    "count": 5606,
+    "already_hand_listed": true
+   },
+   {
+    "form": "nahin",
+    "source": "comi-lingua",
+    "count": 562,
+    "already_hand_listed": true
+   },
+   {
+    "form": "nai",
+    "source": "comi-lingua",
+    "count": 341,
+    "already_hand_listed": true
+   },
+   {
+    "form": "nehi",
+    "source": "comi-lingua",
+    "count": 249,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nahi",
+    "source": "comi-lingua",
+    "count": 195,
+    "already_hand_listed": true
+   },
+   {
+    "form": "nii",
+    "source": "comi-lingua",
+    "count": 36,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nahe",
+    "source": "comi-lingua",
+    "count": 24,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nhe",
+    "source": "comi-lingua",
+    "count": 24,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nhii",
+    "source": "comi-lingua",
+    "count": 14,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nei",
+    "source": "comi-lingua",
+    "count": 11,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nehin",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nhin",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nah",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nhai",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nahee",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": true
+   },
+   {
+    "form": "mahi",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nahii",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": true
+   },
+   {
+    "form": "naii",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nhhi",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nnhi",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "naho",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nyi",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "naahi",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "nani",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "off": [
+   {
+    "form": "bnd",
+    "source": "comi-lingua",
+    "count": 21,
+    "already_hand_listed": true
+   },
+   {
+    "form": "bandh",
+    "source": "comi-lingua",
+    "count": 8,
+    "already_hand_listed": true
+   },
+   {
+    "form": "band",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": true
+   },
+   {
+    "form": "baand",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   }
+  ],
+  "on": [
+   {
+    "form": "per",
+    "source": "comi-lingua",
+    "count": 563,
+    "already_hand_listed": false
+   },
+   {
+    "form": "prr",
+    "source": "comi-lingua",
+    "count": 17,
+    "already_hand_listed": false
+   },
+   {
+    "form": "pei",
+    "source": "comi-lingua",
+    "count": 9,
+    "already_hand_listed": false
+   },
+   {
+    "form": "pai",
+    "source": "comi-lingua",
+    "count": 9,
+    "already_hand_listed": false
+   },
+   {
+    "form": "pay",
+    "source": "comi-lingua",
+    "count": 8,
+    "already_hand_listed": false
+   },
+   {
+    "form": "pat",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "parr",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "para",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "paar",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "pey",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "pare",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "pur",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "only": [
+   {
+    "form": "bus",
+    "source": "comi-lingua",
+    "count": 89,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bss",
+    "source": "comi-lingua",
+    "count": 35,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bash",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   }
+  ],
+  "other": [
+   {
+    "form": "dusrey",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "doosare",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "doosara",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "duusare",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "doosaraa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "dusare",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "dusare",
+    "source": "comi-lingua",
+    "count": 11,
+    "already_hand_listed": false
+   },
+   {
+    "form": "dosre",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": false
+   },
+   {
+    "form": "dusra",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "doosre",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": true
+   },
+   {
+    "form": "dusri",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "ourselves": [
+   {
+    "form": "khood",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "qhud",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "khudh",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kud",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "khudh",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "piece": [
+   {
+    "form": "tukra",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "tukada",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "running": [
+   {
+    "form": "chlta",
+    "source": "comi-lingua",
+    "count": 14,
+    "already_hand_listed": false
+   },
+   {
+    "form": "chaltha",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "something": [
+   {
+    "form": "kuchh",
+    "source": "comi-lingua",
+    "count": 441,
+    "already_hand_listed": true
+   },
+   {
+    "form": "kuch",
+    "source": "comi-lingua",
+    "count": 206,
+    "already_hand_listed": true
+   },
+   {
+    "form": "kch",
+    "source": "comi-lingua",
+    "count": 26,
+    "already_hand_listed": true
+   },
+   {
+    "form": "kush",
+    "source": "comi-lingua",
+    "count": 24,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kucch",
+    "source": "comi-lingua",
+    "count": 17,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kucha",
+    "source": "comi-lingua",
+    "count": 12,
+    "already_hand_listed": false
+   },
+   {
+    "form": "khuch",
+    "source": "comi-lingua",
+    "count": 11,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kutch",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kuc",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kuchch",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kocha",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kuck",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kuchho",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kuhhh",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kuvh",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "kochh",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "sound": [
+   {
+    "form": "aawaz",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "aavaas",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "aavaaz",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "aawaaz",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "aavaj",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "awaj",
+    "source": "comi-lingua",
+    "count": 44,
+    "already_hand_listed": true
+   },
+   {
+    "form": "aawaj",
+    "source": "comi-lingua",
+    "count": 24,
+    "already_hand_listed": false
+   },
+   {
+    "form": "aawaz",
+    "source": "comi-lingua",
+    "count": 16,
+    "already_hand_listed": true
+   },
+   {
+    "form": "awaz",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": true
+   },
+   {
+    "form": "aavaj",
+    "source": "comi-lingua",
+    "count": 8,
+    "already_hand_listed": false
+   },
+   {
+    "form": "awaaj",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "aawaaz",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": true
+   },
+   {
+    "form": "aavaaj",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "space": [
+   {
+    "form": "jgh",
+    "source": "comi-lingua",
+    "count": 52,
+    "already_hand_listed": true
+   },
+   {
+    "form": "jagha",
+    "source": "comi-lingua",
+    "count": 30,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jagh",
+    "source": "comi-lingua",
+    "count": 14,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jaga",
+    "source": "comi-lingua",
+    "count": 11,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jgah",
+    "source": "comi-lingua",
+    "count": 11,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jageh",
+    "source": "comi-lingua",
+    "count": 9,
+    "already_hand_listed": true
+   },
+   {
+    "form": "jaghe",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jagaha",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jagaa",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jagga",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jagaah",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "stops": [
+   {
+    "form": "ruktaa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "rukta",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "rukhtha",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "rukataa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "rukata",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "stove": [
+   {
+    "form": "chulha",
+    "source": "aksharantar",
+    "count": 2,
+    "already_hand_listed": true
+   },
+   {
+    "form": "choolhe",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "chuulhaa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "chulhaa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "chuulha",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "chulhe",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "chhulha",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "strange": [
+   {
+    "form": "ajeeb",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "ajib",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "ajiib",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "ajeebsi",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "ajib",
+    "source": "comi-lingua",
+    "count": 8,
+    "already_hand_listed": true
+   }
+  ],
+  "stuck": [
+   {
+    "form": "chipkaa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "cheepka",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "things": [
+   {
+    "form": "sman",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": false
+   }
+  ],
+  "too_much": [
+   {
+    "form": "zyaadaa",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "ziada",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "zyaada",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "zyada",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "jyada",
+    "source": "comi-lingua",
+    "count": 244,
+    "already_hand_listed": true
+   },
+   {
+    "form": "jada",
+    "source": "comi-lingua",
+    "count": 177,
+    "already_hand_listed": true
+   },
+   {
+    "form": "jyda",
+    "source": "comi-lingua",
+    "count": 60,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jayada",
+    "source": "comi-lingua",
+    "count": 39,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jayda",
+    "source": "comi-lingua",
+    "count": 31,
+    "already_hand_listed": false
+   },
+   {
+    "form": "zada",
+    "source": "comi-lingua",
+    "count": 27,
+    "already_hand_listed": true
+   },
+   {
+    "form": "zyada",
+    "source": "comi-lingua",
+    "count": 23,
+    "already_hand_listed": true
+   },
+   {
+    "form": "zayada",
+    "source": "comi-lingua",
+    "count": 13,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jyaada",
+    "source": "comi-lingua",
+    "count": 12,
+    "already_hand_listed": true
+   },
+   {
+    "form": "ziyada",
+    "source": "comi-lingua",
+    "count": 11,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jaada",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": false
+   },
+   {
+    "form": "zyda",
+    "source": "comi-lingua",
+    "count": 8,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jiyada",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "zayda",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jayeda",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "ziada",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "yada",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jiada",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "jtada",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "ejyada",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "very": [
+   {
+    "form": "bhut",
+    "source": "comi-lingua",
+    "count": 713,
+    "already_hand_listed": true
+   },
+   {
+    "form": "bahot",
+    "source": "comi-lingua",
+    "count": 498,
+    "already_hand_listed": true
+   },
+   {
+    "form": "bohot",
+    "source": "comi-lingua",
+    "count": 300,
+    "already_hand_listed": true
+   },
+   {
+    "form": "bhot",
+    "source": "comi-lingua",
+    "count": 264,
+    "already_hand_listed": true
+   },
+   {
+    "form": "bht",
+    "source": "comi-lingua",
+    "count": 172,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bohut",
+    "source": "comi-lingua",
+    "count": 82,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bohat",
+    "source": "comi-lingua",
+    "count": 82,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bahut",
+    "source": "comi-lingua",
+    "count": 65,
+    "already_hand_listed": true
+   },
+   {
+    "form": "bhaut",
+    "source": "comi-lingua",
+    "count": 53,
+    "already_hand_listed": false
+   },
+   {
+    "form": "boht",
+    "source": "comi-lingua",
+    "count": 49,
+    "already_hand_listed": true
+   },
+   {
+    "form": "bahoot",
+    "source": "comi-lingua",
+    "count": 43,
+    "already_hand_listed": true
+   },
+   {
+    "form": "bhout",
+    "source": "comi-lingua",
+    "count": 32,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bahat",
+    "source": "comi-lingua",
+    "count": 31,
+    "already_hand_listed": false
+   },
+   {
+    "form": "baht",
+    "source": "comi-lingua",
+    "count": 17,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bahaut",
+    "source": "comi-lingua",
+    "count": 15,
+    "already_hand_listed": false
+   },
+   {
+    "form": "buhut",
+    "source": "comi-lingua",
+    "count": 13,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bahuth",
+    "source": "comi-lingua",
+    "count": 12,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bauth",
+    "source": "comi-lingua",
+    "count": 10,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bhahut",
+    "source": "comi-lingua",
+    "count": 8,
+    "already_hand_listed": false
+   },
+   {
+    "form": "baut",
+    "source": "comi-lingua",
+    "count": 8,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bahu",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "buhat",
+    "source": "comi-lingua",
+    "count": 7,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bhuth",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bhtt",
+    "source": "comi-lingua",
+    "count": 6,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bhht",
+    "source": "comi-lingua",
+    "count": 5,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bahit",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bhuta",
+    "source": "comi-lingua",
+    "count": 4,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bot",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bhutt",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bahul",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bahutt",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "behat",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bahht",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "bahuta",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   },
+   {
+    "form": "buht",
+    "source": "comi-lingua",
+    "count": 3,
+    "already_hand_listed": false
+   }
+  ],
+  "wall": [
+   {
+    "form": "divaar",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "deevaar",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "dewaar",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "diwaar",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "walls": [
+   {
+    "form": "diwaron",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "deewaron",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": true
+   },
+   {
+    "form": "deewaaron",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "divaaron",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "deevaaron",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "diwaaron",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   }
+  ],
+  "water": [
+   {
+    "form": "paanii",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "phaani",
+    "source": "aksharantar",
+    "count": 1,
+    "already_hand_listed": false
+   },
+   {
+    "form": "pani",
+    "source": "comi-lingua",
+    "count": 145,
+    "already_hand_listed": true
+   }
+  ]
+ }
+}

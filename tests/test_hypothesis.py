@@ -18,13 +18,14 @@ TOY_SCHEMA = FaultSchema.model_validate({
     "faults": {"f1": {"name": "F1", "user_safe": True}, "f2": {"name": "F2", "user_safe": False}},
 })
 TOY_CONFIG = HypothesisConfig.model_validate({
-    "levels": {"typical": 1.0, "possible": 0.25, "atypical": 0.01},
+    "levels": {"typical": 1.0, "possible": 0.25, "atypical": 0.01, "unlisted": 0.05},
     "untagged": "possible", "epsilon": 0.001,
 })
 
 
-def toy_model(rows, defaults=None):
-    spec = HypothesisSpec.model_validate({"version": "t", "rows": rows, "defaults": defaults or {}})
+def toy_model(rows, defaults=None, healthy=None, closed_world=None):
+    spec = HypothesisSpec.model_validate({"version": "t", "rows": rows, "defaults": defaults or {},
+                                          "healthy": healthy, "closed_world": closed_world or {}})
     return compile_model(TOY_SCHEMA, spec, TOY_CONFIG)
 
 
@@ -48,6 +49,26 @@ def test_fault_row_overrides_default():
     model = toy_model({"f2": {"size": {"tags": {"large": "typical"}, "cites": ["p1"]}}}, default)
     assert model.distribution("f1", "size")["small"] > 0.7
     assert model.distribution("f2", "size")["large"] > 0.7
+
+
+def test_healthy_default_applies_only_without_a_row():
+    healthy = {"rationale": "single fault", "values": {"size": ["small"]}}
+    model = toy_model({"f1": {"size": {"tags": {"large": "typical"}, "cites": ["p1"]}}}, healthy=healthy)
+    # f2 has no row: small typical (1), large possible (0.25) -> 0.8 / 0.2 before smoothing
+    # smoothed: (0.8 + 0.001) / 1.002 = 0.799401
+    assert model.distribution("f2", "size")["small"] == pytest.approx(0.799401, abs=1e-6)
+    assert model.distribution("f1", "size")["large"] > 0.7
+    assert model.spec.source("f2", "size") == "healthy" and model.spec.source("f2", "colour") == "uniform"
+
+
+def test_closed_world_marks_untagged_symptoms_unlisted():
+    model = toy_model({"f1": {"colour": {"tags": {"red": "typical"}, "cites": ["p1"]}}},
+                      closed_world={"colour": {"green": ["page"]}})
+    # f1: red 1, green unlisted 0.05, blue possible 0.25 -> 1/1.3, 0.05/1.3, 0.25/1.3
+    d = model.distribution("f1", "colour")
+    assert d["green"] == pytest.approx((0.05 / 1.3 + 0.001) / 1.003, abs=1e-6)
+    # f2 has no row: green unlisted, others possible
+    assert model.distribution("f2", "colour")["green"] == pytest.approx((0.05 / 0.55 + 0.001) / 1.003, abs=1e-6)
 
 
 def test_likelihood_is_a_vector_over_faults():

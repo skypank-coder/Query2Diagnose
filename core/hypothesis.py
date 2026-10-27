@@ -1,10 +1,18 @@
 """Hypothesis model p(attribute = value | fault), paper Sec. III-D.
 
-Compiled from data/hypothesis_model.yaml, where each (fault, attribute) row
-tags some values typical / possible / atypical and records the source passages
-(or the schema definition) behind every tag. Untagged values take the
-`untagged` level and attributes without a row are uniform. Level weights come
-from configs/hypothesis.yaml so the sensitivity experiment can swap them.
+Compiled from data/hypothesis_model.yaml. Each (fault, attribute) row comes
+from, in order of precedence:
+
+1. an explicit row that tags values typical / possible / atypical and cites
+   the passages (or the schema definition) behind every tag;
+2. otherwise the single-fault healthy default: an attribute the fault does not
+   involve shows its working-unit value (`healthy` section);
+3. otherwise uniform.
+
+For primary_symptom, a symptom whose iFixit page enumerates its causes is
+`closed_world`: a fault whose row does not tag that symptom gets the
+`unlisted` level instead of `untagged`. Level weights come from
+configs/hypothesis.yaml so the sensitivity experiment can swap them.
 
 The compiled table supplies p(z | s) in eq. (1) and the answer likelihoods in
 eq. (2).
@@ -23,7 +31,8 @@ from pydantic import BaseModel, Field, model_validator
 from core.paths import HYPOTHESIS_CONFIG, HYPOTHESIS_FILE
 from core.schema import FaultSchema, load_schema
 
-Level = Literal["typical", "possible", "atypical"]
+Level = Literal["typical", "possible", "atypical", "unlisted"]
+Source = Literal["cited", "definitional", "healthy", "uniform"]
 
 
 class Row(BaseModel):
@@ -43,19 +52,35 @@ class Row(BaseModel):
         return self
 
 
+class Healthy(BaseModel):
+    rationale: str
+    values: dict[str, list[str]]             # attribute -> working-unit values
+
+
 class HypothesisSpec(BaseModel):
     version: str
+    healthy: Healthy | None = None
+    closed_world: dict[str, dict[str, list[str]]] = {}  # attribute -> value -> page passages
     defaults: dict[str, Row] = {}            # attribute -> row applied to every fault
     rows: dict[str, dict[str, Row]]          # fault -> attribute -> row
 
     def row(self, fault: str, attribute: str) -> Row | None:
         return self.rows.get(fault, {}).get(attribute) or self.defaults.get(attribute)
 
+    def source(self, fault: str, attribute: str) -> Source:
+        row = self.row(fault, attribute)
+        if row is not None:
+            return "cited" if row.cites else "definitional"
+        if self.healthy and attribute in self.healthy.values:
+            return "healthy"
+        return "uniform"
+
 
 class LevelWeights(BaseModel):
     typical: float = Field(gt=0)
     possible: float = Field(gt=0)
     atypical: float = Field(gt=0)
+    unlisted: float = Field(gt=0)
 
 
 class HypothesisConfig(BaseModel):
@@ -83,23 +108,60 @@ class HypothesisModel:
         probs = self.table[attribute][self.faults.index(fault)]
         return dict(zip(values, probs.tolist()))
 
+    def fault_posterior(self, observed: dict[str, str]) -> np.ndarray:
+        """p(z | observed attribute values) under a uniform prior (naive Bayes),
+        i.e. p(z | s) for one interpretation s; computed in log space."""
+        log_p = np.zeros(len(self.faults))
+        for attribute, value in observed.items():
+            log_p += np.log(self.likelihood(attribute, value))
+        log_p -= log_p.max()
+        p = np.exp(log_p)
+        return p / p.sum()
+
 
 def validate_spec(spec: HypothesisSpec, schema: FaultSchema) -> None:
-    rows = [("(defaults)", a, r) for a, r in spec.defaults.items()]
-    rows += [(z, a, r) for z, attrs in spec.rows.items() for a, r in attrs.items()]
-    for fault, attribute, row in rows:
-        where = f"{fault}.{attribute}"
-        if fault != "(defaults)" and fault not in schema.faults:
-            raise ValueError(f"{where}: unknown fault")
+    def check_values(where: str, attribute: str, values) -> None:
         if attribute not in schema.attributes:
-            raise ValueError(f"{where}: unknown attribute")
-        if bad := set(row.tags) - set(schema.attributes[attribute].values):
+            raise ValueError(f"{where}: unknown attribute {attribute}")
+        if bad := set(values) - set(schema.attributes[attribute].values):
             raise ValueError(f"{where}: unknown values {bad}")
+
+    for attribute, row in spec.defaults.items():
+        check_values(f"defaults.{attribute}", attribute, row.tags)
+    for fault, attrs in spec.rows.items():
+        if fault not in schema.faults:
+            raise ValueError(f"rows.{fault}: unknown fault")
+        for attribute, row in attrs.items():
+            check_values(f"rows.{fault}.{attribute}", attribute, row.tags)
+    if spec.healthy:
+        for attribute, values in spec.healthy.values.items():
+            check_values(f"healthy.{attribute}", attribute, values)
+    for attribute, values in spec.closed_world.items():
+        check_values(f"closed_world.{attribute}", attribute, values)
 
 
 def cited_passages(spec: HypothesisSpec) -> set[str]:
     rows = list(spec.defaults.values()) + [r for a in spec.rows.values() for r in a.values()]
-    return {pid for r in rows for pid in r.cites}
+    ids = {pid for r in rows for pid in r.cites}
+    ids |= {pid for vals in spec.closed_world.values() for pids in vals.values() for pid in pids}
+    return ids
+
+
+def row_levels(spec: HypothesisSpec, config: HypothesisConfig, fault: str, attribute: str,
+               values: list[str]) -> list[Level] | None:
+    """Level of every value in the (fault, attribute) row, or None if uniform."""
+    row = spec.row(fault, attribute)
+    if row is not None:
+        tags = dict(row.tags)
+    elif spec.healthy and attribute in spec.healthy.values:
+        tags = {v: "typical" for v in spec.healthy.values[attribute]}
+    else:
+        tags = None
+    closed = spec.closed_world.get(attribute, {})
+    if tags is None and not closed:
+        return None
+    tags = tags or {}
+    return [tags.get(v, "unlisted" if v in closed else config.untagged) for v in values]
 
 
 def compile_model(schema: FaultSchema, spec: HypothesisSpec, config: HypothesisConfig,
@@ -112,11 +174,11 @@ def compile_model(schema: FaultSchema, spec: HypothesisSpec, config: HypothesisC
         n = len(attr.values)
         probs = np.empty((len(faults), n))
         for i, fault in enumerate(faults):
-            row = spec.row(fault, attribute)
-            if row is None:
+            levels = row_levels(spec, config, fault, attribute, attr.values)
+            if levels is None:
                 p = np.full(n, 1.0 / n)
             else:
-                raw = np.array([w[row.tags.get(v, config.untagged)] for v in attr.values])
+                raw = np.array([w[level] for level in levels])
                 p = raw / raw.sum()
             probs[i] = (p + config.epsilon) / (1 + config.epsilon * n)
         table[attribute] = probs

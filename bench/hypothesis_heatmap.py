@@ -31,16 +31,10 @@ def mutual_information(table: np.ndarray) -> float:
 
 
 def provenance_counts(model) -> dict[str, int]:
-    counts = {"cited": 0, "definitional": 0, "uniform": 0}
+    counts = {"cited": 0, "definitional": 0, "healthy": 0, "uniform": 0}
     for fault in model.faults:
         for attribute in model.schema.attributes:
-            row = model.spec.row(fault, attribute)
-            if row is None:
-                counts["uniform"] += 1
-            elif row.cites:
-                counts["cited"] += 1
-            else:
-                counts["definitional"] += 1
+            counts[model.spec.source(fault, attribute)] += 1
     return counts
 
 

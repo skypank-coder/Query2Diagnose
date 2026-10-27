@@ -1,0 +1,71 @@
+# Romanized Kannada -> English lexicon for core/normalize.py (hand-built).
+# `forms` are spellings seen in Bengaluru Kanglish chat; `native` (Kannada
+# script) lets bench/seed_lexicon.py add attested spellings from Aksharantar
+# (data/lexicon/seeds.json). Longest form wins; the original text is kept.
+lang: kn
+entries:
+  - {id: not_happening, en: not happening, native: [ಆಗುತ್ತಿಲ್ಲ, ಆಗ್ತಿಲ್ಲ, ಆಗಲ್ಲ],
+     forms: [agalla, aagalla, agtilla, aagtilla, agthilla, aagthilla, agta illa, aagta illa, aagtane illa, agtane illa, aaguttilla]}
+  - {id: keeps_going, en: keeps going, forms: [aagtane ide, agtane ide]}
+  - {id: is_happening, en: is happening, native: [ಆಗುತ್ತಿದೆ, ಆಗ್ತಿದೆ], forms: [aagtide, agtide, aagtaide, aaguttide, aagutte]}
+  - {id: has_become, en: has become, native: [ಆಗಿದೆ], forms: [aagide, agide, aagidhe]}
+  - {id: is_there, en: is there, native: [ಇದೆ], forms: [ide, idhe, ideh]}
+  - {id: not_there, en: not there, native: [ಇಲ್ಲ], forms: [illa, ila, illaa]}
+  - {id: very, en: very, native: [ತುಂಬಾ], forms: [tumba, thumba, tumbaa]}
+  - {id: is_full, en: is full, native: [ತುಂಬಿದೆ], forms: [tumbide, thumbide]}
+  - {id: coming, en: is coming, native: [ಬರುತ್ತಿದೆ, ಬರ್ತಿದೆ], forms: [bartide, barthide, barta ide, bartaide, baruttide, barutte]}
+  - {id: not_coming, en: is not coming, native: [ಬರುತ್ತಿಲ್ಲ, ಬರ್ತಿಲ್ಲ], forms: [bartilla, barthilla, barta illa, baruttilla]}
+  - {id: not_stopping, en: not stopping, native: [ನಿಲ್ಲುತ್ತಿಲ್ಲ, ನಿಲ್ತಿಲ್ಲ], forms: [nilsilla, nilta illa, niltilla, nilthilla, nilluttilla]}
+  - {id: water, en: water, native: [ನೀರು], forms: [neeru, niru, neer, neeroo]}
+  - {id: below, en: below, native: [ಕೆಳಗೆ], forms: [kelage, kelge, kelagade]}
+  - {id: from_below, en: from below, native: [ಕೆಳಗಿನಿಂದ], forms: [kelagininda, kelaginda]}
+  - {id: behind, en: behind, native: [ಹಿಂದೆ], forms: [hinde, hindhe]}
+  - {id: inside, en: inside, native: [ಒಳಗೆ], forms: [olage, olge]}
+  - {id: from_inside, en: from inside, native: [ಒಳಗಡೆಯಿಂದ], forms: [olagadinda, olaginda, olagininda]}
+  - {id: wall, en: wall, native: [ಗೋಡೆ], forms: [gode, godey, godeya]}
+  - {id: hot, en: hot, native: [ಬಿಸಿ], forms: [bisi]}
+  - {id: cold, en: cold, native: [ತಣ್ಣಗೆ], forms: [tannage, thannage, tanage]}
+  - {id: loudly, en: loudly, native: [ಜೋರಾಗಿ], forms: [joragi, jor aagi, joraagi, jorage]}
+  - {id: damaged, en: is damaged, native: [ಹಾಳಾಗಿದೆ], forms: [haalagide, halagide, haalaagide]}
+  - {id: rotating, en: is rotating, native: [ತಿರುಗುತ್ತಿದೆ], forms: [tirugtide, thirugtide, tirugtaide, tiruguttide]}
+  - {id: not_rotating, en: is not rotating, native: [ತಿರುಗುತ್ತಿಲ್ಲ], forms: [tirugtilla, thirugtilla, tiruguttilla]}
+  - {id: accumulated, en: has built up, native: [ಕಟ್ಟಿಕೊಂಡಿದೆ], forms: [katkondide, katkondu ide, kattikondide]}
+  - {id: leaking, en: is leaking, native: [ಸೋರುತ್ತಿದೆ], forms: [sortide, sorthide, soruttide]}
+  - {id: and, en: and, native: [ಮತ್ತು], forms: [mattu, mathu]}
+  - {id: in_both, en: in both, native: [ಎರಡರಲ್ಲೂ], forms: [eradralloo, eradaralloo, eradralli]}
+  - {id: next_to, en: right next to, native: [ಪಕ್ಕದಲ್ಲೇ], forms: [pakkadalle, pakkadalli]}
+  - {id: we_did, en: we did, native: [ಮಾಡಿದ್ವಿ], forms: [maadidvi, madidvi, maadidivi]}
+  - {id: did_not, en: did not, native: [ಮಾಡಿಲ್ಲ], forms: [maadilla, madilla]}
+  - {id: recently, en: recently, native: [ಇತ್ತೀಚೆಗೆ], forms: [ittichege, itteechege, ithichege]}
+  - {id: always, en: always, native: [ಯಾವಾಗಲೂ], forms: [yavaglu, yaavaglu, yavagloo, yaavaagaloo]}
+  - {id: properly, en: properly, native: [ಸರಿಯಾಗಿ], forms: [sariyagi, sariyaagi]}
+  - {id: fine, en: fine, native: [ಸರಿ], forms: [sari]}
+  - {id: too_much, en: too much, native: [ಜಾಸ್ತಿ], forms: [jaasti, jasti, jaasthi]}
+  - {id: commotion, en: noise, native: [ಗಲಾಟೆ], forms: [galate, galaate]}
+  - {id: in, en: in, native: [ಅಲ್ಲಿ], forms: [alli, ali]}
+  - {id: from, en: from, native: [ಇಂದ], forms: [inda, indha]}
+  - {id: only, en: only, native: [ಅಷ್ಟೇ], forms: [ashte, ashtey]}
+  - {id: nothing, en: nothing, native: [ಏನೂ], forms: [yenu, enu, enoo]}
+  - {id: something, en: something, native: [ಏನೋ], forms: [yeno, eno]}
+  - {id: anywhere, en: anywhere, native: [ಎಲ್ಲೂ], forms: [elloo, ellu]}
+  - {id: everything, en: everything, native: [ಎಲ್ಲಾ], forms: [ella, ellaa]}
+  - {id: around, en: around, native: [ಸುತ್ತಲೂ], forms: [suttalu, suttaloo]}
+  - {id: space, en: space, native: [ಜಾಗ], forms: [jaaga, jaga]}
+  - {id: on_top, en: "on", native: [ಮೇಲೆ], forms: [mele, myale]}
+  - {id: also, en: also, native: [ಕೂಡ], forms: [kooda, kuda]}
+  - {id: we_ourselves, en: we ourselves, native: [ನಾವೇ], forms: [naave, naavey]}
+  - {id: must_do, en: must do, native: [ಮಾಡಬೇಕು], forms: [maadbeku, madbeku, maadabeku]}
+  - {id: lump, en: lump, native: [ಗಡ್ಡೆ], forms: [gadde]}
+  - {id: low, en: low, native: [ಕಡಿಮೆ], forms: [kadime]}
+  - {id: strange, en: strange, native: [ವಿಚಿತ್ರ], forms: [vichitra, vichithra]}
+  - {id: other, en: another, native: [ಬೇರೆ], forms: [bere, berey]}
+  - {id: if_plugged, en: if plugged, native: [ಹಾಕಿದರೆ], forms: [haakidre, hakidre, haakidare]}
+  - {id: even_if_plugged, en: even if plugged, native: [ಹಾಕಿದರೂ], forms: [haakidroo, hakidru, haakidaru]}
+  - {id: house, en: house, native: [ಮನೆ], forms: [mane]}
+  - {id: brought, en: brought, native: [ತಂದ್ವಿ], forms: [tandvi, thandvi]}
+  - {id: making, en: is making, native: [ಮಾಡ್ತಿದೆ], forms: [maadtide, madtide]}
+  - {id: touching, en: is touching, native: [ತಗುಲಿದೆ], forms: [tagulide, tagalide]}
+  - {id: like, en: like, native: [ಅಂತ], forms: [anta, antha]}
+  - {id: knocking, en: knocking, forms: [dhak dhak]}
+  - {id: clicking, en: clicking, forms: [tick tick]}
+  - {id: squealing, en: squealing, forms: [keech keech]}

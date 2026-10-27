@@ -16,13 +16,14 @@ dependencies = [
     "matplotlib>=3.8",
     "requests>=2.31",
     "beautifulsoup4>=4.12",
+    "rapidfuzz>=3.6",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 
 [tool.setuptools]
-packages = ["core", "bench"]
+packages = ["core", "bench", "eval"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,11 +1,12 @@
 # Hypothesis model compilation (docs/design_decisions.md, decision 4).
-# Each tagged value gets the weight of its level; the weights of one
-# (fault, attribute) row are normalised and then smoothed with epsilon.
+# Each value's level maps to a weight; the weights of one (fault, attribute)
+# row are normalised and then smoothed with epsilon.
 
 levels:
   typical: 1.0
   possible: 0.25
   atypical: 0.01
+  unlisted: 0.05     # symptom not among the causes its iFixit page lists (closed world)
 
 untagged: possible   # level for values a row does not tag
 epsilon: 1.0e-3      # p <- (p + epsilon) / (1 + epsilon * n_values)
@@ -13,8 +14,8 @@ epsilon: 1.0e-3      # p <- (p + epsilon) / (1 + epsilon * n_values)
 # Weight sets for the sensitivity experiment (Phase 5, `make sensitivity`).
 # `base` must equal `levels` above.
 sensitivity:
-  base:          {typical: 1.0, possible: 0.25, atypical: 0.01}
-  flat:          {typical: 1.0, possible: 0.5,  atypical: 0.05}
-  sharp:         {typical: 1.0, possible: 0.1,  atypical: 0.001}
-  soft_atypical: {typical: 1.0, possible: 0.25, atypical: 0.05}
-  hard_atypical: {typical: 1.0, possible: 0.25, atypical: 0.001}
+  base:          {typical: 1.0, possible: 0.25, atypical: 0.01,  unlisted: 0.05}
+  flat:          {typical: 1.0, possible: 0.5,  atypical: 0.05,  unlisted: 0.15}
+  sharp:         {typical: 1.0, possible: 0.1,  atypical: 0.001, unlisted: 0.02}
+  soft_atypical: {typical: 1.0, possible: 0.25, atypical: 0.05,  unlisted: 0.10}
+  hard_atypical: {typical: 1.0, possible: 0.25, atypical: 0.001, unlisted: 0.01}

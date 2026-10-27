@@ -1,0 +1,44 @@
+# Benchmark construction (bench/build_cases.py, split.py, make_variants.py).
+
+seed: 20261028
+cases_per_fault: 20          # 15 faults -> 300 underlying cases
+oracle_tau: 0.75             # model-ceiling diagnostic only; gold labels are model-free (decision 10)
+candidate_min_prob: 0.05
+
+# Clean descriptions mention the primary symptom plus 1-3 further attributes.
+extra_mentions: {1: 0.45, 2: 0.35, 3: 0.20}
+p_mention_compartment: 0.6
+scenario_attribute_weight: 2.0   # scenario-specific attributes are mentioned more often
+mention_only_if_specific: [works_in_other_socket]   # odd to volunteer unless the scenario involves it
+
+# Attribute values for a working refrigerator; scenarios override the fault-specific ones.
+healthy:
+  device: refrigerator
+  cooling_type: [direct_cool, frost_free]
+  compartment_affected: both
+  compressor_running: "yes"
+  noise_type: normal_hum
+  noise_location: not_applicable
+  condenser_fan_running: "yes"
+  evaporator_fan_running: "yes"
+  condenser_coils_dusty: "no"
+  door_seal_condition: good
+  vents_blocked_or_overloaded: "no"
+  placement_clearance: adequate
+  recent_relocation: "no"
+  power_supply_ok: "yes"
+  works_in_other_socket: "yes"
+  thermostat_setting: normal
+  frost_on_back_wall: "no"
+  water_leak_location: none
+  error_code: [none, no_display]
+
+splits: {train: 0.6, val: 0.2, test: 0.2}
+
+variants:
+  kannada_splits: [train, val, test]
+  hindi_splits: [val, test]          # extend to train later (docs/design_decisions.md, Language pairs)
+  p_english_clause: 0.25             # code-mixed variants keep some clauses in English
+  typo_rate: {spelling: 0.20, combined: 0.12}
+  incomplete_keep_other: 0.6         # chance a non-scenario mention survives omission
+  stress_cases: 30                   # Kannada + Hindi + English in one message, test split

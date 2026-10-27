@@ -1,0 +1,81 @@
+# Romanized Hindi-English phrase templates (synthetic provenance; to be
+# corrected by native speakers via the annotation CSV).
+lang: hi
+style: chat
+where:
+  _none: "fridge "
+  fridge: "fridge mein "
+  freezer: "freezer mein "
+  both: "fridge aur freezer dono mein "
+
+phrases:
+  primary_symptom:
+    not_cooling: ["{where}cooling nahi ho rahi", "{where}thanda nahi ho raha", "{where}bilkul thanda nahi kar raha"]
+    over_cooling: ["{where}bahut zyada thanda ho raha hai, sab jam ja raha hai", "{where}sab kuch freeze ho raha hai"]
+    noise: ["fridge se bahut awaaz aa rahi hai", "fridge bahut shor kar raha hai"]
+    leaking_water: ["{where}paani tapak raha hai", "{where}paani leak ho raha hai"]
+    ice_buildup: ["{where}neeche barf ka thos tukda ban gaya hai", "{where}neeche paani jam kar barf ban gaya hai"]
+    frost_buildup: ["{where}deewaron pe bahut frost jam raha hai", "{where}frost bahut zyada hai"]
+    not_powering_on: ["fridge chalu hi nahi ho raha", "fridge bilkul band pada hai"]
+    runs_constantly: ["compressor band nahi ho raha, hamesha chalta rehta hai", "motor kabhi rukta nahi"]
+  cooling_type:
+    direct_cool: ["single door direct cool fridge hai", "humein khud defrost karna padta hai"]
+    frost_free: ["frost free fridge hai", "double door frost free model hai"]
+  compressor_running:
+    "yes": ["compressor ki awaaz aa rahi hai", "compressor chal raha hai"]
+    "no": ["compressor nahi chal raha", "compressor ki koi awaaz nahi"]
+  noise_type:
+    none: ["koi awaaz nahi aa rahi"]
+    normal_hum: ["bas normal halki awaaz hai"]
+    loud_hum_or_buzz: ["zor se ghoon ghoon ki awaaz aa rahi hai", "tez bhinbhinahat ki awaaz hai"]
+    clicking: ["tik tik ki awaaz aati hai"]
+    knocking_or_rattling: ["khat khat ki awaaz aa rahi hai", "andar kuch khadkhada raha hai"]
+    squealing_or_chirping: ["cheen cheen ki awaaz aati hai"]
+  noise_location:
+    inside_compartment: ["awaaz andar se aa rahi hai", "freezer ke andar se awaaz aati hai"]
+    back_bottom: ["awaaz peeche neeche se aa rahi hai"]
+    not_applicable: ["koi ajeeb awaaz nahi hai"]
+  condenser_fan_running:
+    "yes": ["peeche neeche wala fan ghoom raha hai"]
+    "no": ["peeche neeche wala fan nahi ghoom raha"]
+    not_applicable: ["peeche koi fan nahi hai"]
+  evaporator_fan_running:
+    "yes": ["freezer ke andar fan chal raha hai"]
+    "no": ["freezer ke andar fan nahi chal raha"]
+    not_applicable: ["andar koi fan nahi hai"]
+  condenser_coils_dusty:
+    "yes": ["peeche ki coil pe bahut dhool hai"]
+    "no": ["peeche ki coil saaf hai"]
+  door_seal_condition:
+    good: ["darwaze ki rubber theek hai", "darwaza theek se band hota hai"]
+    damaged_or_gap: ["darwaze ki rubber kharab hai, gap hai", "darwaza theek se band nahi hota"]
+  vents_blocked_or_overloaded:
+    "yes": ["fridge poora bhara hua hai", "saaman se vents band ho gaye hain"]
+    "no": ["zyada saaman nahi rakha"]
+  placement_clearance:
+    adequate: ["aas paas kaafi jagah hai"]
+    too_close_or_hot: ["chulhe ke bilkul paas rakha hai", "deewar se chipka hai aur kamra bahut garam hai"]
+  recent_relocation:
+    "yes": ["abhi haal mein fridge shift kiya", "ghar badla tha, fridge bhi le gaye"]
+    "no": ["fridge hilaya nahi"]
+  power_supply_ok:
+    "yes": ["andar ki light jalti hai"]
+    "no": ["light nahi jal rahi", "na light hai na display"]
+  works_in_other_socket:
+    "yes": ["doosre socket mein lagane par chalu ho jaata hai"]
+    "no": ["doosre socket mein bhi chalu nahi hota"]
+  thermostat_setting:
+    too_warm: ["temperature knob sabse kam pe hai"]
+    normal: ["temperature setting normal hai"]
+    too_cold: ["knob full thande pe hai"]
+  frost_on_back_wall:
+    "yes": ["peeche ki deewar pe barf jami hai"]
+    "no": ["peeche deewar pe barf nahi hai"]
+  water_leak_location:
+    none: ["kahin paani nahi hai"]
+    inside_compartment: ["andar neeche paani jama hai"]
+    under_unit: ["fridge ke neeche paani hai"]
+  error_code:
+    none: ["display pe koi error nahi"]
+    displayed: ["display pe error code aa raha hai"]
+    no_display: ["display hi nahi hai"]

@@ -110,6 +110,7 @@ defrost_system_failure:
   - ifx-506845-ice-buildup
   - ifx-506960-ice-buildup
   - ifx-506958-compressor-failure--excessive-frost
+  - ifx-505030-evaporator-fan
   - ifx-505020-excessive-frost-buildup
   - ifx-505069-defrost-freezer-or-fresh-food-compartment--perform-a-manual-defrost
 

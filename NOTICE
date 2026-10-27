@@ -39,4 +39,12 @@ Files that contain third-party text are NOT covered by the MIT License:
    and is in the public domain (17 U.S.C. 105). Credit: ENERGY STAR / U.S.
    Environmental Protection Agency.
 
+3. Seed spellings in data/lexicon/seeds.json
+   Romanized spellings derived from Aksharantar (AI4Bharat; manually collected
+   data CC-BY, mined data CC0; https://huggingface.co/datasets/ai4bharat/Aksharantar)
+   and the COMI-LINGUA text-normalisation split (Sheth, Beniwal and Singh,
+   Findings of EMNLP 2025; CC-BY-4.0;
+   https://huggingface.co/datasets/LingoIITGN/COMI-LINGUA). Only individual
+   word spellings are stored; the datasets themselves are not redistributed.
+
 No manufacturer manuals or service guides are used, stored or redistributed.

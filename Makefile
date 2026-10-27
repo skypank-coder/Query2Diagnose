@@ -4,7 +4,7 @@ PY ?= $(if $(wildcard .venv/Scripts/python.exe),.venv/Scripts/python,$(if $(wild
 # Isolated mode: scripts that read downloaded files must not import from cwd.
 PYI = $(PY) -I
 
-.PHONY: install sources passages data heatmap test
+.PHONY: install sources passages seeds benchmark annotations data heatmap test
 
 install:
 	$(PY) -m pip install -e ".[dev]"
@@ -15,7 +15,19 @@ sources:
 passages:
 	$(PYI) -m bench.extract_passages
 
-data: sources passages
+seeds:
+	$(PYI) -m bench.seed_lexicon
+
+benchmark:
+	$(PYI) -m bench.build_cases
+	$(PYI) -m bench.split
+	$(PYI) -m bench.make_variants
+	$(PYI) -m bench.validate
+
+annotations:
+	$(PYI) -m bench.import_annotations
+
+data: sources passages seeds benchmark
 
 heatmap:
 	$(PYI) -m bench.hypothesis_heatmap

@@ -10,7 +10,7 @@
 # effort: 1 = glance / already known, 2 = open a door or listen closely,
 #         3 = move the unit or look behind/under it.  C(q) = (effort - 1) / 2.
 
-version: "0.2"
+version: "0.3"
 
 device_scope: refrigerator
 
@@ -26,7 +26,7 @@ attributes:
     effort: 1
 
   primary_symptom:
-    description: Main complaint
+    description: Main complaint (ice_buildup = solid ice at the bottom of a compartment; frost_buildup = frost or ice coating the walls / back panel)
     values: [not_cooling, over_cooling, noise, leaking_water, ice_buildup, frost_buildup, not_powering_on, runs_constantly]
     effort: 1
 
@@ -43,6 +43,11 @@ attributes:
   noise_type:
     description: Unusual sound from the unit (users usually attribute any sound to the compressor)
     values: [none, normal_hum, loud_hum_or_buzz, clicking, knocking_or_rattling, squealing_or_chirping]
+    effort: 2
+
+  noise_location:
+    description: Where an unusual sound comes from (iFixit noise pages use it to tell fans from compressor)
+    values: [inside_compartment, back_bottom, not_applicable]
     effort: 2
 
   condenser_fan_running:
@@ -81,9 +86,14 @@ attributes:
     effort: 1
 
   power_supply_ok:
-    description: Interior light / display comes on; plug, socket, MCB and stabiliser are working
+    description: Interior light / display comes on (the unit is getting power)
     values: ["yes", "no"]
     effort: 1
+
+  works_in_other_socket:
+    description: Unit powers on when plugged into a different socket (iFixit's extension-cord test)
+    values: ["yes", "no"]
+    effort: 2
 
   thermostat_setting:
     description: Temperature control position relative to normal
