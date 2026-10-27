@@ -1,0 +1,244 @@
+% Query2Diagnose: design-justification references, 2022-2026 only.
+% NOT cited in the paper, which keeps exactly the 15 entries in references.bib.
+% Cited from docs/design_decisions.md; candidate swaps are flagged there.
+% Every entry was checked on 2026-10-28 against arXiv, the ACL Anthology, the
+% official proceedings/journal page, or the dataset card. Where the full author
+% list was not checked, the entry lists the checked authors followed by "others".
+
+% ---------------------------------------------------------------------------
+% Information seeking, question selection, clarification
+% ---------------------------------------------------------------------------
+
+@inproceedings{li2025questbench,
+  author    = {Li, Belinda Z. and Kim, Been and Wang, Zi},
+  title     = {{QuestBench}: Can {LLMs} Ask the Right Question to Acquire Information in Reasoning Tasks?},
+  booktitle = {Adv. Neural Inf. Process. Syst. (NeurIPS)},
+  year      = {2025},
+  note      = {arXiv:2503.22674}
+}
+
+@inproceedings{choudhury2026bedllm,
+  author    = {Choudhury, D. and Williamson, S. and Goli{\'n}ski, A. and Miao, N. and Bickford Smith, F. and Kirchhof, M. and Zhang, Y. and Rainforth, T.},
+  title     = {{BED-LLM}: Intelligent Information Gathering with {LLMs} and {Bayesian} Experimental Design},
+  booktitle = {Proc. Int. Conf. Learn. Represent. (ICLR)},
+  year      = {2026},
+  note      = {arXiv:2508.21184}
+}
+
+@misc{pedrozo2026reasoning,
+  author       = {Pedrozo, Daniel M. and Soares, Telma W. de L. and de Oliveira, Bryan L. M.},
+  title        = {Do Reasoning Models Ask Better Questions? {A} Formal Information-Theoretic Analysis on Multi-Turn {LLM} Games},
+  howpublished = {arXiv:2601.17716},
+  month        = jan,
+  year         = {2026}
+}
+
+@misc{kuhn2022clam,
+  author       = {Kuhn, Lorenz and Gal, Yarin and Farquhar, Sebastian},
+  title        = {{CLAM}: Selective Clarification for Ambiguous Questions with Generative Language Models},
+  howpublished = {arXiv:2212.07769},
+  month        = dec,
+  year         = {2022}
+}
+
+% ---------------------------------------------------------------------------
+% Uncertainty, calibration, abstention
+% ---------------------------------------------------------------------------
+
+@article{lin2024generating,
+  author  = {Lin, Zhen and Trivedi, Shubhendu and Sun, Jimeng},
+  title   = {Generating with Confidence: Uncertainty Quantification for Black-box Large Language Models},
+  journal = {Trans. Mach. Learn. Res. (TMLR)},
+  year    = {2024}
+}
+
+@inproceedings{geng2024survey,
+  author    = {Geng, Jiahui and Cai, Fengyu and Wang, Yuxia and Koeppl, Heinz and Nakov, Preslav and Gurevych, Iryna},
+  title     = {A Survey of Confidence Estimation and Calibration in Large Language Models},
+  booktitle = {Proc. Conf. North Amer. Chapter Assoc. Comput. Linguist. (NAACL)},
+  pages     = {6577--6595},
+  year      = {2024},
+  doi       = {10.18653/v1/2024.naacl-long.366}
+}
+
+@inproceedings{sun2024dst,
+  author    = {Sun, Yi-Jyun and Dey, Suvodip and Hakkani-T{\"u}r, Dilek and Tur, Gokhan},
+  title     = {Confidence Estimation for {LLM}-Based Dialogue State Tracking},
+  booktitle = {Proc. IEEE Spoken Lang. Technol. Workshop (SLT)},
+  year      = {2024},
+  note      = {arXiv:2409.09629}
+}
+
+@misc{abbasiyadkori2024conformal,
+  author       = {Abbasi-Yadkori, Yasin and Kuzborskij, Ilja and others},
+  title        = {Mitigating {LLM} Hallucinations via Conformal Abstention},
+  howpublished = {arXiv:2405.01563},
+  year         = {2024}
+}
+
+@inproceedings{blasiok2024smooth,
+  author    = {B{\l}asiok, Jaros{\l}aw and Nakkiran, Preetum},
+  title     = {Smooth {ECE}: Principled Reliability Diagrams via Kernel Smoothing},
+  booktitle = {Proc. Int. Conf. Learn. Represent. (ICLR)},
+  year      = {2024}
+}
+
+% ---------------------------------------------------------------------------
+% User simulation and evaluation
+% ---------------------------------------------------------------------------
+
+@inproceedings{panickssery2024llm,
+  author    = {Panickssery, Arjun and Bowman, Samuel R. and Feng, Shi},
+  title     = {{LLM} Evaluators Recognize and Favor Their Own Generations},
+  booktitle = {Adv. Neural Inf. Process. Syst. (NeurIPS)},
+  volume    = {37},
+  year      = {2024}
+}
+
+@article{balog2024user,
+  author  = {Balog, Krisztian and Zhai, ChengXiang},
+  title   = {User Simulation for Evaluating Information Access Systems},
+  journal = {Found. Trends Inf. Retr.},
+  volume  = {18},
+  number  = {1--2},
+  pages   = {1--261},
+  year    = {2024}
+}
+
+@inproceedings{ni2026survey,
+  author    = {Ni, Bo and Wang, Yu and Wang, Leyao and others},
+  title     = {A Survey on {LLM}-based Conversational User Simulation},
+  booktitle = {Proc. Conf. Eur. Chapter Assoc. Comput. Linguist. (EACL)},
+  pages     = {4266--4301},
+  year      = {2026}
+}
+
+@article{tu2025amie,
+  author  = {Tu, Tao and Schaekermann, Mike and Palepu, Anil and others},
+  title   = {Towards Conversational Diagnostic Artificial Intelligence},
+  journal = {Nature},
+  volume  = {642},
+  number  = {8067},
+  pages   = {442--450},
+  year    = {2025},
+  doi     = {10.1038/s41586-025-08866-7}
+}
+
+% ---------------------------------------------------------------------------
+% Retrieval and grounding
+% ---------------------------------------------------------------------------
+
+@inproceedings{gao2023alce,
+  author    = {Gao, Tianyu and Yen, Howard and Yu, Jiatong and Chen, Danqi},
+  title     = {Enabling Large Language Models to Generate Text with Citations},
+  booktitle = {Proc. Conf. Empirical Methods Natural Lang. Process. (EMNLP)},
+  pages     = {6465--6488},
+  year      = {2023}
+}
+
+@inproceedings{asai2024selfrag,
+  author    = {Asai, Akari and Wu, Zeqiu and Wang, Yizhong and Sil, Avirup and Hajishirzi, Hannaneh},
+  title     = {Self-{RAG}: Learning to Retrieve, Generate, and Critique through Self-Reflection},
+  booktitle = {Proc. Int. Conf. Learn. Represent. (ICLR)},
+  year      = {2024}
+}
+
+@inproceedings{zhuang2022characterbert,
+  author    = {Zhuang, Shengyao and Zuccon, Guido},
+  title     = {{CharacterBERT} and Self-Teaching for Improving the Robustness of Dense Retrievers on Queries with Typos},
+  booktitle = {Proc. 45th Int. ACM SIGIR Conf. Res. Develop. Inf. Retrieval},
+  pages     = {1444--1454},
+  year      = {2022},
+  doi       = {10.1145/3477495.3531951}
+}
+
+@misc{wang2024me5,
+  author       = {Wang, Liang and Yang, Nan and Huang, Xiaolong and Yang, Linjun and Majumder, Rangan and Wei, Furu},
+  title        = {Multilingual {E5} Text Embeddings: A Technical Report},
+  howpublished = {arXiv:2402.05672},
+  month        = feb,
+  year         = {2024}
+}
+
+@misc{douze2024faiss,
+  author       = {Douze, Matthijs and others},
+  title        = {The {Faiss} Library},
+  howpublished = {arXiv:2401.08281},
+  year         = {2024}
+}
+
+% ---------------------------------------------------------------------------
+% Code-mixed and Romanized Kannada-English resources
+% ---------------------------------------------------------------------------
+
+@inproceedings{balouchzahi2022coli,
+  author    = {Balouchzahi, Fazlourrahman and Butt, Sabur and Hegde, Asha and Ashraf, Noman and Shashirekha, H. L. and Sidorov, Grigori and Gelbukh, Alexander},
+  title     = {Overview of {CoLI-Kanglish}: Word Level Language Identification in Code-mixed {Kannada-English} Texts at {ICON} 2022},
+  booktitle = {Proc. Int. Conf. Natural Lang. Process. (ICON): Shared Task on Word Level Language Identification in Code-mixed {Kannada-English} Texts},
+  pages     = {38--45},
+  year      = {2022}
+}
+
+@inproceedings{madhani2023aksharantar,
+  author    = {Madhani, Yash and Parthan, Sushane and Bedekar, Priyanka and NC, Gokul and Khapra, Ruchi and Kunchukuttan, Anoop and Kumar, Pratyush and Khapra, Mitesh M.},
+  title     = {Aksharantar: Open {Indic}-language Transliteration Datasets and Models for the Next Billion Users},
+  booktitle = {Findings Assoc. Comput. Linguist.: EMNLP},
+  pages     = {40--57},
+  year      = {2023}
+}
+
+@inproceedings{ravikiran2024offensive,
+  author    = {Ravikiran, Manikandan and Rajalakshmi, Ratnavel and Chakravarthi, Bharathi Raja and Madasamy, Anand Kumar and Thavareesan, Sajeetha},
+  title     = {Findings of the First Shared Task on Offensive Span Identification from Code-Mixed {Kannada-English} Comments},
+  booktitle = {Proc. 4th Workshop Speech, Vision, Lang. Technol. Dravidian Lang. (DravidianLangTech)},
+  pages     = {43--48},
+  year      = {2024}
+}
+
+@inproceedings{sheth2025comilingua,
+  author    = {Sheth, Rajvee and Beniwal, Himanshu and Singh, Mayank},
+  title     = {{COMI-LINGUA}: Expert Annotated Large-Scale Dataset for Multitask {NLP} in {Hindi-English} Code-Mixing},
+  booktitle = {Findings Assoc. Comput. Linguist.: EMNLP},
+  pages     = {7973--7992},
+  year      = {2025}
+}
+
+@article{dhole2023nlaugmenter,
+  author  = {Dhole, Kaustubh D. and others},
+  title   = {{NL-Augmenter}: A Framework for Task-Sensitive Natural Language Augmentation},
+  journal = {Northern Eur. J. Lang. Technol. (NEJLT)},
+  year    = {2023},
+  note    = {ACL Anthology 2023.nejlt-1.5}
+}
+
+% ---------------------------------------------------------------------------
+% Fault diagnosis domain and probability elicitation
+% ---------------------------------------------------------------------------
+
+@misc{caminha2025hwdiag,
+  author       = {Caminha, Carlos and others},
+  title        = {Evaluating {LLMs} and Prompting Strategies for Automated Hardware Diagnosis from Textual User-Reports},
+  howpublished = {arXiv:2507.00742},
+  month        = jul,
+  year         = {2025}
+}
+
+@article{xu2023bnac,
+  author  = {Xu, Jiaqi and Wang, Qiang and Zhou, Juan and Zhou, Haiting and Chen, Jiayan},
+  title   = {Improved {Bayesian} Network-Based for Fault Diagnosis of Air Conditioner System},
+  journal = {Int. J. Metrol. Qual. Eng.},
+  volume  = {14},
+  pages   = {10},
+  year    = {2023},
+  doi     = {10.1051/ijmqe/2023009}
+}
+
+@inproceedings{capstick2025autoelicit,
+  author    = {Capstick, Alexander and Krishnan, Rahul G. and Barnaghi, Payam},
+  title     = {{AutoElicit}: Using Large Language Models for Expert Prior Elicitation in Predictive Modelling},
+  booktitle = {Proc. 42nd Int. Conf. Mach. Learn. (ICML)},
+  series    = {PMLR},
+  volume    = {267},
+  pages     = {6746--6777},
+  year      = {2025}
+}

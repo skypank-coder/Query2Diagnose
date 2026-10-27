@@ -1,0 +1,21 @@
+{
+ "source": "ifixit",
+ "namespace": "WIKI",
+ "title": "How to Reset Refrigerator Compressor",
+ "display_title": "How to Reset Refrigerator Compressor",
+ "wikiid": 506841,
+ "revisionid": 1223654,
+ "langid": "en",
+ "modified_date": "2024-04-22T21:25:36+00:00",
+ "url": "https://www.ifixit.com/Wiki/How_to_Reset_Refrigerator_Compressor",
+ "api_url": "https://www.ifixit.com/api/2.0/wikis/WIKI/How_to_Reset_Refrigerator_Compressor",
+ "authors": [
+  "nicO",
+  "Bill Gilbert"
+ ],
+ "license": "CC BY-NC-SA 3.0",
+ "license_url": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+ "terms_url": "https://www.ifixit.com/Info/Licensing",
+ "fetched_at": "2026-10-27T19:43:49+00:00",
+ "contents_raw": "Resetting your refrigerator compressor really only consists of unplugging or disconnecting power from your unit, waiting, and reconnecting, with a few other steps.\n\nYou should also ensure that your fridge hasn't accidentally been put into a display mode, meant for showroom units. This will often be signified by the temperature displays showing 00 or the like. The compressor will not run in those circumstances.\n\n== Unplug the Refrigerator ==\n\nYou can disconnect your fridge from its power source by removing the power cord from the wall outlet or by flipping the correct circuit breaker in the breaker panel.\n\n* There may be whooshing or knocking noises, which is normal.\n* Remain unplugged for 10 minutes.\n* Plug the refrigerator in or turn on the circuit breaker.\n\n== Reset Fridge and Freezer Temperature Settings ==\n\nReturn your control panel to the appropriate cold setting. This may be 4 or 5 on a 1-10 scale or simply be labeled “cold.”\n\n* Wait for the temperature to stabilize. Depending on the model, this may take more than 24 hours, so be patient.\n* If your compressor will not start again, try adjusting the controls to colder settings to see if it will start. Wait for some time, as the refrigerator could be in the midst of a defrost cycle, and the compressor won't run when it is defrosting."
+}

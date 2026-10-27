@@ -1,0 +1,213 @@
+# Fault tags for passages that describe a fault as a cause or give its fix.
+# Used by the stopping rule: a retrieved passage "supports z" iff z is in its
+# tags (docs/design_decisions.md, decision 8). Glossary, how-it-works,
+# brand-specific and ice-maker/dispenser passages are deliberately untagged.
+# Annotated from section headings and text on 2026-10-28.
+
+thermostat_setting:
+  - ifx-505025-incorrect-thermostat-setting
+  - ifx-506845-incorrect-thermostat-setting
+  - ifx-505020-incorrect-thermostat-setting
+  - ifx-506960-the-basics--incorrect-thermostat-setting
+  - ifx-509172-the-basics--incorrect-thermostat-setting
+  - ifx-506841-reset-fridge-and-freezer-temperature-settings
+  - pd-energystar-refrigerators-saving-tips
+
+door_seal:
+  - ifx-505025-failing-door-seals
+  - ifx-506845-failing-door-seals
+  - ifx-505020-failing-door-seals
+  - ifx-506960-failing-door-seals
+  - ifx-505021-failing-door-seals
+  - ifx-506960-door-blocked
+  - ifx-505021-door-left-open
+  - ifx-515719-cause-1-dirty-or-damaged-door-gasket
+  - ifx-515719-cause-2-misaligned-doors
+  - ifx-515719-cause-3-obstructions
+  - ifx-505028-the-basics
+  - ifx-505028-the-refrigerator-is-out-of-level
+  - ifx-505028-the-door-gaskets-are-loose-or-damaged
+  - ifx-505028-the-magnetic-door-gasket-is-faulty
+  - ifx-505028-the-door-is-out-of-adjustment
+  - ifx-505028-worn-or-broken-closing-cams
+  - ifx-505028-broken-mullion-spring
+  - ifx-505028-hinge-problems
+  - ifx-505028-door-seals-iced
+  - ifx-505028-faulty-door
+  - ifx-505069-annual-maintenance--test-door-seal
+  - ifx-505025-out-of-level-fridge
+  - ifx-505069-annual-maintenance--out-of-level-fridge
+  - pd-energystar-refrigerators-saving-tips
+
+blocked_airflow:
+  - ifx-505025-incorrectly-loaded-or-overloaded-fridge
+  - ifx-506845-incorrectly-loaded-or-overloaded-fridge
+  - ifx-505020-incorrectly-loaded-or-overloaded-fridge
+  - ifx-506960-the-basics--incorrectly-loaded-or-overloaded-fridge
+  - ifx-509172-the-basics--incorrectly-loaded-or-overloaded-fridge
+  - ifx-505021-incorrectly-loaded-or-overloaded-fridge
+  - ifx-505021-hot-or-wet-contents
+  - ifx-505069-monthly-maintenance
+
+hot_surroundings:
+  - ifx-505025-extreme-external-temperatures
+  - ifx-506845-extreme-external-temperatures
+  - ifx-505023-external-temperature-too-high
+  - pd-energystar-refrigerators-saving-tips
+
+dirty_condenser_coils:
+  - ifx-505025-dirty-condenser-coils
+  - ifx-506845-dirty-condenser-coils
+  - ifx-505020-dirty-condenser-coils
+  - ifx-506960-dirty-condenser-coils
+  - ifx-509172-dirty-condenser-coils
+  - ifx-505022-dirty-condenser-coils
+  - ifx-505069-annual-maintenance--dirty-condenser-coils
+  - pd-energystar-refrigerators-saving-tips
+
+condenser_fan_failure:
+  - ifx-505025-failed-condenser-or-evaporator-fan-motor
+  - ifx-506845-failed-condenser-or-evaporator-fan-motor
+  - ifx-505020-failed-condenser-or-evaporator-fan-motor
+  - ifx-506960-failed-condenser-or-evaporator-fan-motor
+  - ifx-509172-failed-condenser-or-evaporator-fan-motor
+  - ifx-505022-failed-condenser-fan-motor
+  - ifx-506958-condenser-fan-failure
+  - ifx-505030-condenser-fan
+
+evaporator_fan_failure:
+  - ifx-505025-failed-condenser-or-evaporator-fan-motor
+  - ifx-506845-failed-condenser-or-evaporator-fan-motor
+  - ifx-505020-failed-condenser-or-evaporator-fan-motor
+  - ifx-506960-failed-condenser-or-evaporator-fan-motor
+  - ifx-509172-failed-condenser-or-evaporator-fan-motor
+  - ifx-509172-intro
+  - ifx-506958-evaporator-fan-failure
+  - ifx-505030-evaporator-fan
+
+defrost_system_failure:
+  - ifx-505021-defrost-system-malfunction
+  - ifx-505021-defrost-system-malfunction--defrost-type
+  - ifx-505021-defrost-system-malfunction--initial-troubleshooting
+  - ifx-505021-defrost-thermal-fuse
+  - ifx-505021-faulty-defrost-heater
+  - ifx-505021-faulty-defrost-timer
+  - ifx-505021-thermistor-failure
+  - ifx-505021-temperature-control-board-failure
+  - ifx-509172-intro
+  - ifx-509172-defrost-system-malfunction
+  - ifx-509172-defrost-system-malfunction--defrost-type
+  - ifx-509172-defrost-system-malfunction--initial-troubleshooting
+  - ifx-509172-defrost-thermal-fuse
+  - ifx-509172-faulty-defrost-heater
+  - ifx-509172-faulty-defrost-timer
+  - ifx-509172-thermistor-failure
+  - ifx-509172-temperature-control-board-failure
+  - ifx-505022-faulty-defrost-timer
+  - ifx-505020-faulty-thermistor-defrost-temperature-sensor
+  - ifx-505025-thermistor-failure-faulty-defrost-temperature-sensor
+  - ifx-506845-thermistor-failure
+  - ifx-506845-ice-buildup
+  - ifx-506960-ice-buildup
+  - ifx-506958-compressor-failure--excessive-frost
+  - ifx-505020-excessive-frost-buildup
+  - ifx-505069-defrost-freezer-or-fresh-food-compartment--perform-a-manual-defrost
+
+excess_frost_manual_defrost:
+  - ifx-505020-excessive-frost-buildup
+  - ifx-505021-the-basics
+  - ifx-505069-defrost-freezer-or-fresh-food-compartment
+  - ifx-505069-defrost-freezer-or-fresh-food-compartment--perform-a-manual-defrost
+  - ifx-515719-cause-4-excessive-frost-or-ice-buildup
+
+drain_blockage:
+  - ifx-505027-the-basics
+  - ifx-505027-plugged-defrost-drain
+  - ifx-505027-cracked-or-warped-defrost-water-tray
+  - ifx-506960-ice-buildup
+  - ifx-506845-ice-buildup
+  - ifx-505069-6-month-maintenance
+
+power_supply:
+  - ifx-505025-no-power
+  - ifx-506960-the-basics--reset-power
+  - ifx-505029-the-basics
+  - ifx-505029-faulty-gfci-outlet
+  - ifx-505029-unnecessary-gfci-outlet
+  - ifx-505029-leaky-loads
+  - ifx-505029-overloaded-outlet
+
+start_relay_capacitor:
+  - ifx-505022-intro
+  - ifx-505020-faulty-start-capacitor
+  - ifx-505020-faulty-overload-relay
+  - ifx-505020-faulty-start-relay
+  - ifx-505025-faulty-start-capacitor
+  - ifx-505025-faulty-overload-relay
+  - ifx-505025-faulty-start-relay
+  - ifx-506845-faulty-capacitor
+  - ifx-506845-faulty-overload-relay
+  - ifx-506845-faulty-start-relay
+  - ifx-505022-faulty-capacitor
+  - ifx-505022-faulty-overload-relay
+  - ifx-505022-faulty-start-relay
+  - ifx-506960-compressor-faults--start-relay-failure
+  - ifx-506960-compressor-faults--faulty-run-capacitor
+  - ifx-506960-compressor-faults--faulty-overload-relay
+  - ifx-509172-faulty-capacitor
+
+compressor_failure:
+  - ifx-505022-intro
+  - ifx-509172-intro
+  - ifx-505020-faulty-compressor
+  - ifx-505025-faulty-compressor
+  - ifx-505022-faulty-compressor
+  - ifx-509172-faulty-compressor
+  - ifx-506960-compressor-faults
+  - ifx-506960-compressor-faults--faulty-compressor
+  - ifx-506958-compressor-failure
+  - ifx-505030-compressor
+  - ifx-505029-appliance-leakage-current--leakage-currents-in-the-appliance
+
+sealed_system_refrigerant:
+  - ifx-509172-intro
+  - ifx-505020-leaking-coolant-system
+  - ifx-506845-refrigerant-sealed-system-fault
+  - ifx-509172-refrigerant-leaks
+  - ifx-505025-refrigerant-leak
+  - ifx-506958-compressor-failure--excessive-frost--refrigerant-leak
+  - ifx-506958-compressor-failure--excessive-frost--sealed-system-plugged
+
+control_board_wiring:
+  - ifx-505021-thermistor-failure--temperature-control-thermostat-failure
+  - ifx-505020-temperature-control-thermostat-failure
+  - ifx-505022-temperature-control-thermostat-failure
+  - ifx-509172-temperature-control-thermostat-failure
+  - ifx-505021-thermistor-failure
+  - ifx-505020-faulty-thermistor-defrost-temperature-sensor
+  - ifx-506845-thermistor-failure
+  - ifx-505022-thermistor-failure
+  - ifx-509172-thermistor-failure
+  - ifx-505025-thermistor-failure-faulty-defrost-temperature-sensor
+  - ifx-505021-temperature-control-board-failure
+  - ifx-506845-temperature-control-board-failure
+  - ifx-505022-temperature-control-board-failure
+  - ifx-509172-temperature-control-board-failure
+  - ifx-505025-temperature-control-board-failure
+  - ifx-505021-main-control-board-failure
+  - ifx-505020-main-control-board-failure
+  - ifx-506845-main-control-board-failure
+  - ifx-505022-main-control-board-failure
+  - ifx-509172-main-control-board-failure
+  - ifx-505025-main-control-board-failure
+  - ifx-505027-faulty-control-board
+  - ifx-505022-compressor-inverter-board-failure
+  - ifx-509172-compressor-inverter-board-failure
+  - ifx-506845-damper-failure
+  - ifx-505030-damper
+  - ifx-505029-appliance-leakage-current--faulty-power-cord
+  - ifx-505029-appliance-leakage-current--leakage-currents-in-the-appliance
+  - ifx-505029-appliance-leakage-current--damaged-appliance-wiring
+  - ifx-505029-appliance-leakage-current--improperly-connected-appliance-wiring
+  - ifx-505029-problem-appliance-and-gfci-combo--faulty-power-cord
+  - ifx-505069-5-year-maintenance--inspect-wiring

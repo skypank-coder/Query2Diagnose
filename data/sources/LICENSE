@@ -1,0 +1,15 @@
+Files in this directory that reproduce iFixit text (raw/ifixit/ and the iFixit
+rows of passages.jsonl) are licensed under the Creative Commons
+Attribution-NonCommercial-ShareAlike 3.0 Unported license:
+https://creativecommons.org/licenses/by-nc-sa/3.0/
+
+Original content: iFixit (https://www.ifixit.com), licensed CC BY-NC-SA 3.0 per
+https://www.ifixit.com/Info/Licensing. Authors, page URLs and revisions are
+listed in LICENSES.md. Changes: markup and images removed, pages split into
+section-level passages. iFixit does not endorse this project.
+
+raw/public_domain/ and the pd-* rows of passages.jsonl are works of the U.S.
+federal government (ENERGY STAR / U.S. EPA) and are in the public domain.
+
+The project's own files here (manifest.yaml, passage_faults.yaml, README.md)
+are MIT-licensed with the rest of the code; see ../../LICENSE and ../../NOTICE.

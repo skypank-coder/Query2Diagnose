@@ -1,0 +1,315 @@
+# Hypothesis model: qualitative p(attribute = value | fault) with provenance.
+# Compiled by core/hypothesis.py using the level weights in configs/hypothesis.yaml.
+#
+# Tagging protocol (docs/design_decisions.md, decision 4):
+#   1. A symptom page that lists a fault's section  -> that symptom is `typical`
+#      for the fault (e.g. "Refrigerator Not Cooling" > "Dirty Condenser Coils").
+#   2. A passage stating an observation under the fault ("compressor is likely
+#      running non-stop", "if the fans are running and the compressor won't
+#      start") -> that value is `typical`.
+#   3. A passage whose mechanism rules a value out ("your fridge will not work
+#      if its power has gone out") -> that value is `atypical`.
+#   4. Values that follow from the fault's own definition in the schema are
+#      listed under `definitional` with a rationale, never passed off as cited.
+#   Untagged values take the `untagged` level; attributes without a row are
+#   uniform. `error_code` and `noise_type: squealing_or_chirping` have no
+#   source coverage and are left uniform on purpose.
+#
+# YAML note: "yes" / "no" must be quoted (unquoted they parse as booleans).
+
+version: "0.2"
+
+defaults:
+  device:
+    tags: {refrigerator: typical, other: atypical}
+    definitional: [refrigerator, other]
+    rationale: The schema covers refrigerator faults only.
+
+rows:
+  thermostat_setting:
+    primary_symptom:
+      tags: {not_cooling: typical}
+      cites: [ifx-505025-incorrect-thermostat-setting, ifx-506845-incorrect-thermostat-setting,
+              ifx-505020-incorrect-thermostat-setting, ifx-509172-the-basics--incorrect-thermostat-setting]
+    compartment_affected:
+      tags: {fridge: typical, freezer: typical}
+      cites: [ifx-506845-incorrect-thermostat-setting, ifx-505020-incorrect-thermostat-setting]
+    thermostat_setting:
+      tags: {too_warm: typical, normal: atypical}
+      cites: [ifx-505025-incorrect-thermostat-setting, ifx-506960-the-basics--incorrect-thermostat-setting]
+      definitional: [normal]
+      rationale: The fault is defined as a setting outside the normal range.
+
+  door_seal:
+    primary_symptom:
+      tags: {not_cooling: typical, frost_buildup: typical, ice_buildup: typical}
+      cites: [ifx-505025-failing-door-seals, ifx-505021-failing-door-seals,
+              ifx-515719-cause-1-dirty-or-damaged-door-gasket, ifx-506845-ice-buildup, ifx-506960-door-blocked]
+    door_seal_condition:
+      tags: {damaged_or_gap: typical, good: atypical}
+      cites: [ifx-505028-the-door-gaskets-are-loose-or-damaged, ifx-505069-annual-maintenance--test-door-seal,
+              ifx-515719-cause-1-dirty-or-damaged-door-gasket]
+      definitional: [good]
+      rationale: The fault is defined as a door that does not seal.
+    frost_on_back_wall:
+      tags: {"yes": typical}
+      cites: [ifx-505021-intro, ifx-505021-failing-door-seals, ifx-506845-ice-buildup]
+    vents_blocked_or_overloaded:
+      tags: {"yes": typical}
+      cites: [ifx-506960-door-blocked, ifx-515719-cause-3-obstructions, ifx-505028-the-basics]
+
+  blocked_airflow:
+    primary_symptom:
+      tags: {not_cooling: typical, frost_buildup: typical}
+      cites: [ifx-505025-incorrectly-loaded-or-overloaded-fridge, ifx-505021-incorrectly-loaded-or-overloaded-fridge,
+              ifx-505021-hot-or-wet-contents]
+    vents_blocked_or_overloaded:
+      tags: {"yes": typical}
+      cites: [ifx-505025-incorrectly-loaded-or-overloaded-fridge, ifx-505020-incorrectly-loaded-or-overloaded-fridge,
+              ifx-505069-monthly-maintenance]
+    compressor_running:
+      tags: {"yes": typical}
+      cites: [ifx-509172-the-basics--incorrectly-loaded-or-overloaded-fridge]
+    frost_on_back_wall:
+      tags: {"yes": typical}
+      cites: [ifx-505021-intro, ifx-505021-incorrectly-loaded-or-overloaded-fridge, ifx-505021-hot-or-wet-contents]
+
+  hot_surroundings:
+    primary_symptom:
+      tags: {not_cooling: typical}
+      cites: [ifx-505025-extreme-external-temperatures, ifx-506845-extreme-external-temperatures]
+    placement_clearance:
+      tags: {too_close_or_hot: typical, adequate: atypical}
+      cites: [ifx-505025-extreme-external-temperatures, pd-energystar-refrigerators-saving-tips]
+      definitional: [adequate]
+      rationale: The fault is defined by the unit's surroundings.
+
+  dirty_condenser_coils:
+    primary_symptom:
+      tags: {not_cooling: typical, runs_constantly: typical}
+      cites: [ifx-505025-dirty-condenser-coils, ifx-509172-dirty-condenser-coils, ifx-506960-dirty-condenser-coils]
+    condenser_coils_dusty:
+      tags: {"yes": typical, "no": atypical}
+      cites: [ifx-505025-dirty-condenser-coils, ifx-505069-annual-maintenance--dirty-condenser-coils]
+      definitional: ["no"]
+      rationale: The fault is defined as visibly dirty coils.
+
+  condenser_fan_failure:
+    primary_symptom:
+      tags: {not_cooling: typical, noise: typical}
+      cites: [ifx-505025-failed-condenser-or-evaporator-fan-motor, ifx-506958-condenser-fan-failure,
+              ifx-505030-condenser-fan]
+    condenser_fan_running:
+      tags: {"no": typical, not_applicable: atypical}
+      cites: [ifx-505020-failed-condenser-or-evaporator-fan-motor, ifx-505022-failed-condenser-fan-motor]
+      definitional: [not_applicable]
+      rationale: A unit without a condenser fan cannot have a failed one.
+    noise_type:
+      tags: {loud_hum_or_buzz: typical, knocking_or_rattling: typical}
+      cites: [ifx-506958-condenser-fan-failure, ifx-505030-condenser-fan]
+    compartment_affected:
+      tags: {both: typical}
+      cites: [ifx-506845-failed-condenser-or-evaporator-fan-motor]
+    cooling_type:
+      tags: {direct_cool: atypical}
+      definitional: [direct_cool]
+      rationale: The schema defines direct-cool units as having no fans.
+
+  evaporator_fan_failure:
+    primary_symptom:
+      tags: {not_cooling: typical, noise: typical}
+      cites: [ifx-505025-failed-condenser-or-evaporator-fan-motor, ifx-506958-evaporator-fan-failure,
+              ifx-505030-evaporator-fan]
+    evaporator_fan_running:
+      tags: {"no": typical, not_applicable: atypical}
+      cites: [ifx-505020-failed-condenser-or-evaporator-fan-motor, ifx-509172-intro]
+      definitional: [not_applicable]
+      rationale: A unit without an evaporator fan cannot have a failed one.
+    compartment_affected:
+      tags: {fridge: typical}
+      cites: [ifx-505025-failed-condenser-or-evaporator-fan-motor, ifx-506845-failed-condenser-or-evaporator-fan-motor]
+    compressor_running:
+      tags: {"yes": typical}
+      cites: [ifx-509172-intro]
+    noise_type:
+      tags: {loud_hum_or_buzz: typical, knocking_or_rattling: typical}
+      cites: [ifx-506958-evaporator-fan-failure, ifx-505030-evaporator-fan]
+    frost_on_back_wall:
+      tags: {"yes": typical}
+      cites: [ifx-506960-failed-condenser-or-evaporator-fan-motor]
+    cooling_type:
+      tags: {direct_cool: atypical}
+      definitional: [direct_cool]
+      rationale: The schema defines direct-cool units as having no fans.
+
+  defrost_system_failure:
+    primary_symptom:
+      tags: {frost_buildup: typical, not_cooling: typical, noise: typical}
+      cites: [ifx-505021-defrost-system-malfunction, ifx-509172-defrost-system-malfunction,
+              ifx-506958-compressor-failure--excessive-frost, ifx-505030-evaporator-fan]
+    frost_on_back_wall:
+      tags: {"yes": typical}
+      cites: [ifx-505021-defrost-system-malfunction, ifx-506958-compressor-failure--excessive-frost,
+              ifx-505021-faulty-defrost-heater]
+    compressor_running:
+      tags: {"yes": typical}
+      cites: [ifx-509172-intro]
+    evaporator_fan_running:
+      tags: {"no": typical}
+      cites: [ifx-505020-failed-condenser-or-evaporator-fan-motor, ifx-506958-evaporator-fan-failure]
+    noise_type:
+      tags: {loud_hum_or_buzz: typical, knocking_or_rattling: typical}
+      cites: [ifx-506958-evaporator-fan-failure, ifx-506958-compressor-failure--excessive-frost, ifx-505030-evaporator-fan]
+    cooling_type:
+      tags: {frost_free: typical, direct_cool: atypical}
+      cites: [ifx-505020-excessive-frost-buildup,
+              ifx-505069-defrost-freezer-or-fresh-food-compartment--perform-a-manual-defrost]
+      definitional: [direct_cool]
+      rationale: Direct-cool units have no auto-defrost system to fail.
+    compartment_affected:
+      tags: {freezer: typical, fridge: typical}
+      cites: [ifx-505021-intro, ifx-506845-ice-buildup]
+
+  excess_frost_manual_defrost:
+    primary_symptom:
+      tags: {frost_buildup: typical, ice_buildup: typical, not_cooling: typical}
+      cites: [ifx-505020-excessive-frost-buildup, ifx-505069-defrost-freezer-or-fresh-food-compartment,
+              ifx-515719-cause-4-excessive-frost-or-ice-buildup]
+    frost_on_back_wall:
+      tags: {"yes": typical, "no": atypical}
+      cites: [ifx-505069-defrost-freezer-or-fresh-food-compartment]
+      definitional: ["no"]
+      rationale: The fault is defined by visible frost build-up.
+    cooling_type:
+      tags: {direct_cool: typical, frost_free: atypical}
+      cites: [ifx-505020-excessive-frost-buildup,
+              ifx-505069-defrost-freezer-or-fresh-food-compartment--perform-a-manual-defrost]
+      definitional: [frost_free]
+      rationale: >-
+        Defined for manual-defrost units; the same passages attribute thick ice
+        in an auto-defrost unit to a failed defrost cycle (defrost_system_failure).
+    compartment_affected:
+      tags: {freezer: typical}
+      cites: [ifx-505020-excessive-frost-buildup]
+    evaporator_fan_running:
+      tags: {not_applicable: typical}
+      definitional: [not_applicable]
+      rationale: Manual-defrost (direct-cool) units have no fans by schema definition.
+    condenser_fan_running:
+      tags: {not_applicable: typical}
+      definitional: [not_applicable]
+      rationale: Manual-defrost (direct-cool) units have no fans by schema definition.
+
+  drain_blockage:
+    primary_symptom:
+      tags: {leaking_water: typical, ice_buildup: typical}
+      cites: [ifx-505027-plugged-defrost-drain, ifx-505027-cracked-or-warped-defrost-water-tray,
+              ifx-506960-ice-buildup]
+    water_leak_location:
+      tags: {inside_compartment: typical, under_unit: typical}
+      cites: [ifx-505027-plugged-defrost-drain, ifx-505027-cracked-or-warped-defrost-water-tray]
+
+  power_supply:
+    primary_symptom:
+      tags: {not_powering_on: typical, not_cooling: typical, over_cooling: atypical,
+             runs_constantly: atypical, noise: atypical}
+      cites: [ifx-505025-no-power, ifx-505029-faulty-gfci-outlet, ifx-505029-overloaded-outlet]
+    power_supply_ok:
+      tags: {"no": typical, "yes": atypical}
+      cites: [ifx-505025-no-power, ifx-506960-the-basics--reset-power]
+      definitional: ["yes"]
+      rationale: The fault is defined as missing supply.
+    compressor_running:
+      tags: {"no": typical}
+      cites: [ifx-505025-no-power]
+    condenser_fan_running:
+      tags: {"no": typical}
+      cites: [ifx-505025-no-power]
+    evaporator_fan_running:
+      tags: {"no": typical}
+      cites: [ifx-505025-no-power]
+    noise_type:
+      tags: {none: typical}
+      cites: [ifx-505025-no-power]
+    compartment_affected:
+      tags: {both: typical}
+      cites: [ifx-505025-no-power]
+
+  start_relay_capacitor:
+    primary_symptom:
+      tags: {not_cooling: typical, noise: typical}
+      cites: [ifx-505025-faulty-start-relay, ifx-505022-intro, ifx-505020-faulty-overload-relay]
+    compressor_running:
+      tags: {"no": typical}
+      cites: [ifx-505022-faulty-start-relay, ifx-505022-faulty-capacitor, ifx-505022-faulty-overload-relay]
+    noise_type:
+      tags: {clicking: typical, none: typical}
+      cites: [ifx-505022-intro, ifx-505022-faulty-overload-relay]
+    condenser_fan_running:
+      tags: {"yes": typical}
+      cites: [ifx-505022-faulty-overload-relay]
+    evaporator_fan_running:
+      tags: {"yes": typical}
+      cites: [ifx-505022-faulty-overload-relay]
+    power_supply_ok:
+      tags: {"yes": typical}
+      cites: [ifx-505022-faulty-overload-relay]
+    compartment_affected:
+      tags: {both: typical}
+      cites: [ifx-506845-faulty-overload-relay]
+
+  compressor_failure:
+    primary_symptom:
+      tags: {not_cooling: typical, noise: typical, runs_constantly: typical}
+      cites: [ifx-505025-faulty-compressor, ifx-506958-compressor-failure, ifx-505030-compressor, ifx-505022-intro]
+    noise_type:
+      tags: {loud_hum_or_buzz: typical, knocking_or_rattling: typical}
+      cites: [ifx-505022-intro, ifx-506958-compressor-failure, ifx-505030-compressor, ifx-505020-faulty-compressor]
+    recent_relocation:
+      tags: {"yes": typical}
+      cites: [ifx-505025-faulty-compressor, ifx-505020-faulty-compressor]
+    compartment_affected:
+      tags: {both: typical}
+      cites: [ifx-506960-compressor-faults--faulty-compressor]
+
+  sealed_system_refrigerant:
+    primary_symptom:
+      tags: {not_cooling: typical, runs_constantly: typical, noise: typical}
+      cites: [ifx-505025-refrigerant-leak, ifx-509172-refrigerant-leaks, ifx-505020-leaking-coolant-system,
+              ifx-509172-intro]
+    compressor_running:
+      tags: {"yes": typical}
+      cites: [ifx-509172-refrigerant-leaks, ifx-505025-refrigerant-leak]
+    noise_type:
+      tags: {loud_hum_or_buzz: typical}
+      cites: [ifx-509172-intro, ifx-506958-compressor-failure--excessive-frost--refrigerant-leak]
+    recent_relocation:
+      tags: {"yes": typical}
+      cites: [ifx-505020-leaking-coolant-system, ifx-506958-compressor-failure--excessive-frost--sealed-system-plugged,
+              ifx-506845-refrigerant-sealed-system-fault]
+    frost_on_back_wall:
+      tags: {"no": typical}
+      cites: [ifx-505020-leaking-coolant-system, ifx-506958-compressor-failure--excessive-frost--refrigerant-leak]
+    compartment_affected:
+      tags: {both: typical}
+      cites: [ifx-506845-refrigerant-sealed-system-fault,
+              ifx-506958-compressor-failure--excessive-frost--refrigerant-leak]
+
+  control_board_wiring:
+    primary_symptom:
+      tags: {not_cooling: typical, over_cooling: typical, runs_constantly: typical, not_powering_on: typical}
+      cites: [ifx-505025-temperature-control-board-failure, ifx-505020-faulty-thermistor-defrost-temperature-sensor,
+              ifx-505022-thermistor-failure, ifx-505029-appliance-leakage-current--leakage-currents-in-the-appliance]
+    compressor_running:
+      tags: {"no": typical}
+      cites: [ifx-505022-temperature-control-thermostat-failure, ifx-505022-temperature-control-board-failure,
+              ifx-509172-thermistor-failure]
+    condenser_fan_running:
+      tags: {"no": typical}
+      cites: [ifx-505022-temperature-control-thermostat-failure, ifx-505022-temperature-control-board-failure]
+    evaporator_fan_running:
+      tags: {"no": typical}
+      cites: [ifx-505022-temperature-control-thermostat-failure, ifx-505022-temperature-control-board-failure]
+    compartment_affected:
+      tags: {fridge: typical}
+      cites: [ifx-506845-damper-failure, ifx-506845-thermistor-failure]

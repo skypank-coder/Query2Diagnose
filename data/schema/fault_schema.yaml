@@ -1,0 +1,153 @@
+# Query2Diagnose fault schema — domestic refrigerators.
+#
+# Every attribute is single-valued with a closed set of values, so that an
+# interpretation s (paper Sec. III-C) is a dict {attribute: value | "unmentioned"}
+# and two LLM samples "agree on every schema field" iff their dicts are equal.
+#
+# "not_sure" is never a ground-truth value; it is a universal answer option
+# handled by the answer model (core/belief.py) and the user simulator.
+#
+# effort: 1 = glance / already known, 2 = open a door or listen closely,
+#         3 = move the unit or look behind/under it.  C(q) = (effort - 1) / 2.
+
+version: "0.2"
+
+device_scope: refrigerator
+
+attributes:
+  device:
+    description: Appliance the user is describing
+    values: [refrigerator, other]
+    effort: 1
+
+  cooling_type:
+    description: Direct-cool (manual defrost, no fans; common single-door models in India) or frost-free (fan-forced, auto defrost)
+    values: [direct_cool, frost_free]
+    effort: 1
+
+  primary_symptom:
+    description: Main complaint
+    values: [not_cooling, over_cooling, noise, leaking_water, ice_buildup, frost_buildup, not_powering_on, runs_constantly]
+    effort: 1
+
+  compartment_affected:
+    description: Which compartment shows the symptom
+    values: [fridge, freezer, both]
+    effort: 1
+
+  compressor_running:
+    description: Compressor at the lower back is humming / warm / vibrating
+    values: ["yes", "no"]
+    effort: 2
+
+  noise_type:
+    description: Unusual sound from the unit (users usually attribute any sound to the compressor)
+    values: [none, normal_hum, loud_hum_or_buzz, clicking, knocking_or_rattling, squealing_or_chirping]
+    effort: 2
+
+  condenser_fan_running:
+    description: Fan near the compressor at the lower back is spinning while the compressor runs
+    values: ["yes", "no", not_applicable]
+    effort: 3
+
+  evaporator_fan_running:
+    description: Fan behind the freezer back panel is running (heard/felt with door switch pressed)
+    values: ["yes", "no", not_applicable]
+    effort: 2
+
+  condenser_coils_dusty:
+    description: Condenser coils (back or underneath) visibly covered in dust or lint
+    values: ["yes", "no"]
+    effort: 3
+
+  door_seal_condition:
+    description: Door gasket intact and sealing (e.g. paper-slip test)
+    values: [good, damaged_or_gap]
+    effort: 2
+
+  vents_blocked_or_overloaded:
+    description: Compartment packed full or internal air vents blocked by food
+    values: ["yes", "no"]
+    effort: 1
+
+  placement_clearance:
+    description: Space around the unit and distance from heat sources
+    values: [adequate, too_close_or_hot]
+    effort: 1
+
+  recent_relocation:
+    description: Unit moved or newly installed in the last few days
+    values: ["yes", "no"]
+    effort: 1
+
+  power_supply_ok:
+    description: Interior light / display comes on; plug, socket, MCB and stabiliser are working
+    values: ["yes", "no"]
+    effort: 1
+
+  thermostat_setting:
+    description: Temperature control position relative to normal
+    values: [too_warm, normal, too_cold]
+    effort: 1
+
+  frost_on_back_wall:
+    description: Frost or ice layer on the inside back wall of the freezer/fridge
+    values: ["yes", "no"]
+    effort: 1
+
+  water_leak_location:
+    description: Where water appears, if anywhere
+    values: [none, inside_compartment, under_unit]
+    effort: 1
+
+  error_code:
+    description: Error code on the display
+    values: [none, displayed, no_display]
+    effort: 1
+
+faults:
+  thermostat_setting:
+    name: Temperature control set incorrectly
+    user_safe: true
+  door_seal:
+    name: Door gasket worn, door misaligned or blocked from closing
+    user_safe: true
+  blocked_airflow:
+    name: Overloading, blocked vents or warm contents
+    user_safe: true
+  hot_surroundings:
+    name: Hot surroundings or no clearance for ventilation
+    user_safe: true
+  dirty_condenser_coils:
+    name: Dirty condenser coils
+    user_safe: true
+  condenser_fan_failure:
+    name: Condenser fan not running
+    user_safe: true        # inspect/clear with unit unplugged; motor replacement -> technician
+  evaporator_fan_failure:
+    name: Evaporator fan not running
+    user_safe: true        # same scope as condenser fan
+  defrost_system_failure:
+    name: Auto-defrost failure (heater, thermal fuse, timer, defrost sensor)
+    user_safe: true        # manual defrost as stop-gap; component replacement -> technician
+  excess_frost_manual_defrost:
+    name: Excess frost in a manual-defrost unit (needs defrosting)
+    user_safe: true
+  drain_blockage:
+    name: Blocked defrost drain or cracked drain pan
+    user_safe: true
+  power_supply:
+    name: External power supply (plug, socket, MCB/RCCB, stabiliser, outage)
+    user_safe: true
+  start_relay_capacitor:
+    name: Start relay, overload relay or capacitor
+    user_safe: false       # mounted on compressor terminals; capacitor can hold charge
+  compressor_failure:
+    name: Compressor failure
+    user_safe: false
+  sealed_system_refrigerant:
+    name: Refrigerant leak or sealed-system blockage
+    user_safe: false
+  control_board_wiring:
+    name: Temperature-control electronics (thermostat, thermistor, damper, control boards) or appliance wiring
+    user_safe: false

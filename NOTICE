@@ -1,0 +1,42 @@
+Query2Diagnose
+Copyright (c) 2026 Saatwik Kumar Yadav, Rachana Bhaskar Gowda,
+Priyanshu Kumar Senapati, S Md Adil Ahmed
+School of Computer Science and Engineering, RV University, Bengaluru
+
+LICENSING SUMMARY
+-----------------
+
+Source code (core/, bench/, sim/, systems/, eval/, api/, web/, tests/) is
+licensed under the MIT License (see LICENSE).
+
+Files that contain third-party text are NOT covered by the MIT License:
+
+1. iFixit content (CC BY-NC-SA 3.0)
+   Text from iFixit (https://www.ifixit.com) is licensed under the Creative
+   Commons Attribution-NonCommercial-ShareAlike 3.0 license
+   (https://creativecommons.org/licenses/by-nc-sa/3.0/), per
+   https://www.ifixit.com/Info/Licensing. Each page's URL, revision and authors
+   are listed in data/sources/LICENSES.md.
+
+   Changes made: wiki markup and images removed; pages split into
+   section-level passages; passages re-used verbatim or in part as retrieval
+   evidence and as source passages for benchmark cases.
+
+   Files under this license:
+     - data/sources/raw/ifixit/
+     - data/sources/passages.jsonl
+     - any derived file that reproduces passage text, including
+       data/benchmark/ and retrieval indexes built from the passages
+   These files are released under CC BY-NC-SA 3.0 (share-alike) and may only
+   be used for non-commercial purposes. iFixit does not endorse this project.
+
+   iFixit's Terms of Use prohibit using its content to train machine learning
+   or AI models. This project trains no models on iFixit content; see
+   docs/design_decisions.md ("Data sources").
+
+2. U.S. federal government works (public domain)
+   Text from ENERGY STAR (U.S. EPA) is a work of the U.S. federal government
+   and is in the public domain (17 U.S.C. 105). Credit: ENERGY STAR / U.S.
+   Environmental Protection Agency.
+
+No manufacturer manuals or service guides are used, stored or redistributed.

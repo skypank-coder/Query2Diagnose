@@ -1,0 +1,29 @@
+{
+ "source": "ifixit",
+ "namespace": "CATEGORY",
+ "title": "Refrigerator",
+ "display_title": "Refrigerator",
+ "wikiid": 15614,
+ "revisionid": 1415607,
+ "langid": "en",
+ "modified_date": "2025-11-17T15:42:05+00:00",
+ "url": "https://www.ifixit.com/Device/Refrigerator",
+ "api_url": "https://www.ifixit.com/api/2.0/wikis/CATEGORY/Refrigerator",
+ "authors": [
+  "Sam Goldheart",
+  "Max Bennett",
+  "Austin Blakely",
+  "Matt Zieminski",
+  "Jeff Suovanen",
+  "iRobot",
+  "Evan Gattuso",
+  "Walter Galan",
+  "Arielle Sampson",
+  "Amber Taus"
+ ],
+ "license": "CC BY-NC-SA 3.0",
+ "license_url": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+ "terms_url": "https://www.ifixit.com/Info/Licensing",
+ "fetched_at": "2026-10-27T19:43:58+00:00",
+ "contents_raw": "== Background ==\n\nA refrigerator (often called a fridge) is a household appliance that includes a thermally insulated compartment and a heat pump. The pump, which can be mechanical, electronic, or chemical, transfers heat from the inside of the refrigerator to its outside environment. This keeps the inside of the appliance cooler than the area outside. In many countries, refrigeration is considered an essential food storage technique.\n\nThe ideal temperature for storing perishable food in refrigerators is between 3 and 5 degrees Celcius (or between 37 and 41 degrees Fahrenheit), which is just above the freezing temperature of water. These cooler temperatures lower the reproduction rate of bacteria so food takes longer to spoil. Similarly, freezers maintain foods at a temperature below the freezing point of water. Freezing foods can halt the reproduction of bacteria entirely. Refrigerators replaced the icebox, which was common in households for approximately 150 years.\n\nThe development of the first artificial refrigeration systems began in the mid-1750s. The first working refrigeration system using vapor compression was built in 1834. Early systems for cooling food mainly involved the use of ice. However, a vapor-compression refrigeration system was introduced in 1834. Modern refrigerators were invented for household use in 1913. Frigidaire sold the first self-contained refrigeration unit in 1923. Freezers as separate compartments for refrigeration systems were introduced in 1940.\n\n== Identification ==\n\nThe most common means of identifying your fridge is to classify it by type as listed below, and then look for a manufacturer's label on it. Model numbers from the label, sometimes referred to as a model code, are critical to identification for exact parts matching and also for determining what features are provided on the unit. The use of an exact model number may also be helpful in identifying a common defect or problem and associated fix.\n\nModel numbers are found on the model label sticker which is usually located on the left side of the refrigerator compartment, or the left side of the external cabinet.\n\n=== Types ===\n\n* Traditional style\n** Freezer on top, Fridge on bottom\n* Side-by-side style\n** Fridge one side (usually right), Freezer on the other\n* Top-refrigerator/bottom-freezer style\n* French-door style\n** Double-door (saloon style) Fridge up top, Freezer drawer on bottom\n* Four-door French-door style\n** Double-door (saloon style) Fridge up top\n** Either two drawers OR saloon style double-doors down below\n* Door and drawer\n** As far as I can tell, same as \"French-door\"\n\n== Additional Information ==\n\n[link|http://en.wikipedia.org/wiki/Refrigerator|Wikipedia: Refrigerator]\n\n[link|https://www.pcrichard.com/library/blogArticle/what-are-the-types-of-refrigerators/1100796.pcra|Types of Refrigerators]\n\n[link|http://www.historyofrefrigeration.com/refrigeration-history/history-of-refrigerator/|History of Refrigerators]"
+}

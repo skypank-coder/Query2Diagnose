@@ -1,0 +1,41 @@
+# Sources fetched by `make sources` (bench/fetch_sources.py).
+# Policy: iFixit + U.S. public-domain pages only. No manufacturer manuals.
+
+ifixit:
+  api: https://www.ifixit.com/api/2.0/wikis
+  license: CC BY-NC-SA 3.0
+  license_url: https://creativecommons.org/licenses/by-nc-sa/3.0/
+  terms_url: https://www.ifixit.com/Info/Licensing
+  pages:
+    # Generic-refrigerator troubleshooting pages listed in iFixit's
+    # "Fridge Troubleshooting Directory" (brand-specific and ice-maker /
+    # water-dispenser pages are out of scope).
+    - {namespace: WIKI, title: Refrigerator_Not_Cooling}
+    - {namespace: WIKI, title: Fridge_Not_Cooling_But_Freezer_Works}
+    - {namespace: WIKI, title: Freezer_Not_Freezing}
+    - {namespace: WIKI, title: Freezer_Not_Freezing_Ice_Cream}
+    - {namespace: WIKI, title: Refrigerator_Compressor_Running_But_Not_Cooling}
+    - {namespace: WIKI, title: Refrigerator_Compressor_Not_Running}
+    - {namespace: WIKI, title: Freezer_Ice_Building_Up}
+    - {namespace: WIKI, title: Refrigerator_Leaking_Water}
+    - {namespace: WIKI, title: Refrigerator_Door_Not_Closing}
+    - {namespace: WIKI, title: Refrigerator_Tripping_GFCI}
+    - {namespace: WIKI, title: Refrigerator_Light_Flickering}
+    - {namespace: WIKI, title: Refrigerator_Makes_Humming_Noise}
+    - {namespace: WIKI, title: Refrigerator_Making_Knocking_Noise}
+    # Background pages linked from the Refrigerator device page.
+    - {namespace: WIKI, title: Frost_Build_Up_in_Freezer}
+    - {namespace: WIKI, title: Refrigerator_Maintenance}
+    - {namespace: WIKI, title: How_to_Reset_Refrigerator_Compressor}
+    - {namespace: WIKI, title: Refrigerator_Parts_and_Terms_Glossary}
+    - {namespace: WIKI, title: How_a_Refrigerator_Works}
+    - {namespace: CATEGORY, title: Refrigerator}
+
+public_domain:
+  - id: energystar-refrigerators
+    url: https://www.energystar.gov/products/refrigerators
+    publisher: ENERGY STAR (U.S. Environmental Protection Agency)
+    license: Public domain (U.S. federal government work, 17 U.S.C. 105)
+    # Headings whose panel text is kept; the rest of the page is site chrome
+    # or purchase advice.
+    sections: [Saving Tips]
