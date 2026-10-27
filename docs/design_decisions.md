@@ -128,6 +128,21 @@ even locally. Fetched with `make sources`, pinned to page revisions, credited in
 | Retrieval | `multilingual-e5-small` + FAISS over 299 chunks; query = English phrases of the confirmed facts + the top fault's name. Oracle-fact queries retrieve a passage supporting the true fault in the top 5 for 83 % of cases. iFixit repeats sections verbatim across pages, so Recall@k counts a near-duplicate of the gold passage as a hit |
 | Observed limitation | With 15 faults and base weights a single answer mostly eliminates one fault, so H_D falls slowly and τ = 0.75 is often not reached within T_max = 6 (cf. the model ceiling in 5b) |
 
+## 5d. Baselines, ablations and simulator (Phase 4)
+
+| System | Definition |
+|---|---|
+| B1 `b1_direct` | One LLM call: opening message + 5 passages retrieved with the raw message → fault, DIY/refer, confidence, guidance |
+| B2 `b2_llm_questions` | Same LLM and passages; each turn it asks one question or answers; must name the schema attribute it asks about so the rule-based simulator can answer it (otherwise a keyword mapper would unfairly misread its questions); same T_max |
+| B3 `b3_infogain_dx` | Q2D pipeline with one greedy interpretation (K = 1, H_L = 0), no clarification, λ = μ = 0 → expected information gain over faults only |
+| Q2D `q2d` | Full system, λ and μ from validation tuning |
+| `q2d_minus_hl` | K = 1, no clarification, keeps λ, μ |
+| `q2d_minus_fault_state` | An LLM re-reads the dialogue each turn and outputs the state; no interpretation sampling, no answer model |
+| `q2d_minus_cost_clarity` | λ = μ = 0 |
+| `q2d_minus_normalisation` | No lexicon / fuzzy gloss |
+
+Simulator (`sim/user_simulator.py`): question → attribute (structured attribute when given, else ordered keyword rules that map all 19 Q2D questions correctly — tested) → gold value → option label. Never sees the fault. Unmappable questions get "I don't know". Noisy mode: wrong value (10 %), "not sure" (10 %), answers in the variant's language with typos. Main runs use deterministic mode; noisy mode is a robustness run.
+
 ## 6. Language pairs
 
 Hindi–English is a second language pair, paired with Kannada–English on the
