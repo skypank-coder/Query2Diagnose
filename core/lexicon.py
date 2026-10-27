@@ -37,6 +37,16 @@ def english_vocabulary() -> frozenset[str]:
     return frozenset(w for w in words if len(w) > 1)
 
 
+@lru_cache(maxsize=1)
+def domain_vocabulary() -> frozenset[str]:
+    """English words of the schema, the question templates and the English
+    phrase templates: the vocabulary noisy input is most likely aiming at."""
+    text = " ".join((DATA / p).read_text(encoding="utf-8") for p in
+                    ("schema/fault_schema.yaml", "questions.yaml", "benchmark/templates/en.yaml"))
+    words = set(re.findall(r"[a-z]+", text.lower().replace("_", " ")))
+    return frozenset(w for w in words if len(w) >= 4) & english_vocabulary()
+
+
 @lru_cache(maxsize=2)
 def load_entries(lang: str) -> tuple[dict, ...]:
     return tuple(yaml.safe_load((LEXICON / f"{lang}_en.yaml").read_text(encoding="utf-8"))["entries"])

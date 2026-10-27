@@ -1,0 +1,28 @@
+# Query2Diagnose agent parameters (paper Sec. III; docs/design_decisions.md).
+understanding:
+  K: 8                 # interpretations sampled per message
+  temperature: 0.7
+  use_normalization: true
+belief:
+  epsilon: 0.05        # user gives a wrong value
+  eta: 0.05            # user answers "not sure" (uninformative)
+fault_state:
+  confirmed: 0.8       # one mentioned value has at least this mass
+  unknown: 0.8         # `unmentioned` has at least this mass
+selection:
+  lambda_: 0.1         # effort weight; tuned on validation (make tune)
+  mu: 0.1              # clarity weight; tuned on validation
+  min_gain_bits: 0.01  # stop early when no question is worth asking (decision 7)
+  discriminate_min: 0.05
+policy:
+  tau: 0.75
+  T_max: 6
+retrieval:
+  backend: sentence-transformers   # sentence-transformers | tfidf (offline tests)
+  model: intfloat/multilingual-e5-small
+  top_k: 5
+  chunk_words: 200
+  overlap_words: 40
+questions:
+  language: en         # en | kn | hi
+  paraphrase: false

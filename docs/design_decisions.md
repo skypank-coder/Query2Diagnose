@@ -114,6 +114,20 @@ even locally. Fetched with `make sources`, pinned to page revisions, credited in
   variants than on real messages. Lexicons are seeded from external
   resources (below) and results on `genuine` variants are reported separately.
 
+## 5c. Core method implementation (Phase 3)
+
+| Component | Choice |
+|---|---|
+| LLM | `openai/gpt-oss-20b` on Groq (Llama 3.1 8B was retired); `reasoning_effort: low`, +400 max tokens for hidden reasoning. One client, disk cache keyed by (provider, model, prompt, temperature, seed), budget guard, RPM/TPM throttle, clean stop when the daily quota (1,000 requests/day on the free tier) is exhausted |
+| Understanding | Strict JSON prompt over the closed schema (~810 tokens); K = 8 samples at T = 0.7 with distinct seeds; invalid samples retried twice; exact-match clustering on the attribute dict; the normaliser's gloss is passed alongside the original text |
+| Normalisation | Lexicon forms (longest match, up to 3 words, language chosen by unambiguous hits) → fuzzy match to Romanized forms (85) and to the schema/template vocabulary (80), then to general passage English (88); English words are never rewritten |
+| Answer model | ε = 0.05 wrong value, η = 0.05 "not sure" (uninformative), exactly as decision 3; verified by hand-computed tests |
+| E[ΔH] | Exact enumeration of every answer incl. "not sure" over the joint (s, z) belief; a clarification on an attribute that does not separate faults gains exactly H_L (tested) |
+| A(q) | Mock users are told what they *observe* (the English template phrase) and answer in their own words; A(q) = share of replies that do not parse back to the intended value. Stored per model in `data/clarity/` |
+| Answer parsing | Rules first (not-sure phrases in 3 languages, negation-aware yes/no, fuzzy option and template matching), LLM fallback only when nothing matches |
+| Retrieval | `multilingual-e5-small` + FAISS over 299 chunks; query = English phrases of the confirmed facts + the top fault's name. Oracle-fact queries retrieve a passage supporting the true fault in the top 5 for 83 % of cases. iFixit repeats sections verbatim across pages, so Recall@k counts a near-duplicate of the gold passage as a hit |
+| Observed limitation | With 15 faults and base weights a single answer mostly eliminates one fault, so H_D falls slowly and τ = 0.75 is often not reached within T_max = 6 (cf. the model ceiling in 5b) |
+
 ## 6. Language pairs
 
 Hindi–English is a second language pair, paired with Kannada–English on the

@@ -1,0 +1,164 @@
+# Question templates (core/questions.py). One question per schema attribute,
+# with option labels; Kannada / Hindi mirrors are Romanized like the user input.
+# A clarification question prefixes `clarify_prefix` and lists only the
+# competing readings. An LLM may paraphrase the English text (configs/agent.yaml,
+# paraphrase: false by default) but never the options.
+
+clarify_prefix:
+  en: "Just to check I understood: "
+  kn: "Sariyaagi arthamaadkondidini anta check maadtini: "
+  hi: "Bas confirm kar raha hoon: "
+
+not_sure_label: {en: "Not sure", kn: "Gottilla", hi: "Pata nahi"}
+
+attributes:
+  primary_symptom:
+    en: What is the main problem with the fridge?
+    kn: Fridge alli mukhya problem enu?
+    hi: Fridge mein main problem kya hai?
+    options:
+      not_cooling: {en: Not cooling enough, kn: Cooling aagtilla, hi: Thanda nahi kar raha}
+      over_cooling: {en: Too cold / food freezing, kn: Jaasti cold, ella freeze, hi: Bahut zyada thanda, sab jam raha}
+      noise: {en: Unusual noise, kn: Vichitra sound, hi: Ajeeb awaaz}
+      leaking_water: {en: Water leaking, kn: Neeru leak, hi: Paani leak}
+      ice_buildup: {en: Block of ice at the bottom, kn: Kelage ice gadde, hi: Neeche barf jam rahi}
+      frost_buildup: {en: Frost on the walls, kn: Gode mele frost, hi: Deewaron pe frost}
+      not_powering_on: {en: Will not turn on, kn: On aagtilla, hi: Chalu nahi hota}
+      runs_constantly: {en: Runs all the time, kn: Yavaglu run aagtide, hi: Hamesha chalta rehta hai}
+  cooling_type:
+    en: Is it a frost-free fridge, or a direct-cool one that you defrost by hand?
+    kn: Idu frost free fridge aa, athava naave defrost maadbekaada direct cool fridge aa?
+    hi: Yeh frost free fridge hai ya direct cool, jise khud defrost karna padta hai?
+    options:
+      direct_cool: {en: Direct-cool (manual defrost), kn: Direct cool, hi: Direct cool}
+      frost_free: {en: Frost-free, kn: Frost free, hi: Frost free}
+  compartment_affected:
+    en: Which part has the problem - the fridge section, the freezer, or both?
+    kn: Yaava bhaga dalli problem ide - fridge, freezer, athava eradu?
+    hi: Problem kis hisse mein hai - fridge, freezer, ya dono?
+    options:
+      fridge: {en: Fridge section, kn: Fridge, hi: Fridge}
+      freezer: {en: Freezer, kn: Freezer, hi: Freezer}
+      both: {en: Both, kn: Eradu, hi: Dono}
+  compressor_running:
+    en: Is the compressor (the motor at the lower back) running? You can usually hear a hum or feel it vibrate.
+    kn: Hinde kelagina compressor (motor) run aagtide aa? Humming sound kelisutte athava vibrate aagutte.
+    hi: Kya peeche neeche wala compressor (motor) chal raha hai? Usually halki awaaz ya vibration hoti hai.
+    options:
+      "yes": {en: "Yes, it is running", kn: "Haudu, run aagtide", hi: "Haan, chal raha hai"}
+      "no": {en: "No, it is silent", kn: "Illa, sound illa", hi: "Nahi, bilkul shaant hai"}
+  noise_type:
+    en: What kind of sound does it make?
+    kn: Yaava tara sound bartide?
+    hi: Kis tarah ki awaaz aati hai?
+    options:
+      none: {en: No sound at all, kn: Yenu sound illa, hi: Koi awaaz nahi}
+      normal_hum: {en: Just the usual soft hum, kn: Normal humming ashte, hi: Bas normal halki awaaz}
+      loud_hum_or_buzz: {en: Loud humming or buzzing, kn: Joragi humming / buzz, hi: Zor ki ghoon ghoon}
+      clicking: {en: Clicking, kn: Tick tick click, hi: Tik tik}
+      knocking_or_rattling: {en: Knocking or rattling, kn: Dhak dhak / rattle, hi: Khat khat}
+      squealing_or_chirping: {en: Squealing or chirping, kn: Keech keech, hi: Cheen cheen}
+  noise_location:
+    en: Where does the unusual sound come from - inside the fridge or freezer, or the lower back of the unit?
+    kn: Vichitra sound ellinda bartide - olaginda, athava hinde kelaginda?
+    hi: Ajeeb awaaz kahan se aati hai - andar se, ya peeche neeche se?
+    options:
+      inside_compartment: {en: From inside, kn: Olaginda, hi: Andar se}
+      back_bottom: {en: From the lower back, kn: Hinde kelaginda, hi: Peeche neeche se}
+      not_applicable: {en: There is no unusual sound, kn: Vichitra sound illa, hi: Koi ajeeb awaaz nahi}
+  condenser_fan_running:
+    en: At the lower back, next to the compressor, is the small fan spinning while the compressor runs?
+    kn: Hinde kelage compressor pakka iruva chikka fan tirugtide aa?
+    hi: Peeche neeche compressor ke paas wala chhota fan ghoom raha hai?
+    options:
+      "yes": {en: "Yes, it spins", kn: "Haudu, tirugtide", hi: "Haan, ghoom raha hai"}
+      "no": {en: "No, it is not spinning", kn: "Illa, tirugtilla", hi: "Nahi, nahi ghoom raha"}
+      not_applicable: {en: There is no fan there, kn: Alli fan illa, hi: Wahan koi fan nahi}
+  evaporator_fan_running:
+    en: Open the freezer and press the door switch - can you hear or feel the fan inside running?
+    kn: Freezer tegedu door switch otti - olage fan run aagtirodu kelisutta?
+    hi: Freezer khol kar door switch dabaiye - andar ka fan chalta sunai deta hai?
+    options:
+      "yes": {en: "Yes, the fan runs", kn: "Haudu, fan run aagtide", hi: "Haan, fan chal raha hai"}
+      "no": {en: "No, it does not run", kn: "Illa, fan run aagtilla", hi: "Nahi, fan nahi chalta"}
+      not_applicable: {en: There is no fan inside, kn: Olage fan illa, hi: Andar koi fan nahi}
+  condenser_coils_dusty:
+    en: Are the coils at the back or underneath covered in dust or lint?
+    kn: Hinde athava kelagina coil mele dust tumbide aa?
+    hi: Peeche ya neeche ki coils par dhool jami hai?
+    options:
+      "yes": {en: "Yes, very dusty", kn: "Haudu, full dust", hi: "Haan, bahut dhool"}
+      "no": {en: "No, they look clean", kn: "Illa, clean ide", hi: "Nahi, saaf hain"}
+  door_seal_condition:
+    en: Does the door close and seal properly? Is the rubber gasket torn or is there a gap?
+    kn: Door sariyagi close aagi seal aagtide aa? Rubber haalagide athava gap ide aa?
+    hi: Darwaza theek se band hota hai? Rubber phati hai ya gap hai?
+    options:
+      good: {en: Seals fine, kn: Sari ide, hi: Theek hai}
+      damaged_or_gap: {en: Torn seal or gap, kn: Haalagide / gap ide, hi: Kharab hai / gap hai}
+  vents_blocked_or_overloaded:
+    en: Is the fridge packed full, or is food blocking the air vents inside?
+    kn: Fridge full tumbide aa, athava food vents na block maadide aa?
+    hi: Kya fridge poora bhara hai, ya saaman andar ke vents rok raha hai?
+    options:
+      "yes": {en: "Yes, it is packed / vents blocked", kn: "Haudu, full ide", hi: "Haan, bhara hua hai"}
+      "no": {en: "No, there is space", kn: "Illa, jaaga ide", hi: "Nahi, jagah hai"}
+  placement_clearance:
+    en: Is the fridge close to a stove or in direct sun, or pushed tight against the wall?
+    kn: Fridge stove pakka, bisilalli, athava gode ge ottikondu ide aa?
+    hi: Kya fridge chulhe ke paas, dhoop mein, ya deewar se chipka hai?
+    options:
+      adequate: {en: Plenty of space and shade, kn: Suttalu jaaga ide, hi: Kaafi jagah hai}
+      too_close_or_hot: {en: Near heat or no space, kn: Bisi / jaaga illa, hi: Garmi ke paas / jagah nahi}
+  recent_relocation:
+    en: Was the fridge moved or newly installed in the last few days?
+    kn: Kelavu dinagalalli fridge move maadidra athava hosadaagi install maadidra?
+    hi: Kya pichhle kuch dinon mein fridge shift ya naya install hua?
+    options:
+      "yes": {en: "Yes, recently moved", kn: "Haudu, move maadidvi", hi: "Haan, shift kiya"}
+      "no": {en: "No", kn: "Illa", hi: "Nahi"}
+  power_supply_ok:
+    en: When you open the door, does the light inside come on (or the display light up)?
+    kn: Door tegedaga olage light bartide aa (athava display on aagutte aa)?
+    hi: Darwaza kholne par andar ki light jalti hai (ya display chalu hota hai)?
+    options:
+      "yes": {en: "Yes, the light comes on", kn: "Haudu, light bartide", hi: "Haan, light jalti hai"}
+      "no": {en: "No light at all", kn: "Illa, light illa", hi: "Nahi, light nahi jalti"}
+  works_in_other_socket:
+    en: If you plug the fridge into a different socket (or use an extension to another one), does it turn on?
+    kn: Bere socket ge haakidre fridge on aagtide aa?
+    hi: Fridge ko doosre socket mein lagane par chalu hota hai?
+    options:
+      "yes": {en: "Yes, it works there", kn: "Haudu, on aagtide", hi: "Haan, chalu hota hai"}
+      "no": {en: "No, still dead", kn: "Illa, aagalla", hi: "Nahi, phir bhi band"}
+  thermostat_setting:
+    en: Where is the temperature knob or setting - warm side, middle, or coldest?
+    kn: Temperature knob ellide - kadime, madhya, athava full cold?
+    hi: Temperature knob kahan hai - kam, beech mein, ya full thanda?
+    options:
+      too_warm: {en: Warm side / lowest cooling, kn: Kadime, hi: Kam pe}
+      normal: {en: Middle / normal, kn: Madhya, hi: Beech mein}
+      too_cold: {en: Coldest setting, kn: Full cold, hi: Full thanda}
+  frost_on_back_wall:
+    en: Is there frost or ice on the back wall inside the freezer or fridge?
+    kn: Olage hinde gode mele frost athava ice ide aa?
+    hi: Andar peeche ki deewar par frost ya barf hai?
+    options:
+      "yes": {en: "Yes, there is frost", kn: "Haudu, frost ide", hi: "Haan, frost hai"}
+      "no": {en: "No frost", kn: "Illa", hi: "Nahi"}
+  water_leak_location:
+    en: Do you see water anywhere - inside at the bottom, or under the fridge?
+    kn: Elladaru neeru kaanutta - olage kelage, athava fridge kelage?
+    hi: Kahin paani dikhta hai - andar neeche, ya fridge ke neeche?
+    options:
+      none: {en: No water, kn: Neeru illa, hi: Paani nahi}
+      inside_compartment: {en: Inside at the bottom, kn: Olage kelage, hi: Andar neeche}
+      under_unit: {en: Under the fridge, kn: Fridge kelage, hi: Fridge ke neeche}
+  error_code:
+    en: Does the display show an error code?
+    kn: Display alli error code bartide aa?
+    hi: Display par koi error code aata hai?
+    options:
+      none: {en: No error code, kn: Error illa, hi: Error nahi}
+      displayed: {en: Shows an error code, kn: Error code bartide, hi: Error code aata hai}
+      no_display: {en: There is no display, kn: Display illa, hi: Display nahi hai}
