@@ -15,8 +15,7 @@ from core.retrieval import Retriever
 from eval.export_latex import export
 
 
-@pytest.fixture()
-def tiny_run(tmp_path, monkeypatch):
+def _offline(tmp_path, monkeypatch, cfg):
     monkeypatch.setenv("LLM_PROVIDER", "mock")
     monkeypatch.setenv("LLM_MODEL", "mock-1")
     monkeypatch.setattr(core.llm, "CACHE_DIR", tmp_path / "llm")
@@ -25,11 +24,48 @@ def tiny_run(tmp_path, monkeypatch):
     monkeypatch.setattr(rx, "RESULTS", tmp_path)
     monkeypatch.setattr(rx, "TUNING_FILE", tmp_path / "none.json")
     monkeypatch.setattr(rx, "make_retriever", lambda: Retriever(backend="tfidf"))
+    monkeypatch.setattr(rx, "load_experiment", lambda profile: dict(cfg))
+
+
+def test_interrupted_run_resumes_without_losing_records(tmp_path, monkeypatch):
+    cfg = {"split": "test", "systems": ["b1_direct", "b3_infogain_dx"], "conditions": ["clean"], "seeds": [0],
+           "max_cases": 3, "include_stress": False, "simulator": {"mode": "deterministic"}, "overrides": {},
+           "hypothesis_weights": None, "clarity_model": None}
+    _offline(tmp_path, monkeypatch, cfg)
+    real_sim, started = rx.UserSimulator, []
+
+    def flaky_sim(*a, **kw):  # Ctrl+C during the 4th record
+        started.append(1)
+        if len(started) == 4:
+            raise KeyboardInterrupt
+        return real_sim(*a, **kw)
+
+    monkeypatch.setattr(rx, "UserSimulator", flaky_sim)
+    monkeypatch.setattr(sys, "argv", ["run_experiment", "--yes"])
+    with pytest.raises(KeyboardInterrupt):
+        rx.main()
+    run_dir = next((tmp_path / "runs").iterdir())
+    assert json.loads((run_dir / "manifest.json").read_text())["status"] == "partial"
+    with (run_dir / "b1_direct.jsonl").open("a", encoding="utf-8") as f:
+        f.write('{"variant_id": "cut off by a power')  # half-written record
+
+    monkeypatch.setattr(rx, "UserSimulator", real_sim)
+    monkeypatch.setattr(sys, "argv", ["run_experiment", "--resume", run_dir.name, "--yes"])
+    with pytest.raises(SystemExit):
+        rx.main()
+    assert json.loads((run_dir / "manifest.json").read_text())["status"] == "complete"
+    for name in cfg["systems"]:
+        records = [json.loads(line) for line in (run_dir / f"{name}.jsonl").read_text().splitlines()]
+        assert len(records) == len({r["variant_id"] for r in records}) == 3
+
+
+@pytest.fixture()
+def tiny_run(tmp_path, monkeypatch):
     cfg = {"split": "test", "systems": ["b1_direct", "b2_llm_questions", "b3_infogain_dx", "q2d", "q2d_minus_hl"],
            "conditions": ["clean", "codemixed_kn", "codemixed_hi"], "seeds": [0], "max_cases": 3,
            "include_stress": True, "simulator": {"mode": "deterministic"}, "overrides": {"K": 3},
            "hypothesis_weights": None, "clarity_model": None}
-    monkeypatch.setattr(rx, "load_experiment", lambda profile: dict(cfg))
+    _offline(tmp_path, monkeypatch, cfg)
     monkeypatch.setattr(sys, "argv", ["run_experiment", "--yes"])
     with pytest.raises(SystemExit):
         rx.main()

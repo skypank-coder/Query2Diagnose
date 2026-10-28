@@ -6,8 +6,8 @@ Prints an estimated number of LLM calls, tokens and cost first and asks for
 confirmation (rule: no paid calls above MAX_USD_PER_RUN without asking).
 Writes results/runs/<run_id>/<system>.jsonl plus manifest.json (git hash,
 config, model, date, cost) and, when every record exists, summary.json.
-A run stopped by an exhausted quota is resumable: completed records are
-skipped and cached LLM calls are free.
+A run stopped by an exhausted quota, Ctrl+C, a crash or a power cut is
+resumable: completed records are skipped and cached LLM calls are free.
 """
 
 from __future__ import annotations
@@ -183,17 +183,28 @@ def main() -> None:
         "tuned": tuned, "agent_config": vars(AgentConfig.from_yaml(**base_overrides)),
         "n_variants": len(variants), "n_cases": len({v.case_id for v in variants}), "estimate": est,
         "ledger": [], "status": "running"}
+    # Written now, so a run killed by a crash, Ctrl+C or a power cut can still be resumed.
+    manifest_path.write_text(json.dumps(manifest, indent=1, default=str) + "\n", encoding="utf-8")
 
     done: dict[str, set] = {}
     for name in cfg["systems"]:
         path = run_dir / f"{name}.jsonl"
         done[name] = set()
         if path.exists():
-            for line in path.read_text(encoding="utf-8").splitlines():
-                r = json.loads(line)
+            lines = path.read_text(encoding="utf-8").splitlines()
+            kept = []
+            for line in lines:
+                try:
+                    r = json.loads(line)
+                except json.JSONDecodeError:  # record cut off by a hard stop; it is redone
+                    continue
+                kept.append(line)
                 done[name].add((r["variant_id"], r["seed"]))
+            if len(kept) < len(lines):
+                print(f"{name}: dropped {len(lines) - len(kept)} incomplete record(s)")
+                path.write_text("".join(f"{line}\n" for line in kept), encoding="utf-8")
     total = len(variants) * len(cfg["seeds"]) * len(cfg["systems"])
-    status = "complete"
+    status = "partial"
     try:
         n = sum(len(d) for d in done.values())
         for v in variants:
@@ -209,13 +220,17 @@ def main() -> None:
                     n += 1
                     if n % 25 == 0:
                         print(f"  {n}/{total} records | {llm.ledger.summary()}", flush=True)
+        status = "complete"
     except (QuotaExhausted, BudgetExceeded) as e:
-        status = "partial"
-        print(f"stopped: {e}\nresume with: python -I -m eval.run_experiment --resume {run_dir.name}")
-    manifest["ledger"].append({"at": datetime.now(timezone.utc).isoformat(timespec="seconds"), **llm.ledger.summary()})
-    manifest["status"] = status
-    manifest["cost_usd"] = round(sum(e["cost_usd"] for e in manifest["ledger"]), 4)
-    manifest_path.write_text(json.dumps(manifest, indent=1, default=str) + "\n", encoding="utf-8")
+        print(f"stopped: {e}")
+    finally:  # also on Ctrl+C or an error, which still propagate afterwards
+        manifest["ledger"].append({"at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                                   **llm.ledger.summary()})
+        manifest["status"] = status
+        manifest["cost_usd"] = round(sum(e["cost_usd"] for e in manifest["ledger"]), 4)
+        manifest_path.write_text(json.dumps(manifest, indent=1, default=str) + "\n", encoding="utf-8")
+        if status != "complete":
+            print(f"resume with: python -I -m eval.run_experiment --resume {run_dir.name}", flush=True)
     if status == "complete":
         from eval.aggregate import summarize
         summarize(run_dir)
