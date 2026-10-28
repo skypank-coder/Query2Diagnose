@@ -37,7 +37,7 @@ API access.
 
 | Run id | Profile | What | Status |
 |---|---|---|---|
-| `20261028T165042Z-pilot` | `pilot` | 15 test cases (one per fault) × 7 conditions = 105 variants; B1, B2, B3, Q2D, Q2D − H_L, Q2D − cost/clarity; seed 0; K = 4; λ = μ = 0.1 (untuned); deterministic simulator | see `results/runs/20261028T165042Z-pilot/manifest.json` |
+| `20261028T171154Z-pilot` | `pilot` | 15 test cases (one per fault) × 7 conditions = 105 variants; B1, B2, B3, Q2D, Q2D − H_L, Q2D − cost/clarity; seed 0; K = 4; λ = μ = 0.1 (untuned); deterministic simulator | partial: 75 / 630 records on 2026-10-28, stopped by the free tier's 200,000 tokens/day; resume with `python -I -m eval.run_experiment --resume 20261028T171154Z-pilot` |
 
 The pilot is labelled as such on the website and in the generated tables. The
 paper's main results need the full grid:

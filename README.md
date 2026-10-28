@@ -81,14 +81,16 @@ writes Cohen's κ. Details: `data/benchmark/README.md`.
 ## Experiments
 
 Every experiment command prints the estimated LLM calls, tokens, cost and (on
-Groq) days of free-tier quota, and asks before running. Runs are resumable:
+Groq) days of free-tier quota, and asks before running. On Groq's free tier the
+binding limit is 200,000 tokens per day per model (hidden reasoning tokens
+count), so anything beyond the pilot needs a paid tier. Runs are resumable:
 `python -I -m eval.run_experiment --resume <run_id>`.
 
 | Command | What | Requests (approx.) | Groq free tier |
 |---|---|---|---|
-| `make pilot` | 15 test cases × 7 conditions, 4 systems + 2 free ablations, K = 4, 1 seed | ~1,050 + 220 for A(q) | ~1 day |
-| `make tune` | λ, μ grid on 30 validation cases × 3 conditions | ~720 | ~1 day |
-| `make experiments` | full test split (60 cases × 7 conditions + 30 stress), 8 systems, 3 seeds, K = 8 | ~24,500 | ~25 days, or ~$5.40 on a paid tier |
+| `make pilot` | 15 test cases × 7 conditions, 4 systems + 2 free ablations, K = 4, 1 seed | ~1,050 + 220 for A(q) (~1.55M tokens) | ~8 days, or ~$0.30 on a paid tier |
+| `make tune` | λ, μ grid on 30 validation cases × 3 conditions | ~720 (~0.9M tokens) | ~5 days |
+| `make experiments` | full test split (60 cases × 7 conditions + 30 stress), 8 systems, 3 seeds, K = 8 | ~24,500 (~29.5M tokens) | not practical (~150 days); ~$5.40 on a paid tier |
 | `make sensitivity` | B3 and Q2D under four alternative hypothesis weight sets | ~4,000 per set before cache hits; the parses are reused from `make experiments`, so after it almost none | — |
 | `make experiments` with `--profile noisy_sim` | noisy simulator (wrong / not-sure answers in the user's language) | as above | |
 

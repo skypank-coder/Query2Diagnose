@@ -146,7 +146,10 @@ def main() -> None:
           f"~{est['input_tokens'] / 1e6:.2f}M in / {est['output_tokens'] / 1e6:.2f}M out tokens, "
           f"~${est['usd_if_paid']} at paid-tier prices (MAX_USD_PER_RUN={settings.max_usd})")
     if settings.provider == "groq":
-        print(f"on the Groq free tier (1,000 requests/day per model) this is ~{est['total_calls'] / 1000:.1f} day(s)")
+        daily = yaml.safe_load((CONFIGS / "llm.yaml").read_text(encoding="utf-8"))["free_tier_daily"]
+        days = max(est["total_calls"] / daily["requests"], (est["input_tokens"] + est["output_tokens"]) / daily["tokens"])
+        print(f"on the Groq free tier ({daily['tokens']:,} tokens and {daily['requests']:,} requests per day per model) "
+              f"this is ~{days:.1f} day(s); a paid tier removes the daily caps")
     if args.estimate_only:
         return
     if est["usd_if_paid"] > settings.max_usd:

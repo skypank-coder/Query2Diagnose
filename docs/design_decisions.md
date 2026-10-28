@@ -119,7 +119,7 @@ even locally. Fetched with `make sources`, pinned to page revisions, credited in
 
 | Component | Choice |
 |---|---|
-| LLM | `openai/gpt-oss-20b` on Groq (Llama 3.1 8B was retired); `reasoning_effort: low`, +400 max tokens for hidden reasoning. One client, disk cache keyed by (provider, model, prompt, temperature, seed), budget guard, RPM/TPM throttle, clean stop when the daily quota (1,000 requests/day on the free tier) is exhausted |
+| LLM | `openai/gpt-oss-20b` on Groq (Llama 3.1 8B was retired); `reasoning_effort: low`, +400 max tokens for hidden reasoning. One client, disk cache keyed by (provider, model, prompt, temperature, seed), budget guard, RPM/TPM throttle, clean stop when the daily quota is exhausted (free tier: 200,000 tokens/day binds before 1,000 requests/day) |
 | Understanding | Strict JSON prompt over the closed schema (~810 tokens); K = 8 samples at T = 0.7 with distinct seeds; invalid samples retried twice; exact-match clustering on the attribute dict; the normaliser's gloss is passed alongside the original text |
 | Normalisation | Lexicon forms (longest match, up to 3 words, language chosen by unambiguous hits) → fuzzy match to Romanized forms (85) and to the schema/template vocabulary (80), then to general passage English (88); English words are never rewritten |
 | Answer model | ε = 0.05 wrong value, η = 0.05 "not sure" (uninformative), exactly as decision 3; verified by hand-computed tests |

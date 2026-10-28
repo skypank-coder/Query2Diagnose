@@ -29,7 +29,10 @@ model_params:
   openai/gpt-oss-20b: {reasoning_effort: low, extra_max_tokens: 400}
   openai/gpt-oss-120b: {reasoning_effort: low, extra_max_tokens: 400}
 
-# Free-tier friendly throttle (Groq gpt-oss-20b on 2026-10-28: 8,000 tokens/min,
-# 1,000 requests/day); raise in .env (LLM_RPM, LLM_TPM) on paid tiers.
+# Free-tier friendly throttle; raise in .env (LLM_RPM, LLM_TPM) on paid tiers.
 rate_limits: {rpm: 30, tpm: 8000}
+# Groq free tier for openai/gpt-oss-20b, read from its 429 responses on 2026-10-28:
+# 200,000 tokens/day binds long before 1,000 requests/day (hidden reasoning
+# tokens count). Used only to print how many days a run needs.
+free_tier_daily: {requests: 1000, tokens: 200000}
 max_retry_wait_s: 120        # a longer server-requested wait means the quota is exhausted

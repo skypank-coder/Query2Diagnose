@@ -61,8 +61,8 @@ repository so it can be checked.
   parser bug; it was fixed and A(q) re-estimated before the pilot.
 
 ## Compute
-- One system LLM (`openai/gpt-oss-20b` on Groq). The free tier's 1,000
-  requests/day limits what can be run per day; the reported pilot uses 15
+- One system LLM (`openai/gpt-oss-20b` on Groq). The free tier's 200,000
+  tokens/day limits what can be run per day; the reported pilot uses 15
   test cases, one seed and K = 4, and is labelled as a pilot. Conclusions need
   the full grid (3 seeds, K = 8, all ablations) and ideally a second model.
 - iFixit's Terms of Use prohibit training ML models on its content. No model
