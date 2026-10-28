@@ -132,6 +132,15 @@ def test_fault_state_thresholds(dist, status):
     assert state["compressor_running"].status == status
 
 
+def test_rejected_json_generation_is_an_empty_reply():
+    import requests
+    from core.llm import _InvalidGeneration, _raise_for
+    r = requests.Response()
+    r.status_code, r._content = 400, b'{"error":{"code":"json_validate_failed","failed_generation":""}}'
+    with pytest.raises(_InvalidGeneration):
+        _raise_for(r)
+
+
 def test_answers_are_negation_aware():
     q = render_question("compressor_running", "diagnostic")
     assert parse_rules("No, it is silent", q) == "no"

@@ -164,7 +164,8 @@ Simulator (`sim/user_simulator.py`): question → attribute (structured attribut
 - **Cost control.** Greedy calls (B1, B2, B3, `q2d_minus_hl`) use seed 0 for the LLM, so extra seeds only re-sample Q2D's interpretations and the noisy simulator. `q2d_minus_hl` shares B3's parse and `q2d_minus_cost_clarity` shares Q2D's samples through the cache.
 - **Pilot profile** (`make pilot`): one test case per fault (15) × 7 conditions, seed 0, K = 4, the four main systems plus the two zero-cost ablations, λ = μ = 0.1 untuned. Fits the Groq free tier (1,000 requests/day for the system model). Reported as a pilot, never as the full grid.
 - **A(q) model.** The mock users that estimate A(q) run on `openai/gpt-oss-120b` (a separate quota), not the system model. A(q) is a fixed property of the question templates shared by every Q2D variant; B3 does not use it.
-- **Known issue found in the A(q) trials.** The rule-based answer parser read "both the fridge and the freezer" as `freezer` (longest label wins), inflating A(compartment_affected) to 0.33. Fixed after the pilot (the pilot ran the code as committed in Phase 5); A(q) must be re-estimated before the full run.
+- **Issue found in the first A(q) trials.** The rule-based answer parser read "both the fridge and the freezer" as `freezer` (longest label wins), inflating A(compartment_affected) to 0.33. Fixed, and A(q) re-estimated from the same cached mock-user replies before the pilot run.
+- **Rejected generations.** In JSON mode Groq answers HTTP 400 `json_validate_failed` when the model emits no valid JSON; the client returns an empty reply, which callers treat as an invalid sample (understanding retries with a new seed, answer parsing falls back to "not sure", B1/B2 refer).
 
 ## 6. Language pairs
 

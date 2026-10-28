@@ -194,6 +194,8 @@ class LLMClient:
                 if s.provider == "anthropic":
                     return self._anthropic(messages, temperature, max_tokens)
                 return self._openai_compatible(messages, temperature, seed, max_tokens, json_mode)
+            except _InvalidGeneration:
+                return "", 0, 0       # the model produced no valid JSON: callers treat it as an invalid reply
             except _Retryable as e:
                 last = f"HTTP {e.status}"
                 if e.wait and e.wait > max_wait:
@@ -236,6 +238,10 @@ class LLMClient:
         return text, usage.get("input_tokens", 0), usage.get("output_tokens", 0)
 
 
+class _InvalidGeneration(Exception):
+    """The provider rejected the model's own output (e.g. Groq json_validate_failed)."""
+
+
 class _Retryable(Exception):
     def __init__(self, status: int, wait: float | None):
         self.status, self.wait = status, wait
@@ -263,6 +269,8 @@ def _raise_for(r: requests.Response) -> None:
                 waits.append(_seconds(h.get("x-ratelimit-reset-requests")))
             wait = max((w for w in waits if w is not None), default=None)
         raise _Retryable(r.status_code, wait)
+    if r.status_code == 400 and "json_validate_failed" in r.text:
+        raise _InvalidGeneration(r.text[:200])
     if r.status_code >= 400:
         raise RuntimeError(f"LLM API error {r.status_code}: {r.text[:300]}")
 

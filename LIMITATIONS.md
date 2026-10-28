@@ -57,8 +57,8 @@ repository so it can be checked.
 - Recall@k counts near-duplicate passages as hits because iFixit repeats
   sections verbatim; the threshold (Jaccard ≥ 0.9) is a choice.
 - A(q) is an estimate: an LLM (gpt-oss-120b) role-plays three user personas.
-  The first estimate was inflated for the compartment question by an answer
-  parser bug fixed afterwards; it must be re-estimated before the full run.
+  A first estimate was inflated for the compartment question by an answer
+  parser bug; it was fixed and A(q) re-estimated before the pilot.
 
 ## Compute
 - One system LLM (`openai/gpt-oss-20b` on Groq). The free tier's 1,000

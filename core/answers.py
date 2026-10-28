@@ -94,7 +94,7 @@ def parse_answer(text: str, question: Question, llm: LLMClient | None = None) ->
     prompt = (f'A technician asked: """{question.text}"""\nOptions:\n{options}\n'
               f'Answer """{text}"""\n'
               'Which option does the answer mean? Reply as JSON: {"value": "<option>"}')
-    reply = llm.complete([{"role": "user", "content": prompt}], temperature=0.0, max_tokens=30, json_mode=True,
+    reply = llm.complete([{"role": "user", "content": prompt}], temperature=0.0, max_tokens=60, json_mode=True,
                          task="parse_answer")
     obj = parse_json(reply.text) or {}
     v = obj.get("value")

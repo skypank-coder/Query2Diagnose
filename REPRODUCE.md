@@ -44,8 +44,6 @@ paper's main results need the full grid:
 
 ```bash
 make tune                     # λ, μ on validation (results/tuning/best.json)
-# re-estimate A(q) after the answer-parser fix (docs/design_decisions.md §5e):
-rm data/clarity/*.json
 make experiments              # full test split, 8 systems, 3 seeds, K = 8 (~24,500 requests)
 make sensitivity              # four alternative hypothesis weight sets
 make experiments ARGS="--profile noisy_sim"   # optional: noisy simulator
