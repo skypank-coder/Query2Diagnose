@@ -15,7 +15,7 @@ base_urls:
   ollama: http://localhost:11434/v1
   anthropic: https://api.anthropic.com/v1
 
-prices_per_million:          # paid-tier estimates; the Groq free tier costs $0
+prices_per_million:          # paid-tier estimates; the Groq free tier and Ollama (local) cost $0
   default: {input: 0.50, output: 1.50}
   mock-1: {input: 0.0, output: 0.0}
   openai/gpt-oss-20b: {input: 0.10, output: 0.50}
@@ -28,6 +28,7 @@ prices_per_million:          # paid-tier estimates; the Groq free tier costs $0
 model_params:
   openai/gpt-oss-20b: {reasoning_effort: low, extra_max_tokens: 400}
   openai/gpt-oss-120b: {reasoning_effort: low, extra_max_tokens: 400}
+  gpt-oss:20b: {reasoning_effort: low, extra_max_tokens: 400}     # same open weights, run locally with Ollama
 
 # Free-tier friendly throttle; raise in .env (LLM_RPM, LLM_TPM) on paid tiers.
 rate_limits: {rpm: 30, tpm: 8000}

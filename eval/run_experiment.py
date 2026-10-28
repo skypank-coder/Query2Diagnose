@@ -103,6 +103,12 @@ def estimate(cfg: dict, variants: list[Variant], settings: Settings, need_clarit
             "usd_if_paid": round((tin * price["input"] + tout * price["output"]) / 1e6, 2)}
 
 
+def clarity_client(cfg: dict, llm: LLMClient) -> LLMClient:
+    """The LLM playing the A(q) mock users; a saved estimate for it is reused without calls."""
+    s = Settings.from_env(provider=cfg.get("clarity_provider"), model=cfg.get("clarity_model"))
+    return llm if (s.provider, s.model) == (llm.settings.provider, llm.settings.model) else LLMClient(s)
+
+
 def make_retriever() -> Retriever:
     r = yaml.safe_load((CONFIGS / "agent.yaml").read_text(encoding="utf-8"))["retrieval"]
     return Retriever(backend=r["backend"], model_name=r["model"], chunk_words=r["chunk_words"],
@@ -137,9 +143,8 @@ def main() -> None:
     settings = Settings.from_env()
     llm = LLMClient(settings)
     variants, cases = select_variants(cfg)
-    clarity_llm_name = cfg.get("clarity_model") or settings.model
-    clarity_client = llm if clarity_llm_name == settings.model else LLMClient(Settings.from_env(model=clarity_llm_name))
-    clarity = load_clarity(clarity_client.name)
+    clarity_llm = clarity_client(cfg, llm)
+    clarity = load_clarity(clarity_llm.name)
     est = estimate(cfg, variants, settings, need_clarity=clarity is None)
     print(f"LLM: {llm.name} | variants: {len(variants)} | seeds: {cfg['seeds']} | systems: {cfg['systems']}")
     print(f"estimated calls (before cache hits): {est['calls']} -> {est['total_calls']} requests, "
@@ -159,8 +164,8 @@ def main() -> None:
         return
 
     if clarity is None and any(s.startswith("q2d") for s in cfg["systems"]):
-        print(f"estimating A(q) with {clarity_client.name} ...")
-        clarity = estimate_clarity(clarity_client)["A"]
+        print(f"estimating A(q) with {clarity_llm.name} ...")
+        clarity = estimate_clarity(clarity_llm)["A"]
     tuned = tuned_params()
     model = load_hypothesis_model(cfg.get("hypothesis_weights"))
     retriever = make_retriever()
@@ -174,7 +179,7 @@ def main() -> None:
     manifest_path = run_dir / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else {
         "run_id": run_dir.name, "created": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "config": cfg, "llm": llm.name, "clarity_llm": clarity_client.name, "git": git_state(),
+        "config": cfg, "llm": llm.name, "clarity_llm": clarity_llm.name, "git": git_state(),
         "tuned": tuned, "agent_config": vars(AgentConfig.from_yaml(**base_overrides)),
         "n_variants": len(variants), "n_cases": len({v.case_id for v in variants}), "estimate": est,
         "ledger": [], "status": "running"}

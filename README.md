@@ -54,6 +54,7 @@ make test                   # 80+ tests, offline (mock LLM, TF-IDF retrieval)
 | `GROQ_API_KEY` / `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` | Key for the chosen provider; `.env` is git-ignored and a test fails if a key-shaped string appears in any committed file |
 | `MAX_USD_PER_RUN` | Hard stop for paid calls in one process (cached calls are free) |
 | `LLM_RPM`, `LLM_TPM` | Client-side throttle; defaults suit Groq's free tier |
+| `LLM_TIMEOUT_S` | Per-request timeout (default 60; use 300 for a local model) |
 
 Every LLM call is cached on disk (`.cache/llm`) by provider, model, prompt,
 temperature and seed, so reruns are free and deterministic.
@@ -93,6 +94,14 @@ count), so anything beyond the pilot needs a paid tier. Runs are resumable:
 | `make experiments` | full test split (60 cases × 7 conditions + 30 stress), 8 systems, 3 seeds, K = 8 | ~24,500 (~29.5M tokens) | not practical (~150 days); ~$5.40 on a paid tier |
 | `make sensitivity` | B3 and Q2D under four alternative hypothesis weight sets | ~4,000 per set before cache hits; the parses are reused from `make experiments`, so after it almost none | — |
 | `make experiments` with `--profile noisy_sim` | noisy simulator (wrong / not-sure answers in the user's language) | as above | |
+
+**Local GPU (no quota, $0).** The same open `gpt-oss-20b` weights run under
+[Ollama](https://ollama.com): `ollama pull gpt-oss:20b` (about 14 GB; a GPU
+with 16 GB runs it fully on-GPU, 12 GB splits it with system RAM), then use
+the commented "Local GPU" block in `.env.example`. A(q) is not re-estimated:
+the saved `data/clarity/groq-openai-gpt-oss-120b.json` is reused
+(`clarity_provider` / `clarity_model` in `configs/experiment.yaml`). Runtime
+depends on the GPU; the runner prints progress every 25 records.
 
 Outputs: `results/runs/<run_id>/<system>.jsonl` (every transcript),
 `manifest.json` (git commit, config, model, date, cost) and `summary.json`

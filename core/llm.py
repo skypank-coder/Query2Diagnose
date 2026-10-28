@@ -26,6 +26,7 @@ import yaml
 from core.paths import CONFIGS, ROOT
 
 CACHE_DIR = ROOT / ".cache" / "llm"
+LOCAL_PROVIDERS = ("ollama", "mock")  # run on your own hardware: always $0
 
 
 class BudgetExceeded(RuntimeError):
@@ -77,11 +78,13 @@ class Settings:
             max_usd=float(os.getenv("MAX_USD_PER_RUN", "1.0")),
             rpm=int(os.getenv("LLM_RPM", cfg["rate_limits"]["rpm"])),
             tpm=int(os.getenv("LLM_TPM", cfg["rate_limits"]["tpm"])),
-            timeout_s=cfg["defaults"]["timeout_s"],
+            timeout_s=int(os.getenv("LLM_TIMEOUT_S", cfg["defaults"]["timeout_s"])),
             max_retries=cfg["defaults"]["max_retries"],
         )
 
     def price(self) -> dict[str, float]:
+        if self.provider in LOCAL_PROVIDERS:
+            return {"input": 0.0, "output": 0.0}
         prices = llm_config()["prices_per_million"]
         return prices.get(self.model, prices["default"])
 

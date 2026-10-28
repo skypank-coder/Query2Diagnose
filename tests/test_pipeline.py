@@ -58,3 +58,13 @@ def test_pipeline_end_to_end(tiny_run, tmp_path, monkeypatch):
     monkeypatch.setattr(eval.error_analysis, "RESULTS", tmp_path)
     report = eval.error_analysis.analyse(tiny_run.name)
     assert report.startswith("# Error analysis")
+
+
+def test_local_model_is_free_and_reuses_the_saved_clarity_estimate(monkeypatch):
+    monkeypatch.setenv("LLM_PROVIDER", "ollama")
+    monkeypatch.setenv("LLM_MODEL", "gpt-oss:20b")
+    llm = core.llm.LLMClient(core.llm.Settings.from_env())
+    assert llm.settings.price() == {"input": 0.0, "output": 0.0}
+    clarity = rx.clarity_client(rx.load_experiment("pilot"), llm)
+    assert clarity.name == "groq/openai/gpt-oss-120b"
+    assert core.clarity.load_clarity(clarity.name), "A(q) estimate missing from data/clarity/"

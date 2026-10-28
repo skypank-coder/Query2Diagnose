@@ -9,20 +9,21 @@ include_stress: true      # also run the Kannada + Hindi + English stress set (r
 simulator: {mode: deterministic}
 overrides: {}             # AgentConfig overrides, e.g. {K: 4}
 hypothesis_weights: null  # null = base; or a sensitivity set from configs/hypothesis.yaml
-clarity_model: null       # LLM playing the A(q) mock users; null = the system LLM
+# LLM playing the A(q) mock users (null = the system LLM). Its estimate is saved
+# in data/clarity/ and reused, so no calls are made for it once the file exists.
+clarity_provider: groq
+clarity_model: openai/gpt-oss-120b
 
 profiles:
-  # Fits the Groq free tier (1,000 requests/day for the system model): one case
-  # per fault, one seed, the systems that need no extra LLM calls beyond the
-  # main four (q2d_minus_hl shares B3's cached parse, q2d_minus_cost_clarity
-  # shares Q2D's). A(q) mock users run on a different model's quota.
+  # One case per fault, one seed, the systems that need no extra LLM calls
+  # beyond the main four (q2d_minus_hl shares B3's cached parse,
+  # q2d_minus_cost_clarity shares Q2D's). About 1,050 requests.
   pilot:
     systems: [b1_direct, b2_llm_questions, b3_infogain_dx, q2d, q2d_minus_hl, q2d_minus_cost_clarity]
     seeds: [0]
     max_cases: 15
     include_stress: false
     overrides: {K: 4}
-    clarity_model: openai/gpt-oss-120b
   noisy_sim:
     simulator: {mode: noisy}
   sensitivity:

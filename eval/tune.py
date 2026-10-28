@@ -19,7 +19,7 @@ from core.hypothesis import load_hypothesis_model
 from core.llm import LLMClient, QuotaExhausted, Settings
 from core.paths import RESULTS
 from eval.metrics import macro_f1
-from eval.run_experiment import TUNING_FILE, make_retriever, select_variants
+from eval.run_experiment import TUNING_FILE, clarity_client, load_experiment, make_retriever, select_variants
 from sim.user_simulator import UserSimulator
 from systems.registry import build_systems
 
@@ -31,7 +31,6 @@ def main() -> None:
     ap.add_argument("--max-cases", type=int, default=30)
     ap.add_argument("--conditions", nargs="+", default=["clean", "codemixed_kn", "combined_kn"])
     ap.add_argument("--K", type=int)
-    ap.add_argument("--clarity-model")
     ap.add_argument("--yes", action="store_true")
     args = ap.parse_args()
 
@@ -39,7 +38,7 @@ def main() -> None:
     variants, cases = select_variants(cfg)
     settings = Settings.from_env()
     llm = LLMClient(settings)
-    clarity = load_clarity(args.clarity_model or settings.model) or {}
+    clarity = load_clarity(clarity_client(load_experiment(None), llm).name) or {}  # same A(q) as the experiments
     k = args.K or 8
     print(f"tuning on {len(variants)} validation variants; first grid point needs ~{len(variants) * k} LLM calls "
           f"({llm.name}); the other {len(GRID) ** 2 - 1} reuse the cache")

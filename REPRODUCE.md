@@ -11,6 +11,10 @@ model, the date and the spend; `summary.json` holds every metric.
 - System LLM: `openai/gpt-oss-20b` on Groq (`reasoning_effort: low`), A(q) mock
   users: `openai/gpt-oss-120b` on Groq. Llama 3.1 8B, the originally planned
   model, was no longer offered when the experiments ran (2026-10-28).
+- Or locally: the same open weights as `gpt-oss:20b` under Ollama
+  (`LLM_PROVIDER=ollama`, see `.env.example`). Each run's `manifest.json`
+  records which provider produced it (`"llm"`); A(q) always comes from the
+  saved gpt-oss-120b estimate in `data/clarity/`.
 - Retrieval: `intfloat/multilingual-e5-small` + FAISS.
 
 ## Steps
