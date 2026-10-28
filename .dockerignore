@@ -1,0 +1,9 @@
+.venv
+.git
+.cache
+.env
+web/node_modules
+web/dist
+web/public/paper.pdf
+**/__pycache__
+.pytest_cache

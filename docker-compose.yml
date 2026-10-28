@@ -1,0 +1,13 @@
+services:
+  q2d:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env            # LLM_PROVIDER, keys, MAX_USD_PER_RUN (see .env.example)
+        required: false
+    environment:
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}   # without a .env the demo runs on the offline mock LLM
+    volumes:
+      - ./.cache:/app/.cache   # LLM response cache, embeddings and the downloaded retrieval model
+      - ./results:/app/results

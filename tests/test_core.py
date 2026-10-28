@@ -138,6 +138,10 @@ def test_answers_are_negation_aware():
     assert parse_rules("the compressor is not running", q) == "no"
     assert parse_rules("haan chal raha hai", q) == "yes"
     assert parse_rules("pata nahi", q) == NOT_SURE
+    where = render_question("compartment_affected", "diagnostic")
+    assert parse_rules("Both the fridge and the freezer are having problems.", where) == "both"
+    assert parse_rules("fridge aur freezer dono mein", where) == "both"
+    assert parse_rules("only the freezer", where) == "freezer"
 
 
 @pytest.mark.parametrize("args, action, reason", [

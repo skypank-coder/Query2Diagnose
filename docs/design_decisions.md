@@ -6,7 +6,8 @@ references; other keys are in `paper/references_2022_2026.bib`, which is design
 justification only and is not cited in the paper.
 
 Status: decisions 1–11 and the literature-driven adjustments were accepted on
-2026-10-28. The fault-schema changes below are new in Phase 1 and await review.
+2026-10-28. The fault-schema changes (§4) were made during Phases 1–2 and await
+review. Reproduction steps: `REPRODUCE.md`; limitations: `LIMITATIONS.md`.
 
 ## 1. Under-specified points in the method (accepted)
 

@@ -23,6 +23,7 @@ NOT_SURE_PHRASES = ("not sure", "don't know", "dont know", "no idea", "can't tel
                     "pata nahi", "pata nhi", "maloom nahi", "malum nahi", "gottilla", "gotilla", "gothilla",
                     "gotthilla", "not known")
 NO_WORDS = {"no", "nope", "not", "nahi", "nahin", "nhi", "nai", "illa", "ila", "silent", "dead", "never", "nothing"}
+BOTH_WORDS = {"both", "dono", "donon", "eradu", "eradralloo", "eradaralloo"}
 YES_WORDS = {"yes", "yeah", "yep", "yup", "haan", "han", "haa", "ha", "haudu", "houdu", "hudu", "ide", "correct",
              "running", "spinning", "works", "working", "on"}
 
@@ -52,6 +53,8 @@ def parse_rules(text: str, question: Question) -> str | None:
     if any(p in raw or p in norm for p in NOT_SURE_PHRASES):
         return NOT_SURE
     values = [v for v, _ in question.options if v != NOT_SURE]
+    if question.attribute == "compartment_affected" and "both" in values and (_words(raw) | _words(norm)) & BOTH_WORDS:
+        return "both"   # otherwise the longer label "freezer" wins in "both the fridge and the freezer"
 
     # Exact option value or label.
     for v, label in question.options:

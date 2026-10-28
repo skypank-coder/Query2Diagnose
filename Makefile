@@ -4,7 +4,7 @@ PY ?= $(if $(wildcard .venv/Scripts/python.exe),.venv/Scripts/python,$(if $(wild
 # Isolated mode: scripts that read downloaded files must not import from cwd.
 PYI = $(PY) -I
 
-.PHONY: install sources passages seeds benchmark annotations data heatmap test tune pilot experiments \n	sensitivity tables errors relevance-sheet api web all
+.PHONY: install sources passages seeds benchmark annotations data heatmap test tune pilot experiments \n	sensitivity tables errors relevance-sheet api web web-build docker all
 
 install:
 	$(PY) -m pip install -e ".[dev]"
@@ -43,7 +43,7 @@ pilot:
 	$(PYI) -m eval.run_experiment --profile pilot
 
 experiments:
-	$(PYI) -m eval.run_experiment
+	$(PYI) -m eval.run_experiment $(ARGS)
 
 sensitivity:
 	for w in flat sharp soft_atypical hard_atypical; do $(PYI) -m eval.run_experiment --profile sensitivity --weights $$w; done
@@ -56,3 +56,19 @@ errors:
 
 relevance-sheet:
 	$(PYI) -m eval.relevance export
+
+# --- API and website (Phases 6-7) ---
+api:
+	$(PYI) -m uvicorn api.main:app --port 8000
+
+web:
+	cd web && npm install --no-audit --no-fund && npm run dev
+
+web-build:
+	cd web && npm install --no-audit --no-fund && npm run build
+
+docker:
+	docker compose up --build
+
+# Everything, in order. `experiments` prints its cost estimate and asks before spending.
+all: install data test experiments tables errors web-build
