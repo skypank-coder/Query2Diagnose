@@ -78,7 +78,7 @@ class Understanding:
     @property
     def h_l(self) -> float:
         p = self.probs[self.probs > 0]
-        return float(-(p * np.log2(p)).sum())
+        return max(0.0, float(-(p * np.log2(p)).sum()))
 
     @property
     def n_valid(self) -> int:
@@ -107,7 +107,7 @@ def understand(message: str, llm: LLMClient, k: int = 8, temperature: float = 0.
         for attempt in range(max_retries + 1):
             temp = temperature if k > 1 else 0.0
             reply = llm.complete(messages, temperature=temp, seed=seed * 1000 + i + 100 * attempt,
-                                 max_tokens=200, json_mode=True, task="understand")
+                                 max_tokens=300, json_mode=True, task="understand")
             parsed = validate(parse_json(reply.text), schema)
             if parsed is not None:
                 break

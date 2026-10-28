@@ -7,7 +7,7 @@ defaults:
   provider: mock
   model: mock-1
   timeout_s: 60
-  max_retries: 6
+  max_retries: 10
 
 base_urls:
   groq: https://api.groq.com/openai/v1

@@ -4,7 +4,7 @@ PY ?= $(if $(wildcard .venv/Scripts/python.exe),.venv/Scripts/python,$(if $(wild
 # Isolated mode: scripts that read downloaded files must not import from cwd.
 PYI = $(PY) -I
 
-.PHONY: install sources passages seeds benchmark annotations data heatmap test
+.PHONY: install sources passages seeds benchmark annotations data heatmap test tune pilot experiments \n	sensitivity tables errors relevance-sheet api web all
 
 install:
 	$(PY) -m pip install -e ".[dev]"
@@ -34,3 +34,25 @@ heatmap:
 
 test:
 	$(PYI) -m pytest -q
+
+# --- experiments (Phase 5); each prints an estimate and asks before spending ---
+tune:
+	$(PYI) -m eval.tune
+
+pilot:
+	$(PYI) -m eval.run_experiment --profile pilot
+
+experiments:
+	$(PYI) -m eval.run_experiment
+
+sensitivity:
+	for w in flat sharp soft_atypical hard_atypical; do $(PYI) -m eval.run_experiment --profile sensitivity --weights $$w; done
+
+tables:
+	$(PYI) -m eval.export_latex
+
+errors:
+	$(PYI) -m eval.error_analysis
+
+relevance-sheet:
+	$(PYI) -m eval.relevance export

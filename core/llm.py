@@ -13,6 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import threading
 import time
 from collections import deque
@@ -166,7 +167,8 @@ class LLMClient:
         else:
             if self.ledger.cost_usd >= self.settings.max_usd:
                 raise BudgetExceeded(f"spent ${self.ledger.cost_usd:.4f} >= MAX_USD_PER_RUN={self.settings.max_usd}")
-            self._throttle.wait(_estimate_tokens(messages) + max_tokens)
+            extra = llm_config().get("model_params", {}).get(self.settings.model, {}).get("extra_max_tokens", 0)
+            self._throttle.wait(_estimate_tokens(messages) + max_tokens + extra)
             text, tin, tout = self._call_api(messages, temperature, seed, max_tokens, json_mode)
         price = self.settings.price()
         cost = (tin * price["input"] + tout * price["output"]) / 1e6
@@ -186,18 +188,21 @@ class LLMClient:
         if s.provider in ("openai", "groq") and not s.api_key:
             raise RuntimeError(f"{s.provider} selected but its API key is not set in .env")
         max_wait = llm_config().get("max_retry_wait_s", 120)
+        last = "no response"
         for attempt in range(s.max_retries):
             try:
                 if s.provider == "anthropic":
                     return self._anthropic(messages, temperature, max_tokens)
                 return self._openai_compatible(messages, temperature, seed, max_tokens, json_mode)
             except _Retryable as e:
+                last = f"HTTP {e.status}"
                 if e.wait and e.wait > max_wait:
                     raise QuotaExhausted(f"{s.provider} asks to wait {e.wait:.0f}s; quota exhausted, resume later")
-                time.sleep(e.wait if e.wait else min(2 ** attempt, 30))
-            except (requests.ConnectionError, requests.Timeout):
-                time.sleep(min(2 ** attempt, 30))
-        raise RuntimeError(f"{s.provider}: giving up after {s.max_retries} retries")
+                time.sleep(e.wait + 0.5 if e.wait else min(2 ** (attempt + 1), 60))
+            except (requests.ConnectionError, requests.Timeout) as e:
+                last = type(e).__name__
+                time.sleep(min(2 ** (attempt + 1), 60))
+        raise RuntimeError(f"{s.provider}: giving up after {s.max_retries} retries (last: {last})")
 
     def _openai_compatible(self, messages, temperature, seed, max_tokens, json_mode):
         s = self.settings
@@ -232,14 +237,32 @@ class LLMClient:
 
 
 class _Retryable(Exception):
-    def __init__(self, wait: float | None):
-        self.wait = wait
+    def __init__(self, status: int, wait: float | None):
+        self.status, self.wait = status, wait
+
+
+def _seconds(text: str | None) -> float | None:
+    """'2.805s', '1m26.4s', '450ms' or '12' -> seconds."""
+    if not text:
+        return None
+    try:
+        return float(text)
+    except ValueError:
+        parts = re.findall(r"([\d.]+)(ms|h|m|s)", text)
+        scale = {"h": 3600, "m": 60, "s": 1, "ms": 0.001}
+        return sum(float(n) * scale[u] for n, u in parts) if parts else None
 
 
 def _raise_for(r: requests.Response) -> None:
     if r.status_code == 429 or r.status_code >= 500:
-        retry_after = r.headers.get("retry-after")
-        raise _Retryable(float(retry_after) if retry_after and retry_after.replace(".", "").isdigit() else None)
+        wait = _seconds(r.headers.get("retry-after"))
+        if wait is None and r.status_code == 429:
+            h = r.headers
+            waits = [_seconds(h.get("x-ratelimit-reset-tokens"))]
+            if h.get("x-ratelimit-remaining-requests") == "0":
+                waits.append(_seconds(h.get("x-ratelimit-reset-requests")))
+            wait = max((w for w in waits if w is not None), default=None)
+        raise _Retryable(r.status_code, wait)
     if r.status_code >= 400:
         raise RuntimeError(f"LLM API error {r.status_code}: {r.text[:300]}")
 

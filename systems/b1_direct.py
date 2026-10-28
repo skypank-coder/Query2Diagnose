@@ -52,7 +52,7 @@ class B1Direct:
             '"guidance": "<one or two sentences>"}'
         )
         reply = self.llm.complete([{"role": "system", "content": SYSTEM}, {"role": "user", "content": prompt}],
-                                  temperature=0.0, seed=seed, max_tokens=200, json_mode=True, task="direct")
+                                  temperature=0.0, seed=0, max_tokens=200, json_mode=True, task="direct")
         predicted, top, conf, guidance = read_final(parse_json(reply.text), schema.faults)
         return SystemResult(
             system=self.name, case_id=variant.case_id, variant_id=variant.variant_id, condition=variant.condition,

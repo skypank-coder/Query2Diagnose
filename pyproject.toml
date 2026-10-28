@@ -26,13 +26,14 @@ dependencies = [
     "faiss-cpu>=1.8",
     "fastapi>=0.110",
     "uvicorn>=0.29",
+    "relplot>=0.0.2",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 
 [tool.setuptools]
-packages = ["core", "bench", "eval", "sim", "systems"]
+packages = ["core", "bench", "eval", "sim", "systems", "api"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

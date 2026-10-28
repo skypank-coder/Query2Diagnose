@@ -1,0 +1,60 @@
+"""Smoke test of the experiment pipeline on the offline mock LLM:
+run -> summary.json -> LaTeX tables / figures -> error analysis."""
+
+import json
+import sys
+
+import pytest
+
+import core.clarity
+import core.llm
+import eval.aggregate
+import eval.error_analysis
+import eval.run_experiment as rx
+from core.retrieval import Retriever
+from eval.export_latex import export
+
+
+@pytest.fixture()
+def tiny_run(tmp_path, monkeypatch):
+    monkeypatch.setenv("LLM_PROVIDER", "mock")
+    monkeypatch.setenv("LLM_MODEL", "mock-1")
+    monkeypatch.setattr(core.llm, "CACHE_DIR", tmp_path / "llm")
+    monkeypatch.setattr(core.clarity, "CLARITY_DIR", tmp_path / "clarity")
+    monkeypatch.setattr(rx, "RUNS", tmp_path / "runs")
+    monkeypatch.setattr(rx, "RESULTS", tmp_path)
+    monkeypatch.setattr(rx, "TUNING_FILE", tmp_path / "none.json")
+    monkeypatch.setattr(rx, "make_retriever", lambda: Retriever(backend="tfidf"))
+    cfg = {"split": "test", "systems": ["b1_direct", "b2_llm_questions", "b3_infogain_dx", "q2d", "q2d_minus_hl"],
+           "conditions": ["clean", "codemixed_kn", "codemixed_hi"], "seeds": [0], "max_cases": 3,
+           "include_stress": True, "simulator": {"mode": "deterministic"}, "overrides": {"K": 3},
+           "hypothesis_weights": None, "clarity_model": None}
+    monkeypatch.setattr(rx, "load_experiment", lambda profile: dict(cfg))
+    monkeypatch.setattr(sys, "argv", ["run_experiment", "--yes"])
+    with pytest.raises(SystemExit):
+        rx.main()
+    run_dir = next((tmp_path / "runs").iterdir())
+    return run_dir
+
+
+def test_pipeline_end_to_end(tiny_run, tmp_path, monkeypatch):
+    manifest = json.loads((tiny_run / "manifest.json").read_text())
+    assert manifest["status"] == "complete" and manifest["llm"] == "mock/mock-1"
+    summary = json.loads((tiny_run / "summary.json").read_text())
+    assert set(summary["systems"]) == {"b1_direct", "b2_llm_questions", "b3_infogain_dx", "q2d", "q2d_minus_hl"}
+    q = summary["main"]["q2d"]
+    assert 0 <= q["all"]["macro_f1"][1] <= q["all"]["macro_f1"][0] <= q["all"]["macro_f1"][2] <= 1
+    assert "codemixed" in summary["kn_vs_hi"]["q2d"] and summary["stress"]["q2d"]["n"] >= 1
+    assert summary["trajectory"]["q2d"]["clean"]["H_D"]
+
+    # Export refuses mock runs unless explicitly allowed.
+    monkeypatch.setattr("eval.export_latex.RESULTS", tmp_path)
+    with pytest.raises(SystemExit):
+        export(tiny_run.name, tmp_path / "paper")
+    written = export(tiny_run.name, tmp_path / "paper", allow_mock=True)
+    assert "tables/main_results.tex" in written and "figures/hl_hd_trajectory.pdf" in written
+    assert "Query2Diagnose" in (tmp_path / "paper" / "tables" / "main_results.tex").read_text()
+
+    monkeypatch.setattr(eval.error_analysis, "RESULTS", tmp_path)
+    report = eval.error_analysis.analyse(tiny_run.name)
+    assert report.startswith("# Error analysis")

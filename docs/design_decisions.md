@@ -143,6 +143,28 @@ even locally. Fetched with `make sources`, pinned to page revisions, credited in
 
 Simulator (`sim/user_simulator.py`): question → attribute (structured attribute when given, else ordered keyword rules that map all 19 Q2D questions correctly — tested) → gold value → option label. Never sees the fault. Unmappable questions get "I don't know". Noisy mode: wrong value (10 %), "not sure" (10 %), answers in the variant's language with typos. Main runs use deterministic mode; noisy mode is a robustness run.
 
+## 5e. Evaluation protocol (Phase 5)
+
+| Metric | Definition |
+|---|---|
+| Action accuracy / macro-F1 | Predicted action (fault id or REFER) vs gold action; REFER is a class; macro over every label in gold ∪ predicted |
+| Fault accuracy | Top fault (also reported when referring) vs the hidden fault |
+| Slot P/R/F1 | Most probable interpretation vs the gold values of the attributes the variant mentions (agent systems) |
+| Status accuracy | Turn-0 fault state: mentioned attribute confirmed with the right value, or unmentioned attribute marked unknown; `uncertain` never counts as correct |
+| Informative / redundant questions | Informative: asks about a scenario-specific attribute not already stated; redundant: asks about a stated attribute |
+| IG per turn | One shared observer starts from the message's gold facts and applies each answered (attribute, intended value); mean drop in H_D — the same yardstick for B2, B3 and Q2D |
+| Accuracy vs turns | Agent transcripts truncated at each budget (forced decision: answer if top ≥ τ, safe and supported, else REFER); B1/B2 at their mean turns |
+| Calibration | Confidence in the top fault vs top-fault correctness: 15-bin ECE, Smooth ECE (`relplot`), Brier, reliability bins; selective accuracy vs coverage and AURC |
+| Abstention | REFER precision / recall against gold REFER |
+| Unsafe advice | Share of unsafe-fault cases answered with DIY guidance instead of REFER |
+| Retrieval Recall@k | Gold source passage or any near-duplicate (word-set Jaccard ≥ 0.9; iFixit repeats sections verbatim) among the final top-k |
+| Statistics | 95 % case-level bootstrap CIs (1,000 resamples); exact McNemar (action correctness) and Wilcoxon signed-rank (turns), Q2D vs each baseline, Holm-corrected per scope |
+
+- **Cost control.** Greedy calls (B1, B2, B3, `q2d_minus_hl`) use seed 0 for the LLM, so extra seeds only re-sample Q2D's interpretations and the noisy simulator. `q2d_minus_hl` shares B3's parse and `q2d_minus_cost_clarity` shares Q2D's samples through the cache.
+- **Pilot profile** (`make pilot`): one test case per fault (15) × 7 conditions, seed 0, K = 4, the four main systems plus the two zero-cost ablations, λ = μ = 0.1 untuned. Fits the Groq free tier (1,000 requests/day for the system model). Reported as a pilot, never as the full grid.
+- **A(q) model.** The mock users that estimate A(q) run on `openai/gpt-oss-120b` (a separate quota), not the system model. A(q) is a fixed property of the question templates shared by every Q2D variant; B3 does not use it.
+- **Known issue found in the A(q) trials.** The rule-based answer parser read "both the fridge and the freezer" as `freezer` (longest label wins), inflating A(compartment_affected) to 0.33. Fixed after the pilot (the pilot ran the code as committed in Phase 5); A(q) must be re-estimated before the full run.
+
 ## 6. Language pairs
 
 Hindi–English is a second language pair, paired with Kannada–English on the

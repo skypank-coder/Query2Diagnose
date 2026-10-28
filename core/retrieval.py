@@ -36,9 +36,10 @@ class Hit:
     chunk: Chunk
     score: float
 
-    def to_dict(self) -> dict:
-        return {"chunk_id": self.chunk.chunk_id, "passage_id": self.chunk.passage_id,
-                "score": round(self.score, 4), "faults": sorted(self.chunk.faults), "text": self.chunk.text}
+    def to_dict(self, include_text: bool = False) -> dict:
+        d = {"chunk_id": self.chunk.chunk_id, "passage_id": self.chunk.passage_id,
+             "score": round(self.score, 4), "faults": sorted(self.chunk.faults)}
+        return {**d, "text": self.chunk.text} if include_text else d
 
 
 def build_chunks(chunk_words: int = 200, overlap: int = 40) -> list[Chunk]:

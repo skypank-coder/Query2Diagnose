@@ -38,10 +38,9 @@ class AgentSystem:
             lang_pair=variant.lang_pair, seed=seed, predicted=r.predicted, top_fault=r.top_fault,
             confidence=r.confidence, fault_probs=r.fault_probs, turns=r.turns, transcript=transcript,
             passage_ids=r.passage_ids, reason=r.reason,
-            extras={"understanding": agent.understanding_summary(), "facts": r.facts},
+            extras={"understanding": agent.understanding_summary(), "facts": r.facts, "retrieved": r.retrieved_ids},
         )
 
 
-def q2d(llm, model, retriever, clarity, lambda_: float | None = None, mu: float | None = None) -> AgentSystem:
-    overrides = {k: v for k, v in (("lambda_", lambda_), ("mu", mu)) if v is not None}
-    return AgentSystem("q2d", llm, model, retriever, AgentConfig.from_yaml(**overrides), clarity)
+def q2d(llm, model, retriever, clarity, overrides: dict | None = None) -> AgentSystem:
+    return AgentSystem("q2d", llm, model, retriever, AgentConfig.from_yaml(**(overrides or {})), clarity)

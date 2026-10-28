@@ -40,7 +40,10 @@ def clarity_path(model_name: str):
 
 def _observations() -> dict[str, dict[str, str]]:
     t = yaml.safe_load((DATA / "benchmark" / "templates" / "en.yaml").read_text(encoding="utf-8"))
-    return {a: {v: opts[0].replace("{where}", "") for v, opts in values.items()} for a, values in t["phrases"].items()}
+    out = {a: {v: opts[0].replace("{where}", "") for v, opts in values.items()} for a, values in t["phrases"].items()}
+    # The compartment is only ever expressed inside the symptom phrase.
+    out["compartment_affected"] = {v: "the problem is" + w for v, w in t["where"].items() if v != "_none"}
+    return out
 
 
 def estimate_clarity(llm: LLMClient, lang: str = "en") -> dict:

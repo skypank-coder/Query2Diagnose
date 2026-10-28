@@ -103,7 +103,8 @@ class Result:
     turns: int
     reason: str
     facts: dict[str, str]
-    passage_ids: list[str]
+    passage_ids: list[str]               # supporting passages first, else the retrieved ones
+    retrieved_ids: list[str] = field(default_factory=list)   # final retrieval, rank order
     guidance: list[str] = field(default_factory=list)
 
 
@@ -213,6 +214,7 @@ class Agent:
             reason=decision.reason,
             facts=facts,
             passage_ids=[h.chunk.passage_id for h in (supporting or hits)],
+            retrieved_ids=[h.chunk.passage_id for h in hits],
             guidance=guidance,
         )
 

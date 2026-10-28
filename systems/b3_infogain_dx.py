@@ -12,6 +12,7 @@ from core.agent import AgentConfig
 from systems.q2d import AgentSystem
 
 
-def b3(llm, model, retriever) -> AgentSystem:
-    config = AgentConfig.from_yaml(K=1, allow_clarification=False, lambda_=0.0, mu=0.0)
+def b3(llm, model, retriever, overrides: dict | None = None) -> AgentSystem:
+    config = AgentConfig.from_yaml(**{**(overrides or {}), "K": 1, "allow_clarification": False,
+                                      "lambda_": 0.0, "mu": 0.0})
     return AgentSystem("b3_infogain_dx", llm, model, retriever, config, clarity=None)

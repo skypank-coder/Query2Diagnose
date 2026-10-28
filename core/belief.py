@@ -20,7 +20,7 @@ from core.schema import NOT_SURE
 
 def entropy(p: np.ndarray) -> float:
     p = p[p > 0]
-    return float(-(p * np.log2(p)).sum())
+    return max(0.0, float(-(p * np.log2(p)).sum()))
 
 
 class Belief:
