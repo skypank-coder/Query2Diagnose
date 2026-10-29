@@ -40,9 +40,12 @@ def _scenario_specific() -> dict[str, set[str]]:
 
 
 def load_run(run_dir) -> dict[str, list[dict]]:
+    """Records per system, sorted by (variant, seed): parallel workers write in
+    completion order, and the bootstrap must not depend on it."""
     records = {}
     for path in sorted(run_dir.glob("*.jsonl")):
-        records[path.stem] = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
+        rs = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
+        records[path.stem] = sorted(rs, key=lambda r: (r["variant_id"], r["seed"]))
     return records
 
 

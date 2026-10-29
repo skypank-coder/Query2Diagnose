@@ -1,6 +1,6 @@
 """Run systems x conditions x cases x seeds and save every transcript.
 
-    python -I -m eval.run_experiment [--profile pilot] [--estimate-only] [--yes] [--resume RUN_ID]
+    python -I -m eval.run_experiment [--profile pilot] [--estimate-only] [--yes] [--resume RUN_ID] [--workers N]
 
 Prints an estimated number of LLM calls, tokens and cost first and asks for
 confirmation (rule: no paid calls above MAX_USD_PER_RUN without asking).
@@ -16,7 +16,9 @@ import argparse
 import json
 import subprocess
 import sys
+import threading
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 
 import yaml
@@ -142,6 +144,8 @@ def main() -> None:
     ap.add_argument("--estimate-only", action="store_true")
     ap.add_argument("--yes", action="store_true", help="skip the confirmation prompt")
     ap.add_argument("--weights", help="hypothesis weight set from configs/hypothesis.yaml (sensitivity)")
+    ap.add_argument("--workers", type=int, default=1,
+                    help="dialogues run in parallel (default 1); useful when the LLM server accepts parallel requests")
     args = ap.parse_args()
 
     run_dir = RUNS / args.resume if args.resume else None
@@ -215,27 +219,49 @@ def main() -> None:
                 path.write_text("".join(f"{line}\n" for line in kept), encoding="utf-8")
     total = len(variants) * len(cfg["seeds"]) * len(cfg["systems"])
     status = "partial"
+    lock = threading.Lock()
+    progress = {"n": sum(len(d) for d in done.values())}
+
+    def run_unit(v: Variant, seed: int) -> None:
+        """Every system on one (variant, seed), in order, so Q2D's samples are cached
+        before the ablations that share them run."""
+        lang = v.lang_pair.split("-")[0] if v.lang_pair in ("kn-en", "hi-en") else "en"
+        for name, system in systems.items():
+            if (v.variant_id, seed) in done[name]:
+                continue
+            sim = UserSimulator(cases[v.case_id], mode=cfg["simulator"]["mode"], lang=lang, seed=seed)
+            result: SystemResult = system.run(v, sim, seed)
+            line = result.model_dump_json() + "\n"
+            with lock:
+                with (run_dir / f"{name}.jsonl").open("a", encoding="utf-8") as f:
+                    f.write(line)
+                progress["n"] += 1
+                if progress["n"] % 25 == 0:
+                    print(f"  {progress['n']}/{total} records | {llm.ledger.summary()}", flush=True)
+
+    units = [(v, seed) for v in variants for seed in cfg["seeds"]]
     try:
-        n = sum(len(d) for d in done.values())
-        for v in variants:
-            for seed in cfg["seeds"]:
-                lang = v.lang_pair.split("-")[0] if v.lang_pair in ("kn-en", "hi-en") else "en"
-                for name, system in systems.items():
-                    if (v.variant_id, seed) in done[name]:
-                        continue
-                    sim = UserSimulator(cases[v.case_id], mode=cfg["simulator"]["mode"], lang=lang, seed=seed)
-                    result: SystemResult = system.run(v, sim, seed)
-                    with (run_dir / f"{name}.jsonl").open("a", encoding="utf-8") as f:
-                        f.write(result.model_dump_json() + "\n")
-                    n += 1
-                    if n % 25 == 0:
-                        print(f"  {n}/{total} records | {llm.ledger.summary()}", flush=True)
+        if args.workers <= 1:
+            for v, seed in units:
+                run_unit(v, seed)
+        else:
+            # Parallel workers only overlap LLM requests (the server must accept them,
+            # e.g. OLLAMA_NUM_PARALLEL); each record is still computed independently.
+            with ThreadPoolExecutor(args.workers) as pool:
+                futures = [pool.submit(run_unit, v, seed) for v, seed in units]
+                try:
+                    for future in as_completed(futures):
+                        future.result()
+                except BaseException:
+                    for future in futures:
+                        future.cancel()
+                    raise
         status = "complete"
     except (QuotaExhausted, BudgetExceeded) as e:
         print(f"stopped: {e}")
     finally:  # also on Ctrl+C or an error, which still propagate afterwards
         manifest["ledger"].append({"at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                                   **llm.ledger.summary()})
+                                   "workers": args.workers, **llm.ledger.summary()})
         manifest["status"] = status
         manifest["cost_usd"] = round(sum(e["cost_usd"] for e in manifest["ledger"]), 4)
         manifest_path.write_text(json.dumps(manifest, indent=1, default=str) + "\n", encoding="utf-8")

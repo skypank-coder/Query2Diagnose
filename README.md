@@ -103,6 +103,13 @@ the saved `data/clarity/groq-openai-gpt-oss-120b.json` is reused
 (`clarity_provider` / `clarity_model` in `configs/experiment.yaml`). Runtime
 depends on the GPU; the runner prints progress every 25 records.
 
+**Parallel requests.** One request at a time leaves the GPU idle between
+steps. Start the Ollama server with `OLLAMA_NUM_PARALLEL=4` and pass
+`--workers 4` to `eval.run_experiment` or `eval.tune` (also works with a paid
+API tier: raise `LLM_RPM` / `LLM_TPM`). Records are identical to a
+single-worker run; only their order in the `.jsonl` files differs, and the
+aggregation sorts them.
+
 Outputs: `results/runs/<run_id>/<system>.jsonl` (every transcript),
 `manifest.json` (git commit, config, model, date, cost) and `summary.json`
 (all metrics); `results/latest.json` points to the newest finished run.
