@@ -1,0 +1,97 @@
+{
+ "run_id": "20261029T071216Z-pilot",
+ "created": "2026-10-29T07:12:16+00:00",
+ "config": {
+  "split": "test",
+  "systems": [
+   "b1_direct",
+   "b2_llm_questions",
+   "b3_infogain_dx",
+   "q2d",
+   "q2d_minus_hl",
+   "q2d_minus_cost_clarity"
+  ],
+  "conditions": [
+   "clean",
+   "spelling",
+   "codemixed_kn",
+   "codemixed_hi",
+   "incomplete",
+   "combined_kn",
+   "combined_hi"
+  ],
+  "seeds": [
+   0
+  ],
+  "max_cases": 15,
+  "include_stress": false,
+  "simulator": {
+   "mode": "deterministic"
+  },
+  "overrides": {
+   "K": 4
+  },
+  "hypothesis_weights": null,
+  "clarity_provider": "groq",
+  "clarity_model": "openai/gpt-oss-120b",
+  "profile": "pilot"
+ },
+ "llm": "ollama/gpt-oss:20b",
+ "clarity_llm": "groq/openai/gpt-oss-120b",
+ "git": {
+  "commit": "65e587e8d0e707fa977441b3f2e9bdbd0325235d",
+  "dirty": false
+ },
+ "tuned": {},
+ "agent_config": {
+  "K": 4,
+  "temperature": 0.7,
+  "use_normalization": true,
+  "epsilon": 0.05,
+  "eta": 0.05,
+  "confirmed": 0.8,
+  "unknown": 0.8,
+  "lambda_": 0.1,
+  "mu": 0.1,
+  "min_gain_bits": 0.01,
+  "discriminate_min": 0.05,
+  "tau": 0.75,
+  "T_max": 6,
+  "top_k": 5,
+  "lang": "en",
+  "allow_clarification": true,
+  "raw_state": false
+ },
+ "n_variants": 105,
+ "n_cases": 15,
+ "estimate": {
+  "calls": {
+   "direct": 105,
+   "b2_turn": 420,
+   "understand": 525
+  },
+  "total_calls": 1050,
+  "input_tokens": 1207500,
+  "output_tokens": 288750,
+  "usd_if_paid": 0.0
+ },
+ "ledger": [
+  {
+   "at": "2026-10-29T16:15:17+00:00",
+   "workers": 4,
+   "calls": 133,
+   "cache_hits": 76,
+   "input_tokens": 152999,
+   "output_tokens": 5222,
+   "cost_usd": 0.0,
+   "by_task": {
+    "understand": 129,
+    "parse_answer": 12,
+    "direct": 9,
+    "b2_turn": 59
+   }
+  }
+ ],
+ "status": "complete",
+ "cost_usd": 0.0
+}
