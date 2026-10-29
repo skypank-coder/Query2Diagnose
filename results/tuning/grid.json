@@ -1,0 +1,161 @@
+{
+ "llm": "ollama/gpt-oss:20b",
+ "variants": 90,
+ "conditions": [
+  "clean",
+  "codemixed_kn",
+  "combined_kn"
+ ],
+ "grid": [
+  {
+   "lambda_": 0.0,
+   "mu": 0.0,
+   "macro_f1": 0.2332,
+   "mean_turns": 5.767
+  },
+  {
+   "lambda_": 0.0,
+   "mu": 0.1,
+   "macro_f1": 0.2189,
+   "mean_turns": 5.789
+  },
+  {
+   "lambda_": 0.0,
+   "mu": 0.25,
+   "macro_f1": 0.2216,
+   "mean_turns": 5.789
+  },
+  {
+   "lambda_": 0.0,
+   "mu": 0.5,
+   "macro_f1": 0.2073,
+   "mean_turns": 5.778
+  },
+  {
+   "lambda_": 0.0,
+   "mu": 1.0,
+   "macro_f1": 0.1831,
+   "mean_turns": 5.811
+  },
+  {
+   "lambda_": 0.1,
+   "mu": 0.0,
+   "macro_f1": 0.1649,
+   "mean_turns": 5.778
+  },
+  {
+   "lambda_": 0.1,
+   "mu": 0.1,
+   "macro_f1": 0.1506,
+   "mean_turns": 5.822
+  },
+  {
+   "lambda_": 0.1,
+   "mu": 0.25,
+   "macro_f1": 0.1748,
+   "mean_turns": 5.822
+  },
+  {
+   "lambda_": 0.1,
+   "mu": 0.5,
+   "macro_f1": 0.1748,
+   "mean_turns": 5.811
+  },
+  {
+   "lambda_": 0.1,
+   "mu": 1.0,
+   "macro_f1": 0.1506,
+   "mean_turns": 5.833
+  },
+  {
+   "lambda_": 0.25,
+   "mu": 0.0,
+   "macro_f1": 0.1649,
+   "mean_turns": 5.778
+  },
+  {
+   "lambda_": 0.25,
+   "mu": 0.1,
+   "macro_f1": 0.1506,
+   "mean_turns": 5.833
+  },
+  {
+   "lambda_": 0.25,
+   "mu": 0.25,
+   "macro_f1": 0.1506,
+   "mean_turns": 5.833
+  },
+  {
+   "lambda_": 0.25,
+   "mu": 0.5,
+   "macro_f1": 0.1748,
+   "mean_turns": 5.811
+  },
+  {
+   "lambda_": 0.25,
+   "mu": 1.0,
+   "macro_f1": 0.1506,
+   "mean_turns": 5.811
+  },
+  {
+   "lambda_": 0.5,
+   "mu": 0.0,
+   "macro_f1": 0.1764,
+   "mean_turns": 5.756
+  },
+  {
+   "lambda_": 0.5,
+   "mu": 0.1,
+   "macro_f1": 0.1649,
+   "mean_turns": 5.8
+  },
+  {
+   "lambda_": 0.5,
+   "mu": 0.25,
+   "macro_f1": 0.1649,
+   "mean_turns": 5.811
+  },
+  {
+   "lambda_": 0.5,
+   "mu": 0.5,
+   "macro_f1": 0.1649,
+   "mean_turns": 5.789
+  },
+  {
+   "lambda_": 0.5,
+   "mu": 1.0,
+   "macro_f1": 0.1407,
+   "mean_turns": 5.778
+  },
+  {
+   "lambda_": 1.0,
+   "mu": 0.0,
+   "macro_f1": 0.1764,
+   "mean_turns": 5.756
+  },
+  {
+   "lambda_": 1.0,
+   "mu": 0.1,
+   "macro_f1": 0.1649,
+   "mean_turns": 5.8
+  },
+  {
+   "lambda_": 1.0,
+   "mu": 0.25,
+   "macro_f1": 0.1649,
+   "mean_turns": 5.811
+  },
+  {
+   "lambda_": 1.0,
+   "mu": 0.5,
+   "macro_f1": 0.1649,
+   "mean_turns": 5.778
+  },
+  {
+   "lambda_": 1.0,
+   "mu": 1.0,
+   "macro_f1": 0.1407,
+   "mean_turns": 5.767
+  }
+ ]
+}
