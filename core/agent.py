@@ -156,11 +156,12 @@ class Agent:
     # --- internals ---------------------------------------------------------------
     def _raw_belief(self) -> Belief:
         """Ablation: one LLM call reads the whole dialogue and outputs the state;
-        no interpretation sampling, no explicit answer model."""
+        no interpretation sampling, no explicit answer model. Greedy, so it uses
+        LLM seed 0 whatever the run seed (like B3's parse)."""
         text = self.message + "".join(f"\nQ: {q}\nA: {a}" for q, a in self.dialogue)
         messages = build_prompt(text, None)
         messages[-1]["content"] = messages[-1]["content"].replace("Customer message", "Dialogue so far")
-        reply = self.llm.complete(messages, temperature=0.0, seed=self.seed, max_tokens=200, json_mode=True,
+        reply = self.llm.complete(messages, temperature=0.0, seed=0, max_tokens=200, json_mode=True,
                                   task="state_tracker")
         state = validate(parse_json(reply.text), self.schema) or {}
         return Belief(self.model, [state], np.ones(1), self.cfg.epsilon, self.cfg.eta)

@@ -11,6 +11,7 @@ tests). Embeddings are cached under .cache/retrieval.
 from __future__ import annotations
 
 import hashlib
+import threading
 from dataclasses import dataclass
 from functools import lru_cache
 
@@ -77,6 +78,7 @@ class Retriever:
     def __init__(self, backend: str = "sentence-transformers", model_name: str = "intfloat/multilingual-e5-small",
                  chunk_words: int = 200, overlap: int = 40):
         self.backend, self.model_name = backend, model_name
+        self._lock = threading.Lock()   # fast tokenizers must not be called from two threads at once
         self.chunks = build_chunks(chunk_words, overlap)
         texts = [c.text for c in self.chunks]
         if backend == "tfidf":
@@ -104,12 +106,13 @@ class Retriever:
         return np.asarray(self._model.encode(texts, normalize_embeddings=True, batch_size=32), dtype="float32")
 
     def search(self, query: str, k: int = 5) -> list[Hit]:
-        if self.backend == "tfidf":
-            from sklearn.metrics.pairwise import linear_kernel
-            scores = linear_kernel(self._vec.transform([query]), self._matrix).ravel()
-            order = scores.argsort()[::-1][:k]
-            return [Hit(self.chunks[i], float(scores[i])) for i in order]
-        scores, idx = self._index.search(self._encode([f"query: {query}"]), k)
+        with self._lock:
+            if self.backend == "tfidf":
+                from sklearn.metrics.pairwise import linear_kernel
+                scores = linear_kernel(self._vec.transform([query]), self._matrix).ravel()
+                order = scores.argsort()[::-1][:k]
+                return [Hit(self.chunks[i], float(scores[i])) for i in order]
+            scores, idx = self._index.search(self._encode([f"query: {query}"]), k)
         return [Hit(self.chunks[i], float(s)) for s, i in zip(scores[0], idx[0])]
 
 

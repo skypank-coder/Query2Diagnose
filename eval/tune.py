@@ -5,7 +5,7 @@ ties broken by fewer mean turns. Understanding samples are cached, so after
 the first grid point only selection changes and no new parsing calls are made.
 Writes results/tuning/grid.json and results/tuning/best.json.
 
-    python -I -m eval.tune [--max-cases 30] [--conditions clean codemixed_kn combined_kn] [--yes]
+    python -I -m eval.tune [--max-cases 30] [--conditions clean codemixed_kn combined_kn] [--yes] [--workers N]
 """
 
 from __future__ import annotations
@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import itertools
 import json
+from concurrent.futures import ThreadPoolExecutor
 
 from core.clarity import load_clarity
 from core.hypothesis import load_hypothesis_model
@@ -32,6 +33,7 @@ def main() -> None:
     ap.add_argument("--conditions", nargs="+", default=["clean", "codemixed_kn", "combined_kn"])
     ap.add_argument("--K", type=int)
     ap.add_argument("--yes", action="store_true")
+    ap.add_argument("--workers", type=int, default=1, help="dialogues run in parallel (see eval.run_experiment)")
     args = ap.parse_args()
 
     cfg = {"split": "val", "conditions": args.conditions, "max_cases": args.max_cases, "include_stress": False}
@@ -49,14 +51,13 @@ def main() -> None:
     model, retriever = load_hypothesis_model(), make_retriever()
     grid = []
     try:
-        for lam, mu in itertools.product(GRID, GRID):
-            overrides = {"lambda_": lam, "mu": mu, **({"K": args.K} if args.K else {})}
-            system = build_systems(["q2d"], llm, model, retriever, clarity, overrides)["q2d"]
-            results = [system.run(v, UserSimulator(cases[v.case_id]), 0) for v in variants]
-            f1 = macro_f1([cases[r.case_id].gold_action for r in results], [r.predicted for r in results])
-            turns = sum(r.turns for r in results) / len(results)
-            grid.append({"lambda_": lam, "mu": mu, "macro_f1": round(f1, 4), "mean_turns": round(turns, 3)})
-            print(grid[-1], flush=True)
+        with ThreadPoolExecutor(max(1, args.workers)) as pool:
+            for lam, mu in itertools.product(GRID, GRID):
+                overrides = {"lambda_": lam, "mu": mu, **({"K": args.K} if args.K else {})}
+                system = build_systems(["q2d"], llm, model, retriever, clarity, overrides)["q2d"]
+                results = list(pool.map(lambda v: system.run(v, UserSimulator(cases[v.case_id]), 0), variants))
+                grid.append(score(results, cases, lam, mu))
+                print(grid[-1], flush=True)
     except QuotaExhausted as e:
         print(f"stopped: {e}; rerun later, cached calls are free")
         return
@@ -67,6 +68,12 @@ def main() -> None:
                                                "grid": grid}, indent=1), encoding="utf-8")
     TUNING_FILE.write_text(json.dumps({**best, "llm": llm.name}, indent=1), encoding="utf-8")
     print("best:", best)
+
+
+def score(results, cases, lam: float, mu: float) -> dict:
+    f1 = macro_f1([cases[r.case_id].gold_action for r in results], [r.predicted for r in results])
+    turns = sum(r.turns for r in results) / len(results)
+    return {"lambda_": lam, "mu": mu, "macro_f1": round(f1, 4), "mean_turns": round(turns, 3)}
 
 
 if __name__ == "__main__":

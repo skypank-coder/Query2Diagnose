@@ -4,7 +4,8 @@ PY ?= $(if $(wildcard .venv/Scripts/python.exe),.venv/Scripts/python,$(if $(wild
 # Isolated mode: scripts that read downloaded files must not import from cwd.
 PYI = $(PY) -I
 
-.PHONY: install sources passages seeds benchmark annotations data heatmap test tune pilot experiments \n	sensitivity tables errors relevance-sheet api web web-build docker all
+.PHONY: install sources passages seeds benchmark annotations data heatmap test tune pilot experiments \
+	sensitivity tables errors relevance-sheet api web web-build docker all
 
 install:
 	$(PY) -m pip install -e ".[dev]"
@@ -46,7 +47,7 @@ experiments:
 	$(PYI) -m eval.run_experiment $(ARGS)
 
 sensitivity:
-	for w in flat sharp soft_atypical hard_atypical; do $(PYI) -m eval.run_experiment --profile sensitivity --weights $$w; done
+	for w in base flat sharp soft_atypical hard_atypical; do $(PYI) -m eval.run_experiment --profile sensitivity --weights $$w; done
 
 tables:
 	$(PYI) -m eval.export_latex
