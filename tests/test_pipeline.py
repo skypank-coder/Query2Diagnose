@@ -96,6 +96,37 @@ def test_pipeline_end_to_end(tiny_run, tmp_path, monkeypatch):
     assert report.startswith("# Error analysis")
 
 
+def test_only_main_runs_become_latest(tiny_run, tmp_path):
+    # The tiny run is a main run, so it is what the tables and the website read.
+    assert json.loads((tmp_path / "latest.json").read_text())["run_id"] == tiny_run.name
+    base = {"simulator": {"mode": "deterministic"}, "hypothesis_weights": None}
+    assert rx.is_main_run(base)
+    assert not rx.is_main_run({**base, "hypothesis_weights": "flat"})
+    assert not rx.is_main_run({**base, "simulator": {"mode": "noisy"}})
+
+
+def test_side_tables_render(tiny_run):
+    from eval.export_latex import table_noisy, table_sensitivity
+    summary = json.loads((tiny_run / "summary.json").read_text())
+    assert summary["hypothesis_weights"] is None
+    runs = [{**summary, "hypothesis_weights": w} for w in ("sharp", "base")]
+    tex = table_sensitivity(runs)
+    assert tex.index("base &") < tex.index("sharp &") and "Query2Diagnose" in tex
+    assert "Deterministic & Noisy" in table_noisy(summary, {**summary, "simulator": "noisy"})
+
+
+def test_estimate_counts_greedy_calls_once_unless_the_simulator_is_noisy():
+    from core.records import VARIANTS_FILE, Variant, read_jsonl
+    variants = read_jsonl(VARIANTS_FILE, Variant)[:10]
+    settings = core.llm.Settings.from_env(provider="mock", model="mock-1")
+    cfg = {"systems": ["b3_infogain_dx", "b2_llm_questions", "q2d"], "seeds": [0, 1, 2], "overrides": {"K": 4},
+           "simulator": {"mode": "deterministic"}}
+    det = rx.estimate(cfg, variants, settings, need_clarity=False)["calls"]
+    assert det["understand"] == 10 * 4 * 3 + 10 and det["b2_turn"] == 10 * 4
+    noisy = rx.estimate({**cfg, "simulator": {"mode": "noisy"}}, variants, settings, need_clarity=False)["calls"]
+    assert noisy["understand"] == det["understand"] and noisy["b2_turn"] == 3 * det["b2_turn"]
+
+
 def test_local_model_is_free_and_reuses_the_saved_clarity_estimate(monkeypatch):
     monkeypatch.setenv("LLM_PROVIDER", "ollama")
     monkeypatch.setenv("LLM_MODEL", "gpt-oss:20b")

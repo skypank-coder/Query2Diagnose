@@ -49,7 +49,7 @@ paper's main results need the full grid:
 ```bash
 make tune                     # λ, μ on validation (results/tuning/best.json)
 make experiments              # full test split, 8 systems, 3 seeds, K = 8 (~24,500 requests)
-make sensitivity              # four alternative hypothesis weight sets
+make sensitivity              # base + four alternative hypothesis weight sets (seed 0)
 make experiments ARGS="--profile noisy_sim"   # optional: noisy simulator
 make tables errors
 ```

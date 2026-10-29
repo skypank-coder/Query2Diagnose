@@ -75,6 +75,9 @@ def select_variants(cfg: dict) -> tuple[list[Variant], dict[str, Case]]:
 def estimate(cfg: dict, variants: list[Variant], settings: Settings, need_clarity: bool) -> dict:
     agent = AgentConfig.from_yaml(**cfg.get("overrides", {}))
     seeds = len(cfg["seeds"])
+    # Greedy calls use LLM seed 0, so with deterministic answers their dialogues
+    # repeat across seeds (cache hits); the noisy simulator changes them per seed.
+    per_seed = seeds if cfg["simulator"]["mode"] == "noisy" else 1
     calls: dict[str, int] = defaultdict(int)
     changed = sum(bool(normalize(v.text).changes) for v in variants)
     for name in cfg["systems"]:
@@ -87,11 +90,11 @@ def estimate(cfg: dict, variants: list[Variant], settings: Settings, need_clarit
         elif name == "q2d_minus_normalisation":
             calls["understand"] += changed * agent.K * seeds
         elif name == "q2d_minus_fault_state":
-            calls["state_tracker"] += len(variants) * (agent.T_max + 1)
+            calls["state_tracker"] += len(variants) * (agent.T_max + 1) * per_seed
         elif name == "b1_direct":
             calls["direct"] += len(variants)
         elif name == "b2_llm_questions":
-            calls["b2_turn"] += len(variants) * 4
+            calls["b2_turn"] += len(variants) * 4 * per_seed
     if need_clarity:
         n_values = sum(len(a.values) for n, a in load_schema().attributes.items() if n != "device")
         calls["mock_user"] += n_values * 3
@@ -119,6 +122,13 @@ def git_state() -> dict:
     def run(*args):
         return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     return {"commit": run("rev-parse", "HEAD"), "dirty": bool(run("status", "--porcelain"))}
+
+
+def is_main_run(cfg: dict) -> bool:
+    """Runs with the base hypothesis weights and the deterministic simulator.
+    Only these become results/latest.json, which the tables and the website
+    read; sensitivity and noisy-simulator runs are reported separately."""
+    return not cfg.get("hypothesis_weights") and cfg["simulator"]["mode"] == "deterministic"
 
 
 def tuned_params() -> dict:
@@ -234,7 +244,8 @@ def main() -> None:
     if status == "complete":
         from eval.aggregate import summarize
         summarize(run_dir)
-        (RESULTS / "latest.json").write_text(json.dumps({"run_id": run_dir.name}) + "\n", encoding="utf-8")
+        if is_main_run(cfg):
+            (RESULTS / "latest.json").write_text(json.dumps({"run_id": run_dir.name}) + "\n", encoding="utf-8")
         print(f"complete -> {run_dir}")
     sys.exit(0)
 
