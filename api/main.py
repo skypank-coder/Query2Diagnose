@@ -21,7 +21,19 @@ from collections import Counter
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from functools import lru_cache
+from pathlib import Path
 from typing import Any
+
+if os.getenv("VERCEL"):
+    # Serverless host (Vercel): TF-IDF retrieval (the e5 model is too large for a
+    # function), a writable cache in /tmp seeded with the demo's cached responses,
+    # and no background warm-up. Set before core.llm is imported.
+    for _key, _value in {
+        "Q2D_RETRIEVAL": "tfidf", "Q2D_WARMUP": "0", "Q2D_CACHE_DIR": "/tmp/q2d-llm-cache",
+        "Q2D_SEED_CACHE": str(Path(__file__).resolve().parents[1] / "data" / "demo_llm_cache"),
+        "LLM_PROVIDER": "groq", "LLM_MODEL": "openai/gpt-oss-20b", "LLM_TIMEOUT_S": "120",
+    }.items():
+        os.environ.setdefault(_key, _value)
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -209,6 +221,10 @@ async def _budget_exceeded(_request: Request, _exc: BudgetExceeded) -> JSONRespo
 
 @app.exception_handler(Exception)
 async def _unexpected(_request: Request, exc: Exception) -> JSONResponse:
+    if "API key is not set" in str(exc):
+        return JSONResponse(status_code=503, content={"detail": (
+            "The live model is not configured on this server (no API key), so only cached messages work: "
+            "use an instant example or a recorded dialogue.")})
     return JSONResponse(status_code=500, content={"detail": (
         f"The assistant could not finish this step ({type(exc).__name__}). Please try again.")})
 
@@ -221,7 +237,7 @@ def health() -> dict:
 @app.get("/api/systems")
 def systems() -> dict:
     return {"default": "q2d", "systems": [{"id": s, "description": DESCRIPTIONS[s]} for s in ["q2d"] + [x for x in ALL if x != "q2d"]],
-            "llm": resources()["llm"].name}
+            "llm": resources()["llm"].name, "retrieval": resources()["retriever"].backend}
 
 
 def _open_session(message: str, system: str, lang: str) -> tuple[Session, dict]:

@@ -121,7 +121,7 @@ async function readData<T>(file: string): Promise<T> {
 export const api = {
   live: () => fetch("/api/health").then(isJson).catch(() => false),
   health: () => fetch("/api/health").then((r) => (isJson(r) ? r.json() as Promise<{ ok: boolean; ready: boolean }> : null)).catch(() => null),
-  systems: () => read<{ default: string; llm: string; systems: { id: string; description: string }[] }>("/systems"),
+  systems: () => read<{ default: string; llm: string; retrieval?: string; systems: { id: string; description: string }[] }>("/systems"),
   start: (message: string, system: string, lang: string, onRetry?: (n: number) => void) =>
     call<{ session_id: string; turn: Turn; fault_names: FaultNames }>("/session", { method: "POST", body: JSON.stringify({ message, system, lang }) }, onRetry),
   // `ctx` lets the server rebuild the conversation if it restarted in between.

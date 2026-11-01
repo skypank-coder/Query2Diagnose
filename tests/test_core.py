@@ -190,3 +190,17 @@ def test_agent_end_to_end_with_mock(mock_llm, tfidf):
     assert agent.result is not None and agent.result.turns <= 4
     assert agent.result.predicted == "REFER" or agent.result.predicted in agent.model.faults
     assert all({"H_L", "H_D", "H"} <= set(t.belief) for t in agent.turns)
+
+
+def test_numpy_tfidf_scores_like_scikit_learn():
+    from core.retrieval import CharTfidf, build_chunks
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import linear_kernel
+    texts = [c.text for c in build_chunks(200, 40)]
+    vec = TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5), sublinear_tf=True)
+    matrix = vec.fit_transform(texts)
+    ours = CharTfidf(texts)
+    for query in ["fridge not cooling compressor running", "frost on the back wall of the freezer",
+                  "water leaking under the fridge", "door gasket torn"]:
+        expected = linear_kernel(vec.transform([query]), matrix).ravel()
+        assert np.allclose(ours.scores(query), expected, atol=1e-9)

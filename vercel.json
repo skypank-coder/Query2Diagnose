@@ -3,5 +3,12 @@
   "framework": null,
   "installCommand": "cd web && npm install --no-audit --no-fund",
   "buildCommand": "cd web && npm run build",
-  "outputDirectory": "web/dist"
+  "outputDirectory": "web/dist",
+  "functions": {
+    "api/main.py": {
+      "maxDuration": 300,
+      "excludeFiles": "{web,results/runs,paper,tests,docs,.venv,.cache}/**"
+    }
+  },
+  "rewrites": [{ "source": "/api/(.*)", "destination": "/api/main" }]
 }

@@ -11,7 +11,10 @@ tests). Embeddings are cached under .cache/retrieval.
 from __future__ import annotations
 
 import hashlib
+import math
+import re
 import threading
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from functools import lru_cache
 
@@ -74,6 +77,53 @@ def build_query(confirmed: dict[str, str], top_fault: str | None, fault_names: d
     return ". ".join(parts) or "refrigerator problem"
 
 
+_WHITE_SPACES = re.compile(r"\s\s+")
+
+
+class CharTfidf:
+    """scikit-learn's TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5), sublinear_tf=True)
+    with linear-kernel scoring, in plain Python and numpy, for hosts without scikit-learn
+    (the serverless demo). tests/test_core.py checks it scores like scikit-learn."""
+
+    def __init__(self, texts: list[str], ngram_range: tuple[int, int] = (3, 5)):
+        self.ngram_range = ngram_range
+        counts = [Counter(self._grams(t)) for t in texts]
+        df = Counter(g for c in counts for g in c)
+        self.n_docs = len(texts)
+        self.idf = {g: math.log((1 + self.n_docs) / (1 + d)) + 1.0 for g, d in df.items()}
+        self.postings: dict[str, list[tuple[int, float]]] = defaultdict(list)
+        for i, c in enumerate(counts):
+            for g, w in self._weights(c).items():
+                self.postings[g].append((i, w))
+
+    def _grams(self, text: str) -> list[str]:
+        lo, hi = self.ngram_range
+        out = []
+        for word in _WHITE_SPACES.sub(" ", text.lower()).split():
+            w = f" {word} "
+            for n in range(lo, hi + 1):
+                offset = 0
+                out.append(w[offset:offset + n])
+                while offset + n < len(w):
+                    offset += 1
+                    out.append(w[offset:offset + n])
+                if offset == 0:   # a word shorter than n counts once
+                    break
+        return out
+
+    def _weights(self, counts: Counter) -> dict[str, float]:
+        w = {g: (1.0 + math.log(c)) * self.idf[g] for g, c in counts.items() if g in self.idf}
+        norm = math.sqrt(sum(x * x for x in w.values())) or 1.0
+        return {g: x / norm for g, x in w.items()}
+
+    def scores(self, query: str) -> np.ndarray:
+        s = np.zeros(self.n_docs)
+        for g, x in self._weights(Counter(self._grams(query))).items():
+            for i, y in self.postings.get(g, ()):
+                s[i] += x * y
+        return s
+
+
 class Retriever:
     def __init__(self, backend: str = "sentence-transformers", model_name: str = "intfloat/multilingual-e5-small",
                  chunk_words: int = 200, overlap: int = 40):
@@ -81,10 +131,15 @@ class Retriever:
         self._lock = threading.Lock()   # fast tokenizers must not be called from two threads at once
         self.chunks = build_chunks(chunk_words, overlap)
         texts = [c.text for c in self.chunks]
+        self._tfidf: CharTfidf | None = None
         if backend == "tfidf":
-            from sklearn.feature_extraction.text import TfidfVectorizer
-            self._vec = TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5), sublinear_tf=True)
-            self._matrix = self._vec.fit_transform(texts)
+            try:
+                from sklearn.feature_extraction.text import TfidfVectorizer
+            except ImportError:   # e.g. the serverless demo, which ships without scikit-learn
+                self._tfidf = CharTfidf(texts)
+            else:
+                self._vec = TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5), sublinear_tf=True)
+                self._matrix = self._vec.fit_transform(texts)
         elif backend == "sentence-transformers":
             import faiss
             from sentence_transformers import SentenceTransformer
@@ -108,8 +163,11 @@ class Retriever:
     def search(self, query: str, k: int = 5) -> list[Hit]:
         with self._lock:
             if self.backend == "tfidf":
-                from sklearn.metrics.pairwise import linear_kernel
-                scores = linear_kernel(self._vec.transform([query]), self._matrix).ravel()
+                if self._tfidf is not None:
+                    scores = self._tfidf.scores(query)
+                else:
+                    from sklearn.metrics.pairwise import linear_kernel
+                    scores = linear_kernel(self._vec.transform([query]), self._matrix).ravel()
                 order = scores.argsort()[::-1][:k]
                 return [Hit(self.chunks[i], float(scores[i])) for i in order]
             scores, idx = self._index.search(self._encode([f"query: {query}"]), k)

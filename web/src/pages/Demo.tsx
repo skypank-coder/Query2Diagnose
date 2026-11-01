@@ -125,6 +125,7 @@ export default function Demo() {
   const [mode, setMode] = useState<Mode>("checking");
   const [systems, setSystems] = useState<{ id: string; description: string }[]>([]);
   const [llm, setLlm] = useState("");
+  const [retrieval, setRetrieval] = useState("");
   const [system, setSystem] = useState("q2d");
   const [lang, setLang] = useState("en");
   const [input, setInput] = useState("");
@@ -151,7 +152,7 @@ export default function Demo() {
   useEffect(() => {
     api.live().then((live) => {
       setMode(live ? "live" : "replay");
-      api.systems().then((s) => { setSystems(s.systems); setLlm(s.llm); }).catch(() => undefined);
+      api.systems().then((s) => { setSystems(s.systems); setLlm(s.llm); setRetrieval(s.retrieval ?? ""); }).catch(() => undefined);
       api.recordings().then(setRecs).catch(() => { if (!live) setError("No recorded dialogues found."); });
     });
   }, []);
@@ -272,7 +273,7 @@ export default function Demo() {
       <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-200">
         <span><strong>Research prototype, not repair advice.</strong> Refrigerant, sealed-system, compressor and live-electric faults are always referred to a technician.</span>
         {mode === "replay" && <span className="rounded-full bg-amber-200 px-2.5 py-0.5 text-xs font-semibold text-amber-900 dark:bg-amber-800 dark:text-amber-100">Replay mode · recorded real dialogues</span>}
-        {mode === "live" && <span className="rounded-full bg-emerald-200 px-2.5 py-0.5 text-xs font-semibold text-emerald-900 dark:bg-emerald-800 dark:text-emerald-100">{ready ? `Live · ${llm}` : "Live · loading the model…"}</span>}
+        {mode === "live" && <span className="rounded-full bg-emerald-200 px-2.5 py-0.5 text-xs font-semibold text-emerald-900 dark:bg-emerald-800 dark:text-emerald-100">{ready ? `Live · ${llm}${retrieval === "tfidf" ? " · TF-IDF retrieval" : ""}` : "Live · loading the model…"}</span>}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr] [&>*]:min-w-0">
@@ -309,6 +310,27 @@ export default function Demo() {
                   ))}
                 </div>
                 <p className="mt-4 text-xs muted">A new message of your own takes about a minute: the model reads it eight times on a free API tier.</p>
+                {retrieval === "tfidf" && (
+                  <p className="mt-2 rounded-lg bg-sky-50 px-3 py-2 text-xs text-sky-900 dark:bg-sky-950/40 dark:text-sky-200">
+                    This hosted copy retrieves passages with TF-IDF, because the multilingual-e5 model used in the paper is too large
+                    for a serverless function, so some answers differ from the paper's runs. The recorded dialogues below were made
+                    with the paper's setup.
+                  </p>
+                )}
+                {recs.length > 0 && (
+                  <div className="mt-5">
+                    <p className="text-sm muted">Or replay a recorded dialogue (click the highlighted answers, or press ▶):</p>
+                    <div className="mt-2 flex flex-col gap-2">
+                      {recs.map((r) => (
+                        <button key={r.id} className="rounded-xl border border-dashed border-slate-300 px-3 py-2 text-left text-sm transition hover:border-accent-500 hover:bg-accent-50 dark:border-slate-700 dark:hover:bg-accent-700/10" onClick={() => play(r.id)}>
+                          <span className="mr-2 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-slate-600 dark:bg-slate-800 dark:text-slate-300">recorded</span>
+                          <span className="text-[11px] font-semibold uppercase tracking-wide text-accent-600 dark:text-accent-400">{SYSTEM_LABEL[r.system]}</span>
+                          <span className="ml-1.5 font-mono text-[13px]">{r.message}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             {msgs.length === 0 && mode === "replay" && (

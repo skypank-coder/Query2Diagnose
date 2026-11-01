@@ -19,13 +19,18 @@ import time
 from collections import deque
 from dataclasses import dataclass, field
 from functools import lru_cache
+from pathlib import Path
 
 import requests
 import yaml
 
 from core.paths import CONFIGS, ROOT
 
-CACHE_DIR = ROOT / ".cache" / "llm"
+CACHE_DIR = Path(os.getenv("Q2D_CACHE_DIR") or ROOT / ".cache" / "llm")
+# Read-only caches consulted after CACHE_DIR, e.g. the demo's cached responses
+# shipped to a serverless host (paths separated by os.pathsep); hits are copied
+# into CACHE_DIR.
+SEED_CACHE_DIRS = [Path(p) for p in os.getenv("Q2D_SEED_CACHE", "").split(os.pathsep) if p]
 LOCAL_PROVIDERS = ("ollama", "mock")  # run on your own hardware: always $0
 
 
@@ -158,11 +163,20 @@ class LLMClient:
         key_payload = {"provider": self.settings.provider, "model": self.settings.model, "messages": messages,
                        "temperature": temperature, "seed": seed, "max_tokens": max_tokens, "json": json_mode}
         key = hashlib.sha256(json.dumps(key_payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
-        path = CACHE_DIR / key[:2] / f"{key}.json"
+        rel = Path(key[:2]) / f"{key}.json"
+        path = CACHE_DIR / rel
         with self._lock:
             self.ledger.by_task[task] = self.ledger.by_task.get(task, 0) + 1
-        if self.cache and path.exists():
-            hit = json.loads(path.read_text(encoding="utf-8"))
+        found = next((d / rel for d in (CACHE_DIR, *SEED_CACHE_DIRS) if (d / rel).exists()), None) if self.cache else None
+        if found is not None:
+            raw = found.read_text(encoding="utf-8")
+            if found != path:
+                try:
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_text(raw, encoding="utf-8")
+                except OSError:
+                    pass   # a read-only primary cache only loses the copy
+            hit = json.loads(raw)
             with self._lock:
                 self.ledger.cache_hits += 1
             return Response(hit["text"], hit["input_tokens"], hit["output_tokens"], True, 0.0)

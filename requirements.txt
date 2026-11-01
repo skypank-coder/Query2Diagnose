@@ -1,0 +1,10 @@
+# Python packages for the hosted live demo only (Vercel runs api/main.py as a
+# serverless function with TF-IDF retrieval). The full research stack, with the
+# e5 retriever, experiments and website tooling, is in pyproject.toml.
+fastapi>=0.115
+pydantic>=2.8
+numpy>=2.0
+pyyaml>=6.0
+requests>=2.32
+python-dotenv>=1.0
+rapidfuzz>=3.9

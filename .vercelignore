@@ -1,8 +1,18 @@
-# Vercel deploys only the website in web/ (with its data snapshot in
-# web/public/data). Everything else stays out of the upload, in particular
-# api/, whose .py files Vercel would otherwise try to turn into functions.
-/*
-!/web
-!/vercel.json
-/web/node_modules
-/web/dist
+# Vercel builds the website from web/ and runs api/main.py as one Python
+# function (light packages from requirements.txt, TF-IDF retrieval). Nothing
+# below is needed there. pyproject.toml is left out so that requirements.txt,
+# not the full research stack, is installed.
+results/runs/
+results/sanity/
+paper/
+tests/
+docs/
+web/node_modules/
+web/dist/
+data/sources/raw/
+data/benchmark/annotation/
+pyproject.toml
+Dockerfile
+docker-compose.yml
+Makefile
+start_demo.bat

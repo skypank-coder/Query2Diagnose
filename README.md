@@ -254,6 +254,13 @@ conversation so far, so the server rebuilds a conversation it lost, and the page
 back. Without a server (or on a static host) the site uses the snapshot in `web/public/data` and the demo replays
 recorded dialogues; refresh it with `python -m eval.export_site` after a new run.
 
+**Hosting on Vercel.** Import the repository with the default settings: `vercel.json` builds the site from `web/`
+and runs `api/main.py` as one Python function with the light packages in `requirements.txt`. The hosted live demo
+retrieves with TF-IDF (the e5 model is too large for a serverless function), so some answers differ from the
+paper's runs; the recorded dialogues use the paper's setup. The instant examples answer from
+`data/demo_llm_cache` (rebuild it with `python -m eval.seed_demo_cache`); for new messages add `GROQ_API_KEY` under
+Settings → Environment Variables.
+
 The website has five pages: **Home** · **Live demo** (chat with a live belief panel; run B1, B2, B3 and Q2D on the
 same message) · **Results** (reads the saved run only) · **Benchmark** · **How it works**.
 `make docker` serves the API and the built site together on port 8000.
