@@ -1,0 +1,7 @@
+{
+ "lambda_": 0.0,
+ "mu": 0.0,
+ "macro_f1": 0.2332,
+ "mean_turns": 5.767,
+ "llm": "ollama/gpt-oss:20b"
+}

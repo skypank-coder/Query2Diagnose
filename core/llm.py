@@ -142,6 +142,7 @@ class LLMClient:
         self.settings = settings or Settings.from_env()
         self.cache = cache
         self.ledger = Ledger()
+        self._lock = threading.Lock()        # ledger updates from parallel workers
         self._throttle = _Throttle(self.settings.rpm, self.settings.tpm)
         self._mock = None
         if self.settings.provider == "mock":
@@ -158,10 +159,12 @@ class LLMClient:
                        "temperature": temperature, "seed": seed, "max_tokens": max_tokens, "json": json_mode}
         key = hashlib.sha256(json.dumps(key_payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
         path = CACHE_DIR / key[:2] / f"{key}.json"
-        self.ledger.by_task[task] = self.ledger.by_task.get(task, 0) + 1
+        with self._lock:
+            self.ledger.by_task[task] = self.ledger.by_task.get(task, 0) + 1
         if self.cache and path.exists():
             hit = json.loads(path.read_text(encoding="utf-8"))
-            self.ledger.cache_hits += 1
+            with self._lock:
+                self.ledger.cache_hits += 1
             return Response(hit["text"], hit["input_tokens"], hit["output_tokens"], True, 0.0)
 
         if self._mock is not None:
@@ -175,15 +178,19 @@ class LLMClient:
             text, tin, tout = self._call_api(messages, temperature, seed, max_tokens, json_mode)
         price = self.settings.price()
         cost = (tin * price["input"] + tout * price["output"]) / 1e6
-        self.ledger.calls += 1
-        self.ledger.input_tokens += tin
-        self.ledger.output_tokens += tout
-        self.ledger.cost_usd += cost
+        with self._lock:
+            self.ledger.calls += 1
+            self.ledger.input_tokens += tin
+            self.ledger.output_tokens += tout
+            self.ledger.cost_usd += cost
         if self.cache:
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(json.dumps({"text": text, "input_tokens": tin, "output_tokens": tout,
-                                        "model": self.name, "request": key_payload}, ensure_ascii=False),
-                            encoding="utf-8")
+            # Write-then-rename, so a parallel reader never sees a half-written entry.
+            tmp = path.with_name(f"{path.name}.{threading.get_ident()}.tmp")
+            tmp.write_text(json.dumps({"text": text, "input_tokens": tin, "output_tokens": tout,
+                                       "model": self.name, "request": key_payload}, ensure_ascii=False),
+                           encoding="utf-8")
+            os.replace(tmp, path)
         return Response(text, tin, tout, False, cost)
 
     def _call_api(self, messages, temperature, seed, max_tokens, json_mode) -> tuple[str, int, int]:

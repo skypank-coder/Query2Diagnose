@@ -96,17 +96,22 @@ def cluster(samples: list[Interpretation | None]) -> tuple[list[Interpretation],
 
 def understand(message: str, llm: LLMClient, k: int = 8, temperature: float = 0.7, seed: int = 0,
                use_normalization: bool = True, max_retries: int = 2) -> Understanding:
-    """K samples at `temperature`; with k == 1 a single greedy parse (B3)."""
+    """K samples at `temperature`; with k == 1 a single greedy parse (B3).
+
+    The greedy parse does not depend on the run seed: it always uses LLM seed 0,
+    so extra seeds re-sample only the K > 1 interpretations (docs, Sec. 5e)."""
     schema = load_schema()
     norm = normalize(message) if use_normalization else None
     gloss = norm.text if norm and norm.changes else None
     messages = build_prompt(message, gloss)
+    greedy = k == 1
+    temp = 0.0 if greedy else temperature
+    base = 0 if greedy else seed * 1000
     samples: list[Interpretation | None] = []
     for i in range(k):
         parsed = None
         for attempt in range(max_retries + 1):
-            temp = temperature if k > 1 else 0.0
-            reply = llm.complete(messages, temperature=temp, seed=seed * 1000 + i + 100 * attempt,
+            reply = llm.complete(messages, temperature=temp, seed=base + i + 100 * attempt,
                                  max_tokens=300, json_mode=True, task="understand")
             parsed = validate(parse_json(reply.text), schema)
             if parsed is not None:

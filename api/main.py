@@ -38,6 +38,7 @@ from core.records import (
 from core.retrieval import Retriever
 from core.schema import load_schema
 from core.sources import load_passages
+from eval.run_experiment import clarity_client, load_experiment
 from systems.b1_direct import B1Direct
 from systems.b2_llm_questions import B2LLMQuestions
 from systems.registry import ALL, build_systems
@@ -64,8 +65,11 @@ def resources() -> dict:
     tuned_file = RESULTS / "tuning" / "best.json"
     tuned = json.loads(tuned_file.read_text(encoding="utf-8")) if tuned_file.exists() else {}
     overrides = {k: tuned[k] for k in ("lambda_", "mu") if k in tuned}
+    # A(q) comes from the mock-user model in configs/experiment.yaml, as in the
+    # experiments and tuning, not from the system LLM.
+    clarity = load_clarity(clarity_client(load_experiment(None), llm).name) or {}
     return {"llm": llm, "model": load_hypothesis_model(), "retriever": retriever,
-            "clarity": load_clarity(llm.name) or {}, "overrides": overrides}
+            "clarity": clarity, "overrides": overrides}
 
 
 @dataclass

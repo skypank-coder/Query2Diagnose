@@ -35,6 +35,13 @@ def run_dialogue(client, system, message):
     return sid, body
 
 
+def test_demo_uses_the_saved_clarity_estimate(client):
+    # A(q) belongs to the mock-user model in configs/experiment.yaml, not to the system LLM.
+    from core.clarity import load_clarity
+    saved = load_clarity("groq/openai/gpt-oss-120b")
+    assert saved and api.resources()["clarity"] == saved
+
+
 def test_systems_and_stats(client):
     systems = client.get("/api/systems").json()
     assert systems["default"] == "q2d" and len(systems["systems"]) == 8

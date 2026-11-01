@@ -67,6 +67,21 @@ def test_every_system_runs_and_returns_the_shared_schema(setup):
             assert 0 <= r.turns <= 6 and 0.0 <= r.confidence <= 1.0
 
 
+def test_greedy_llm_calls_do_not_depend_on_the_run_seed(setup):
+    # B3's single parse and the raw-state tracker are greedy: a second seed must
+    # reuse the cached seed-0 calls; Q2D's K > 1 samples must be re-drawn.
+    llm, retriever, cases, variants = setup
+    systems = build_systems(["b3_infogain_dx", "q2d_minus_fault_state", "q2d"], llm, load_hypothesis_model(),
+                            retriever, clarity={})
+    v = next(v for v in variants if v.condition == "codemixed_hi")
+    for name, system in systems.items():
+        system.run(v, UserSimulator(cases[v.case_id]), seed=0)
+        before = llm.ledger.calls
+        system.run(v, UserSimulator(cases[v.case_id]), seed=2)
+        new_calls = llm.ledger.calls - before
+        assert (new_calls > 0) if name == "q2d" else (new_calls == 0), (name, new_calls)
+
+
 def test_b3_tracks_only_diagnostic_uncertainty(setup):
     llm, retriever, cases, variants = setup
     b3 = build_systems(["b3_infogain_dx"], llm, load_hypothesis_model(), retriever, clarity={})["b3_infogain_dx"]

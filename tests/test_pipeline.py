@@ -96,6 +96,70 @@ def test_pipeline_end_to_end(tiny_run, tmp_path, monkeypatch):
     assert report.startswith("# Error analysis")
 
 
+def test_parallel_workers_give_the_same_records(tmp_path, monkeypatch):
+    cfg = {"split": "test", "systems": ["b1_direct", "b2_llm_questions", "q2d", "q2d_minus_cost_clarity"],
+           "conditions": ["clean", "codemixed_hi"], "seeds": [0, 1], "max_cases": 3, "include_stress": False,
+           "simulator": {"mode": "deterministic"}, "overrides": {"K": 3}, "hypothesis_weights": None,
+           "clarity_model": None}
+    _offline(tmp_path, monkeypatch, cfg)
+    runs = {}
+    for workers in (3, 1):     # separate LLM caches, so both runs really compute every record
+        monkeypatch.setattr(core.llm, "CACHE_DIR", tmp_path / f"llm-{workers}")
+        monkeypatch.setattr(sys, "argv", ["run_experiment", "--yes", "--workers", str(workers),
+                                          "--profile", f"w{workers}"])
+        with pytest.raises(SystemExit):
+            rx.main()
+        run_dir = next(p for p in (tmp_path / "runs").iterdir() if p.name.endswith(f"-w{workers}"))
+        runs[workers] = eval.aggregate.load_run(run_dir)
+    assert runs[3] == runs[1]
+    assert all(len(rs) == 3 * 2 * 2 for rs in runs[1].values())
+
+
+def test_tuning_runs_in_parallel(tmp_path, monkeypatch):
+    import eval.tune as tune
+    _offline(tmp_path, monkeypatch, {})
+    monkeypatch.setattr(tune, "RESULTS", tmp_path)
+    monkeypatch.setattr(tune, "TUNING_FILE", tmp_path / "tuning" / "best.json")
+    monkeypatch.setattr(tune, "make_retriever", lambda: Retriever(backend="tfidf"))
+    monkeypatch.setattr(tune, "GRID", [0.0, 0.5])
+    monkeypatch.setattr(sys, "argv", ["tune", "--max-cases", "2", "--conditions", "clean", "--K", "2",
+                                      "--workers", "2", "--yes"])
+    tune.main()
+    grid = json.loads((tmp_path / "tuning" / "grid.json").read_text())["grid"]
+    assert len(grid) == 4 and (tmp_path / "tuning" / "best.json").exists()
+
+
+def test_only_main_runs_become_latest(tiny_run, tmp_path):
+    # The tiny run is a main run, so it is what the tables and the website read.
+    assert json.loads((tmp_path / "latest.json").read_text())["run_id"] == tiny_run.name
+    base = {"simulator": {"mode": "deterministic"}, "hypothesis_weights": None}
+    assert rx.is_main_run(base)
+    assert not rx.is_main_run({**base, "hypothesis_weights": "flat"})
+    assert not rx.is_main_run({**base, "simulator": {"mode": "noisy"}})
+
+
+def test_side_tables_render(tiny_run):
+    from eval.export_latex import table_noisy, table_sensitivity
+    summary = json.loads((tiny_run / "summary.json").read_text())
+    assert summary["hypothesis_weights"] is None
+    runs = [{**summary, "hypothesis_weights": w} for w in ("sharp", "base")]
+    tex = table_sensitivity(runs)
+    assert tex.index("base &") < tex.index("sharp &") and "Query2Diagnose" in tex
+    assert "Deterministic & Noisy" in table_noisy(summary, {**summary, "simulator": "noisy"})
+
+
+def test_estimate_counts_greedy_calls_once_unless_the_simulator_is_noisy():
+    from core.records import VARIANTS_FILE, Variant, read_jsonl
+    variants = read_jsonl(VARIANTS_FILE, Variant)[:10]
+    settings = core.llm.Settings.from_env(provider="mock", model="mock-1")
+    cfg = {"systems": ["b3_infogain_dx", "b2_llm_questions", "q2d"], "seeds": [0, 1, 2], "overrides": {"K": 4},
+           "simulator": {"mode": "deterministic"}}
+    det = rx.estimate(cfg, variants, settings, need_clarity=False)["calls"]
+    assert det["understand"] == 10 * 4 * 3 + 10 and det["b2_turn"] == 10 * 4
+    noisy = rx.estimate({**cfg, "simulator": {"mode": "noisy"}}, variants, settings, need_clarity=False)["calls"]
+    assert noisy["understand"] == det["understand"] and noisy["b2_turn"] == 3 * det["b2_turn"]
+
+
 def test_local_model_is_free_and_reuses_the_saved_clarity_estimate(monkeypatch):
     monkeypatch.setenv("LLM_PROVIDER", "ollama")
     monkeypatch.setenv("LLM_MODEL", "gpt-oss:20b")
