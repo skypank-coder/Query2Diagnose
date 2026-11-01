@@ -77,3 +77,28 @@ def test_results_side_endpoints_follow_the_saved_runs(client):
     assert ex.status_code == 200 and ex.json()["message"] and ex.json()["turns"]
     for row in client.get("/api/results/sensitivity").json():
         assert row["weights"] and "q2d" in row["systems"]
+
+
+def test_conversation_survives_a_server_restart(client):
+    message = "fridge not cooling, compressor sound ide"
+    first = client.post("/api/session", json={"message": message, "system": "q2d"}).json()
+    sid, turn = first["session_id"], first["turn"]
+    if turn["action"] != "ask":
+        pytest.skip("the mock run answered at once")
+    option = turn["question"]["options"][0]
+    reply = {"text": option["label"], "value": option["value"]}
+    expected = client.post(f"/api/session/{sid}/answer", json=reply).json()["turn"]
+
+    api.SESSIONS.clear()   # what a restart does to the in-memory sessions
+    assert client.post(f"/api/session/{sid}/answer", json=reply).status_code == 404
+    rebuilt = client.post(f"/api/session/{sid}/answer",
+                          json={**reply, "message": message, "system": "q2d", "history": []})
+    assert rebuilt.status_code == 200, rebuilt.text
+    assert rebuilt.json()["turn"]["belief"] == expected["belief"]
+    assert rebuilt.json()["turn"]["question"] == expected["question"]
+
+
+def test_errors_are_readable_json(client):
+    r = client.post("/api/session/nope/answer", json={"text": "yes"})
+    assert r.status_code == 404 and "expired" in r.json()["detail"]
+    assert client.get("/api/health").json()["ok"] is True

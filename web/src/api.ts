@@ -64,11 +64,35 @@ export type Recording = {
 };
 export type RecordingInfo = Pick<Recording, "id" | "label" | "message" | "system">;
 
-async function call<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`/api${path}`, { headers: { "Content-Type": "application/json" }, ...init });
-  if (!res.ok) throw Object.assign(new Error(await res.text()), { status: res.status });
-  return res.json() as Promise<T>;
+export class ApiError extends Error {
+  constructor(message: string, public status: number) { super(message); }
 }
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** POST/GET to the live API. Network failures (server restarting) are retried for
+ * up to 90 s, reporting each retry; HTTP errors become readable ApiErrors. */
+async function call<T>(path: string, init?: RequestInit, onRetry?: (attempt: number) => void): Promise<T> {
+  const deadline = Date.now() + 90_000;
+  for (let attempt = 1; ; attempt++) {
+    let res: Response;
+    try {
+      res = await fetch(`/api${path}`, { headers: { "Content-Type": "application/json" }, ...init });
+    } catch {
+      if (Date.now() > deadline) throw new ApiError("The server cannot be reached. Start it with start_demo.bat and try again.", 0);
+      onRetry?.(attempt);
+      await sleep(Math.min(1000 * attempt, 5000));
+      continue;
+    }
+    if (res.ok) return res.json() as Promise<T>;
+    const body = await res.text();
+    let message = body || `HTTP ${res.status}`;
+    try { const d = JSON.parse(body).detail; if (typeof d === "string") message = d; } catch { /* not JSON */ }
+    throw new ApiError(message, res.status);
+  }
+}
+
+export type Context = { message: string; system: string; lang: string; history: { text: string; value?: string | null }[] };
 
 // Snapshot written by `python -m eval.export_site` for static hosting (Vercel):
 // read only when the live API is not reachable.
@@ -96,11 +120,13 @@ async function readData<T>(file: string): Promise<T> {
 
 export const api = {
   live: () => fetch("/api/health").then(isJson).catch(() => false),
+  health: () => fetch("/api/health").then((r) => (isJson(r) ? r.json() as Promise<{ ok: boolean; ready: boolean }> : null)).catch(() => null),
   systems: () => read<{ default: string; llm: string; systems: { id: string; description: string }[] }>("/systems"),
-  start: (message: string, system: string, lang: string) =>
-    call<{ session_id: string; turn: Turn; fault_names: FaultNames }>("/session", { method: "POST", body: JSON.stringify({ message, system, lang }) }),
-  answer: (id: string, text: string, value?: string) =>
-    call<{ turn: Turn }>(`/session/${id}/answer`, { method: "POST", body: JSON.stringify({ text, value }) }),
+  start: (message: string, system: string, lang: string, onRetry?: (n: number) => void) =>
+    call<{ session_id: string; turn: Turn; fault_names: FaultNames }>("/session", { method: "POST", body: JSON.stringify({ message, system, lang }) }, onRetry),
+  // `ctx` lets the server rebuild the conversation if it restarted in between.
+  answer: (id: string, text: string, value: string | undefined, ctx: Context, onRetry?: (n: number) => void) =>
+    call<{ turn: Turn }>(`/session/${id}/answer`, { method: "POST", body: JSON.stringify({ text, value, ...ctx }) }, onRetry),
   results: () => read<Summary>("/results/latest"),
   sensitivity: () => read<SensitivityRun[]>("/results/sensitivity"),
   example: () => read<Example>("/results/example"),

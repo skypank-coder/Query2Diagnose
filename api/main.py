@@ -23,15 +23,16 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from core.agent import Agent, agent_defaults
 from core.clarity import load_clarity
 from core.hypothesis import load_hypothesis_model
-from core.llm import LLMClient
+from core.llm import BudgetExceeded, LLMClient, QuotaExhausted
 from core.paths import RESULTS, ROOT
 from core.records import (
     BENCHMARK, CASES_FILE, CONDITIONS, LANG_PAIR, STRESS_FILE, VARIANTS_FILE, Case, Variant, load_splits, read_jsonl,
@@ -56,8 +57,30 @@ DESCRIPTIONS = {
 }
 
 
-@lru_cache(maxsize=1)
+_RESOURCES: dict | None = None
+_RESOURCES_LOCK = threading.Lock()
+
+
 def resources() -> dict:
+    """Model, retriever and LLM client, loaded once: the first caller loads them,
+    concurrent callers wait for that load instead of starting their own."""
+    global _RESOURCES
+    if _RESOURCES is None:
+        with _RESOURCES_LOCK:
+            if _RESOURCES is None:
+                _RESOURCES = _load_resources()
+    return _RESOURCES
+
+
+def _clear_resources() -> None:
+    global _RESOURCES
+    _RESOURCES = None
+
+
+resources.cache_clear = _clear_resources  # same interface as functools.lru_cache, used by the tests
+
+
+def _load_resources() -> dict:
     llm = LLMClient()
     retrieval = agent_defaults()["retrieval"]
     backend = os.getenv("Q2D_RETRIEVAL", retrieval["backend"])
@@ -97,9 +120,21 @@ class StartRequest(BaseModel):
     lang: str = "en"
 
 
+class PastAnswer(BaseModel):
+    text: str = ""
+    value: str | None = None
+
+
 class AnswerRequest(BaseModel):
     text: str = ""
     value: str | None = None      # option chip value; skips parsing
+    # The conversation so far, so the server can rebuild a session it no longer
+    # holds (for example after a restart). LLM calls are cached, so a rebuild
+    # replays the same dialogue.
+    message: str | None = None
+    system: str | None = None
+    lang: str = "en"
+    history: list[PastAnswer] = Field(default_factory=list)
 
 
 def _hit_view(hit: dict) -> dict:
@@ -147,10 +182,11 @@ def _b2_step(session: Session) -> dict:
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    # Load the hypothesis model, the retriever and the LLM client before the
-    # first request, so the first demo message does not wait for them.
+    # Load the hypothesis model, the retriever and the LLM client in the
+    # background: the server answers at once, and the first demo message
+    # finds everything loaded (or waits for the load already under way).
     if os.getenv("Q2D_WARMUP", "1") == "1":
-        resources()
+        threading.Thread(target=resources, name="warm-up", daemon=True).start()
     yield
 
 
@@ -159,9 +195,27 @@ app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http
                    allow_methods=["*"], allow_headers=["*"])
 
 
+@app.exception_handler(QuotaExhausted)
+async def _quota_exhausted(_request: Request, _exc: QuotaExhausted) -> JSONResponse:
+    return JSONResponse(status_code=503, content={"detail": (
+        "The language model's free quota is used up for now. The instant examples still work; "
+        "new messages will work again when the quota resets.")})
+
+
+@app.exception_handler(BudgetExceeded)
+async def _budget_exceeded(_request: Request, _exc: BudgetExceeded) -> JSONResponse:
+    return JSONResponse(status_code=503, content={"detail": "The spending limit for paid model calls was reached."})
+
+
+@app.exception_handler(Exception)
+async def _unexpected(_request: Request, exc: Exception) -> JSONResponse:
+    return JSONResponse(status_code=500, content={"detail": (
+        f"The assistant could not finish this step ({type(exc).__name__}). Please try again.")})
+
+
 @app.get("/api/health")
 def health() -> dict:
-    return {"ok": True}
+    return {"ok": True, "ready": _RESOURCES is not None}
 
 
 @app.get("/api/systems")
@@ -170,18 +224,14 @@ def systems() -> dict:
             "llm": resources()["llm"].name}
 
 
-@app.post("/api/session")
-def start(req: StartRequest) -> dict:
-    if req.system not in DESCRIPTIONS:
-        raise HTTPException(400, f"unknown system {req.system}")
+def _open_session(message: str, system: str, lang: str) -> tuple[Session, dict]:
     res = resources()
-    sid = uuid.uuid4().hex[:12]
-    session = Session(system=req.system, lang=req.lang if req.lang in ("en", "kn", "hi") else "en", message=req.message)
+    session = Session(system=system, lang=lang if lang in ("en", "kn", "hi") else "en", message=message)
     with session.lock:
-        if req.system == "b1_direct":
+        if system == "b1_direct":
             b1 = B1Direct(res["llm"], res["retriever"])
             r = b1.run(Variant(variant_id="demo", case_id="demo", condition="clean", lang_pair="none",
-                               text=req.message, mentioned_attributes=[], provenance="genuine", generator="demo"),
+                               text=message, mentioned_attributes=[], provenance="genuine", generator="demo"),
                        None, 0)
             session.done = True
             hits = [_hit_view({"passage_id": p, "score": None, "faults": []}) for p in r.passage_ids[:3]]
@@ -189,16 +239,39 @@ def start(req: StartRequest) -> dict:
                     "result": {"predicted": r.predicted, "top_fault": r.top_fault, "confidence": r.confidence,
                                "reason": "direct", "guidance": r.extras.get("guidance", ""), "turns": 0,
                                "passages": hits}}
-        elif req.system == "b2_llm_questions":
+        elif system == "b2_llm_questions":
             session.b2 = B2LLMQuestions(res["llm"], res["retriever"])
-            session.hits = res["retriever"].search(req.message, 5)
+            session.hits = res["retriever"].search(message, 5)
             turn = _b2_step(session)
         else:
-            system = build_systems([req.system], res["llm"], res["model"], res["retriever"], res["clarity"],
-                                   {**res["overrides"], "lang": session.lang})[req.system]
-            session.agent = Agent(res["llm"], res["model"], res["retriever"], system.config, system.clarity)
-            turn = _agent_turn(session, session.agent.start(req.message))
+            built = build_systems([system], res["llm"], res["model"], res["retriever"], res["clarity"],
+                                  {**res["overrides"], "lang": session.lang})[system]
+            session.agent = Agent(res["llm"], res["model"], res["retriever"], built.config, built.clarity)
+            turn = _agent_turn(session, session.agent.start(message))
         session.turns.append(turn)
+    return session, turn
+
+
+def _apply_answer(session: Session, text: str, value: str | None) -> dict:
+    """Caller holds session.lock."""
+    if session.done or (session.agent and session.agent.result is not None):
+        raise HTTPException(409, "This conversation has already finished. Start a new one.")
+    if session.agent:
+        turn = _agent_turn(session, session.agent.reply(text or (value or ""), value))
+    else:
+        q = session.pending or {}
+        session.dialogue.append((q.get("text", ""), text or value or ""))
+        turn = _b2_step(session)
+    session.turns.append(turn)
+    return turn
+
+
+@app.post("/api/session")
+def start(req: StartRequest) -> dict:
+    if req.system not in DESCRIPTIONS:
+        raise HTTPException(400, f"unknown system {req.system}")
+    session, turn = _open_session(req.message, req.system, req.lang)
+    sid = uuid.uuid4().hex[:12]
     SESSIONS[sid] = session
     return {"session_id": sid, "system": req.system, "turn": turn, "fault_names": _fault_names()}
 
@@ -207,18 +280,17 @@ def start(req: StartRequest) -> dict:
 def answer(sid: str, req: AnswerRequest) -> dict:
     session = SESSIONS.get(sid)
     if session is None:
-        raise HTTPException(404, "unknown session")
+        # The server no longer holds this conversation (it restarted): rebuild it
+        # from the message and the answers so far, then continue.
+        if not req.message or req.system not in DESCRIPTIONS:
+            raise HTTPException(404, "This conversation has expired. Please start it again.")
+        session, _ = _open_session(req.message, req.system, req.lang)
+        with session.lock:
+            for past in req.history:
+                _apply_answer(session, past.text, past.value)
+        SESSIONS[sid] = session
     with session.lock:
-        if session.done or (session.agent and session.agent.result is not None):
-            raise HTTPException(409, "the session has finished")
-        if session.agent:
-            text = req.text or (req.value or "")
-            turn = _agent_turn(session, session.agent.reply(text, req.value))
-        else:
-            q = session.pending or {}
-            session.dialogue.append((q.get("text", ""), req.text or req.value or ""))
-            turn = _b2_step(session)
-        session.turns.append(turn)
+        turn = _apply_answer(session, req.text, req.value)
     return {"session_id": sid, "system": session.system, "turn": turn}
 
 

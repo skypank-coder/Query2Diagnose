@@ -3,3 +3,4 @@
 *.pdf binary
 *.zip binary
 *.npy binary
+*.bat text eol=crlf

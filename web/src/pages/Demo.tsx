@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { api, pretty, SYSTEM_LABEL, type FaultNames, type Hit, type Recording, type RecordingInfo, type Result, type Turn } from "../api";
+import { api, ApiError, pretty, SYSTEM_LABEL, type FaultNames, type Hit, type Recording, type RecordingInfo, type Result, type Turn } from "../api";
 import { Bar } from "../components/ui";
 
 // Messages rehearsed against the live API: their LLM calls are cached, so they answer instantly.
@@ -141,16 +141,28 @@ export default function Demo() {
   const [rec, setRec] = useState<Recording | null>(null);
   const [step, setStep] = useState(0);
   const [autoplay, setAutoplay] = useState(false);
+  const [history, setHistory] = useState<{ text: string; value?: string | null }[]>([]);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
   const [params] = useSearchParams();
   const scroller = useRef<HTMLDivElement>(null);
+  const retry = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     api.live().then((live) => {
       setMode(live ? "live" : "replay");
       api.systems().then((s) => { setSystems(s.systems); setLlm(s.llm); }).catch(() => undefined);
-      if (!live) api.recordings().then(setRecs).catch(() => setError("No recorded dialogues found."));
+      api.recordings().then(setRecs).catch(() => { if (!live) setError("No recorded dialogues found."); });
     });
   }, []);
+  // The server loads the model in the background after it starts; show when it is ready.
+  useEffect(() => {
+    if (mode !== "live" || ready) return;
+    const poll = () => api.health().then((h) => { if (h?.ready) setReady(true); });
+    poll();
+    const id = setInterval(poll, 2000);
+    return () => clearInterval(id);
+  }, [mode, ready]);
   useEffect(() => {
     const el = scroller.current;
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
@@ -166,32 +178,66 @@ export default function Demo() {
     if (t.question) setMsgs((m) => [...m, { role: "system", text: t.question!.text, kind: t.question!.kind }]);
     if (t.result) setMsgs((m) => [...m, { role: "system", text: "", kind: "final", result: t.result }]);
   };
-  const reset = () => { setAutoplay(false); setMsgs([]); setTurn(null); setFirst(null); setSession(null); setRec(null); setStep(0); setError(null); };
+  const reset = () => {
+    setAutoplay(false); setMsgs([]); setTurn(null); setFirst(null); setSession(null); setRec(null); setStep(0);
+    setError(null); setNotice(null); setHistory([]); retry.current = null;
+  };
+  const reconnecting = (n: number) => setNotice(`The server is not answering; reconnecting… (try ${n})`);
+  const friendly = (e: unknown) => (e instanceof ApiError ? e.message : "Something went wrong. Please try again.");
+
+  // If the live model fails on a dialogue we also have a recording of, and the
+  // answers so far match the recorded ones, continue from the recording.
+  async function fallBack(msgText: string, sys: string, answers: { text: string; value?: string | null }[]): Promise<boolean> {
+    const info = recs.find((r) => r.message === msgText && r.system === sys);
+    if (!info) return false;
+    let r: Recording;
+    try { r = await api.recording(info.id); } catch { return false; }
+    const same = answers.every((a, i) => a.value != null && r.steps[i]?.answer?.value === a.value);
+    if (!same || answers.length >= r.steps.length) return false;
+    setRec(r); setNames(r.fault_names); setStep(answers.length);
+    if (answers.length === 0) setFirst(r.steps[0].turn);
+    show(r.steps[answers.length].turn);
+    setNotice("The live model did not answer, so this continues from a recorded run of the same dialogue.");
+    return true;
+  }
 
   async function start(text: string, sys = system) {
     if (!text.trim()) return;
-    setBusy(true); setError(null); setMessage(text); setSystem(sys);
-    setMsgs([{ role: "user", text }]); setTurn(null); setFirst(null);
+    reset();
+    setBusy(true); setMessage(text); setSystem(sys);
+    setMsgs([{ role: "user", text }]);
+    retry.current = () => start(text, sys);
     try {
-      const r = await api.start(text, sys, lang);
-      setSession(r.session_id); setNames(r.fault_names); setFirst(r.turn); show(r.turn); setInput("");
-    } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+      const r = await api.start(text, sys, lang, reconnecting);
+      setNotice(null); setSession(r.session_id); setNames(r.fault_names); setFirst(r.turn); show(r.turn); setInput("");
+    } catch (e) {
+      setNotice(null);
+      if (!(await fallBack(text, sys, []))) setError(friendly(e));
+    } finally { setBusy(false); }
   }
 
   async function reply(text: string, value?: string) {
     if (!session || (!text.trim() && !value)) return;
-    setBusy(true); setError(null);
+    setBusy(true); setError(null); setNotice(null);
     setMsgs((m) => [...m, { role: "user", text }]);
-    try { show((await api.answer(session, text, value)).turn); setInput(""); }
-    catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+    retry.current = () => { setMsgs((m) => m.slice(0, -1)); reply(text, value); };
+    try {
+      const r = await api.answer(session, text, value, { message, system, lang, history }, reconnecting);
+      setNotice(null); setHistory((h) => [...h, { text, value }]); show(r.turn); setInput("");
+    } catch (e) {
+      setNotice(null);
+      if (!(await fallBack(message, system, [...history, { text, value }]))) setError(friendly(e));
+    } finally { setBusy(false); }
   }
 
   async function play(id: string) {
     reset();
-    const r = await api.recording(id);
-    setRec(r); setNames(r.fault_names); setMessage(r.message); setSystem(r.system); setStep(0);
-    setMsgs([{ role: "user", text: r.message }]);
-    setFirst(r.steps[0].turn); show(r.steps[0].turn);
+    try {
+      const r = await api.recording(id);
+      setRec(r); setNames(r.fault_names); setMessage(r.message); setSystem(r.system); setStep(0);
+      setMsgs([{ role: "user", text: r.message }]);
+      setFirst(r.steps[0].turn); show(r.steps[0].turn);
+    } catch { setError("This recorded dialogue could not be loaded."); }
   }
 
   function advance() {
@@ -217,6 +263,7 @@ export default function Demo() {
 
   const asking = turn?.action === "ask";
   const done = !!turn?.result;
+  const replaying = !!rec;
   const expected = rec?.steps[step]?.answer?.value;
   const siblings = rec ? recs.filter((r) => r.message === rec.message && r.id !== rec.id) : [];
 
@@ -225,14 +272,14 @@ export default function Demo() {
       <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-200">
         <span><strong>Research prototype, not repair advice.</strong> Refrigerant, sealed-system, compressor and live-electric faults are always referred to a technician.</span>
         {mode === "replay" && <span className="rounded-full bg-amber-200 px-2.5 py-0.5 text-xs font-semibold text-amber-900 dark:bg-amber-800 dark:text-amber-100">Replay mode · recorded real dialogues</span>}
-        {mode === "live" && <span className="rounded-full bg-emerald-200 px-2.5 py-0.5 text-xs font-semibold text-emerald-900 dark:bg-emerald-800 dark:text-emerald-100">Live · {llm || "connecting…"}</span>}
+        {mode === "live" && <span className="rounded-full bg-emerald-200 px-2.5 py-0.5 text-xs font-semibold text-emerald-900 dark:bg-emerald-800 dark:text-emerald-100">{ready ? `Live · ${llm}` : "Live · loading the model…"}</span>}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr] [&>*]:min-w-0">
         {/* chat: fixed height, scrolls inside, controls pinned at the bottom */}
         <div className="card flex h-[75vh] min-h-[480px] flex-col p-0 lg:sticky lg:top-20 lg:h-[calc(100vh-8.5rem)]">
           <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 px-5 py-3 dark:border-slate-800">
-            {mode === "live" ? (
+            {mode === "live" && !replaying ? (
               <>
                 <select value={system} onChange={(e) => setSystem(e.target.value)} className="rounded-lg border border-slate-300 bg-transparent px-2 py-1.5 text-sm dark:border-slate-700" aria-label="System">
                   {systems.map((s) => <option key={s.id} value={s.id} className="text-slate-900">{SYSTEM_LABEL[s.id] ?? s.id}</option>)}
@@ -303,15 +350,15 @@ export default function Demo() {
             {asking && turn?.question?.options && turn.question.options.length > 0 && (
               <div className="mb-3">
                 <div className="mb-1.5 flex items-center justify-between gap-2 text-[11px] font-medium uppercase tracking-wide muted">
-                  <span>{mode === "replay" ? "Click the highlighted answer" : "Tap an answer, or type your own"}</span>
-                  {mode === "replay" && !autoplay && <button className="btn-ghost px-2 py-0.5 text-[11px] normal-case" onClick={() => setAutoplay(true)}>▶ Play the rest</button>}
+                  <span>{replaying ? "Click the highlighted answer" : "Tap an answer, or type your own"}</span>
+                  {replaying && !autoplay && <button className="btn-ghost px-2 py-0.5 text-[11px] normal-case" onClick={() => setAutoplay(true)}>▶ Play the rest</button>}
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {turn.question.options.map((o) => {
-                    const isNext = mode === "replay" && o.value === expected;
+                    const isNext = replaying && o.value === expected;
                     return (
-                      <button key={o.value} disabled={busy || (mode === "replay" && !isNext)}
-                        onClick={() => (mode === "replay" ? advance() : reply(o.label, o.value))}
+                      <button key={o.value} disabled={busy || (replaying && !isNext)}
+                        onClick={() => (replaying ? advance() : reply(o.label, o.value))}
                         className={`chip ${isNext ? "border-accent-600 bg-accent-600 text-white ring-4 ring-accent-200 dark:ring-accent-700/40" : "border-accent-400 text-accent-700 hover:bg-accent-50 disabled:opacity-40 dark:text-accent-400 dark:hover:bg-accent-700/20"}`}>
                         {o.label}
                       </button>
@@ -323,7 +370,7 @@ export default function Demo() {
             {done && (
               <div className="mb-3 flex flex-wrap items-center gap-2 text-sm">
                 <span className="muted">Same message with:</span>
-                {mode === "live"
+                {!replaying
                   ? ["q2d", "b3_infogain_dx", "b2_llm_questions", "b1_direct"].filter((s) => s !== system).map((s) => (
                       <button key={s} className="btn-ghost px-3 py-1" onClick={() => start(message, s)}>{SYSTEM_LABEL[s]}</button>
                     ))
@@ -331,12 +378,21 @@ export default function Demo() {
                 <button className="btn-ghost px-3 py-1" onClick={reset}>Another example</button>
               </div>
             )}
-            {error && <div className="mb-2 text-sm text-red-600">{error}</div>}
+            {notice && (
+              <div className="mb-3 rounded-lg border border-sky-300 bg-sky-50 px-3 py-2 text-xs text-sky-900 dark:border-sky-700 dark:bg-sky-950/40 dark:text-sky-200">{notice}</div>
+            )}
+            {error && (
+              <div className="mb-3 flex flex-wrap items-center gap-2 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">
+                <span className="flex-1">{error}</span>
+                {retry.current && <button className="btn-ghost px-3 py-1 text-xs" onClick={() => { setError(null); retry.current?.(); }}>Try again</button>}
+                <button className="btn-ghost px-3 py-1 text-xs" onClick={reset}>Use an instant example</button>
+              </div>
+            )}
             <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); session && asking ? reply(input) : start(input); }}>
-              <input value={input} onChange={(e) => setInput(e.target.value)} disabled={busy || mode !== "live"}
-                placeholder={mode !== "live" ? "Typing needs the local server; pick a recorded dialogue above" : asking ? "Answer in your own words (any language)…" : "fridge cooling agalla, compressor sound ide…"}
+              <input value={input} onChange={(e) => setInput(e.target.value)} disabled={busy || mode !== "live" || replaying}
+                placeholder={mode !== "live" ? "Typing needs the local server; pick a recorded dialogue above" : replaying ? "Click the highlighted answer above, or press New" : asking ? "Answer in your own words (any language)…" : "fridge cooling agalla, compressor sound ide…"}
                 className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-accent-500 disabled:opacity-60 dark:border-slate-700" />
-              <button className="btn-primary" disabled={busy || mode !== "live" || !input.trim()}>{asking ? "Answer" : "Diagnose"}</button>
+              <button className="btn-primary" disabled={busy || mode !== "live" || replaying || !input.trim()}>{asking ? "Answer" : "Diagnose"}</button>
             </form>
           </div>
         </div>
