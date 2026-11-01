@@ -56,7 +56,7 @@ export default function Results() {
         <h1 className="font-serif text-3xl font-semibold text-slate-900 dark:text-white">Results</h1>
         {s.profile === "pilot" && <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">Pilot run — not the full grid</span>}
       </div>
-      <p className="mt-2 text-sm muted">Run <span className="font-mono">{s.run_id}</span> · {s.llm} · {new Date(s.created).toLocaleString()} · commit {s.git.commit.slice(0, 7)}{s.git.dirty ? " (dirty)" : ""}</p>
+      <p className="mt-2 text-sm muted">Run <span className="font-mono">{s.run_id}</span> · {s.llm} · {new Date(s.created).toLocaleString()}</p>
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Cases / variants" value={`${s.n_cases} / ${s.n_variants}`} hint={`test split · seeds ${s.seeds.join(", ")}`} />
         <Stat label="Simulator" value={s.simulator} hint="rule-based, answers from hidden ground truth" />

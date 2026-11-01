@@ -50,10 +50,6 @@ export type Stats = {
   kappa: Record<string, { kappa: number; n: number }> | null;
 };
 
-export type PaperInfo = {
-  title: string | null; authors: string[]; abstract: string | null; keywords: string[];
-  sections: { level: number; title: string }[];
-};
 export type SensitivityRun = { weights: string; run_id: string; seeds: number[]; systems: Record<string, Block> };
 export type Example = {
   run_id: string; variant_id: string; seed: number; system: string; message: string | null; condition: string | null;
@@ -78,7 +74,6 @@ export const api = {
   sensitivity: () => call<SensitivityRun[]>("/results/sensitivity"),
   example: () => call<Example>("/results/example"),
   stats: () => call<Stats>("/benchmark/stats"),
-  paper: () => call<PaperInfo>("/paper"),
 };
 
 export const pct = (x: number | null | undefined) => (x == null ? "—" : `${(x * 100).toFixed(1)}%`);

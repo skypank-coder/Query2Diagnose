@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import threading
 import uuid
 from collections import Counter
@@ -275,37 +274,6 @@ def results_example(variant_id: str = EXAMPLE_VARIANT, system: str = "q2d", seed
         "predicted": record["predicted"], "fault_name": _fault_names().get(record["predicted"], {}).get("name"),
         "confidence": record.get("confidence"),
         "passages": [_hit_view({"passage_id": p, "score": None, "faults": []}) for p in record.get("passage_ids", [])[:1]],
-    }
-
-
-PAPER_TEX = ROOT / "paper" / "query2diagnose_paper.tex"   # local only: the manuscript is git-ignored
-
-
-def _plain(tex: str) -> str:
-    """LaTeX snippet -> readable text (enough for the title, abstract and headings)."""
-    s = re.sub(r"~?\\cite\{[^}]*\}", "", tex)
-    s = re.sub(r"\\(?:textit|textbf|emph|texttt)\{([^}]*)\}", r"\1", s)
-    s = re.sub(r"\$([^$]*)\$", lambda m: m.group(1).replace("\\", ""), s)
-    s = s.replace("---", "—").replace("--", "–").replace("``", "“").replace("''", "”").replace("\\%", "%")
-    s = s.replace("~", " ").replace("\\,", " ")
-    return re.sub(r"\s+", " ", s).strip()
-
-
-@app.get("/api/paper")
-def paper() -> dict:
-    if not PAPER_TEX.exists():
-        raise HTTPException(404, "the paper source is not on this machine")
-    tex = PAPER_TEX.read_text(encoding="utf-8")
-    title = re.search(r"\\title\{(.*?)\}\s*\n", tex)
-    abstract = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", tex, re.S)
-    keywords = re.search(r"\\begin\{IEEEkeywords\}(.*?)\\end\{IEEEkeywords\}", tex, re.S)
-    return {
-        "title": _plain(title.group(1)) if title else None,
-        "authors": re.findall(r"\\IEEEauthorblockN\{([^}]+)\}", tex),
-        "abstract": _plain(abstract.group(1)) if abstract else None,
-        "keywords": [k.strip() for k in _plain(keywords.group(1)).split(",")] if keywords else [],
-        "sections": [{"level": 1 if kind == "section" else 2, "title": _plain(name)}
-                     for kind, name in re.findall(r"\\(section|subsection)\{([^}]*)\}", tex)],
     }
 
 

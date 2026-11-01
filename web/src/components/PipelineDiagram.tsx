@@ -1,4 +1,4 @@
-// Fig. 1 of the paper: the Query2Diagnose interaction pipeline.
+// The Query2Diagnose interaction pipeline.
 const STEPS = [
   ["User description", "noisy, code-mixed, incomplete"],
   ["Input understanding", "normalise, then sample K = 8 readings over 20 attributes"],

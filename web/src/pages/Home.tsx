@@ -2,11 +2,16 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PipelineDiagram from "../components/PipelineDiagram";
 import { Findings, KeyStats } from "../components/Findings";
-import { api, CONDITION_LABEL, pct, pretty, type Example, type PaperInfo, type Stats, type Summary } from "../api";
+import { api, CONDITION_LABEL, pct, pretty, type Example, type Stats, type Summary } from "../api";
 
-const TEAM = ["Saatwik Kumar Yadav", "Rachana Bhaskar Gowda", "Priyanshu Kumar Senapati", "S Md Adil Ahmed"];
+const TEAM = [
+  { name: "Saatwik Kumar Yadav", role: "Team lead" },
+  { name: "Rachana Bhaskar Gowda", role: "Team member" },
+  { name: "Priyanshu Kumar Senapati", role: "Team member" },
+  { name: "S Md Adil Ahmed", role: "Team member" },
+];
 const GITHUB = "https://github.com/skypank-coder/Query2Diagnose";
-const TITLE = "Query2Diagnose: Uncertainty-Aware Interactive Troubleshooting from Noisy, Code-Mixed and Incomplete User Descriptions";
+const initials = (name: string) => name.split(" ").filter((p) => p.length > 1 || p === "S").map((p) => p[0]).slice(0, 2).join("");
 
 // Replays one saved dialogue from the latest run (GET /api/results/example), bubble by bubble.
 function DialogueReplay({ ex }: { ex: Example | null }) {
@@ -75,12 +80,10 @@ export default function Home() {
   const [s, setS] = useState<Summary | null>(null);
   const [ex, setEx] = useState<Example | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
-  const [paper, setPaper] = useState<PaperInfo | null>(null);
   useEffect(() => {
     api.results().then(setS).catch(() => setS(null));
     api.example().then(setEx).catch(() => setEx(null));
     api.stats().then(setStats).catch(() => setStats(null));
-    api.paper().then(setPaper).catch(() => setPaper(null));
   }, []);
 
   const unsafeFaults = stats?.faults.filter((f) => !f.user_safe).map((f) => f.name) ?? [];
@@ -96,7 +99,7 @@ export default function Home() {
         <div className="container-page grid items-center gap-12 py-16 lg:grid-cols-[1.1fr_1fr] lg:py-24 [&>*]:min-w-0">
           <div className="text-white">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-slate-200 backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent-300" /> IEEE conference paper · RV University, Bengaluru
+              <span className="h-1.5 w-1.5 rounded-full bg-accent-300" /> B.Tech CSE project · RV University, Bengaluru
             </span>
             <h1 className="mt-6 font-serif text-4xl font-semibold leading-[1.08] tracking-tight md:text-6xl">
               When the message is messy,<br /><span className="text-accent-300">ask before you answer.</span>
@@ -110,7 +113,7 @@ export default function Home() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/demo" className="btn bg-accent-400 px-5 py-2.5 text-slate-950 hover:bg-accent-300">Try the live demo →</Link>
               <Link to="/results" className="btn-glass px-5 py-2.5">See the results</Link>
-              <Link to="/paper" className="btn-glass px-5 py-2.5">Read the paper</Link>
+              <Link to="/benchmark" className="btn-glass px-5 py-2.5">The benchmark</Link>
             </div>
             {s && (
               <p className="mt-8 text-xs text-slate-400">
@@ -260,35 +263,26 @@ export default function Home() {
         <Link to="/benchmark" className="btn-ghost mt-6">Explore the benchmark →</Link>
       </section>
 
-      {/* ---------------------------------------------------------------- paper */}
+      {/* ----------------------------------------------------------------- team */}
       <section className="border-t border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40">
-        <div className="container-page grid gap-10 lg:grid-cols-[1.4fr_1fr]">
-          <div>
-            <p className="eyebrow">The paper</p>
-            <h2 className="mt-2 font-serif text-2xl font-semibold leading-snug text-slate-900 md:text-3xl dark:text-white">{paper?.title ?? TITLE}</h2>
-            <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">{(paper?.authors.length ? paper.authors : TEAM).join(", ")}</p>
-            {paper?.abstract && <p className="mt-5 line-clamp-6 text-sm leading-relaxed muted">{paper.abstract}</p>}
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link to="/paper" className="btn-primary">Read the paper</Link>
-              <a href={GITHUB} className="btn-ghost" target="_blank" rel="noreferrer">Code and data on GitHub</a>
-            </div>
+        <div className="container-page">
+          <SectionHead eyebrow="The team" title="Built by four B.Tech students at RV University">
+            Computer Science and Engineering · School of Computer Science and Engineering, RV University, Bengaluru, India
+          </SectionHead>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {TEAM.map(({ name, role }, i) => (
+              <div key={name} className={`card flex flex-col items-center py-8 text-center ${i === 0 ? "ring-2 ring-accent-500" : ""}`}>
+                <span className={`flex h-16 w-16 items-center justify-center rounded-full text-lg font-semibold text-white ${i === 0 ? "bg-gradient-to-br from-amber-400 to-accent-600" : "bg-gradient-to-br from-accent-400 to-accent-700"}`}>
+                  {initials(name)}
+                </span>
+                <div className="mt-4 font-semibold text-slate-900 dark:text-white">{name}</div>
+                <span className={`mt-2 rounded-full px-3 py-0.5 text-xs font-medium ${i === 0 ? "bg-accent-600 text-white" : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300"}`}>
+                  {role}
+                </span>
+              </div>
+            ))}
           </div>
-          <div className="card self-start">
-            <div className="text-xs font-semibold uppercase tracking-wider muted">Team</div>
-            <ul className="mt-4 space-y-3">
-              {TEAM.map((name) => (
-                <li key={name} className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-accent-400 to-accent-700 text-sm font-semibold text-white">
-                    {name.split(" ").filter((p) => p.length > 1 || p === "S").map((p) => p[0]).slice(0, 2).join("")}
-                  </span>
-                  <span className="font-medium text-slate-800 dark:text-slate-100">{name}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-5 border-t border-slate-200 pt-4 text-xs leading-relaxed muted dark:border-slate-800">
-              B.Tech Computer Science and Engineering<br />School of Computer Science and Engineering, RV University, Bengaluru, India
-            </p>
-          </div>
+          <a href={GITHUB} className="btn-ghost mt-8" target="_blank" rel="noreferrer">Code and data on GitHub →</a>
         </div>
       </section>
     </div>

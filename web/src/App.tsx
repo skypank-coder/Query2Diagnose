@@ -8,10 +8,9 @@ const Demo = lazy(() => import("./pages/Demo"));
 const Benchmark = lazy(() => import("./pages/Benchmark"));
 const Results = lazy(() => import("./pages/Results"));
 const Method = lazy(() => import("./pages/Method"));
-const Paper = lazy(() => import("./pages/Paper"));
 
 const NAV = [
-  ["/", "Home"], ["/demo", "Live demo"], ["/results", "Results"], ["/benchmark", "Benchmark"], ["/method", "Method"], ["/paper", "Paper"],
+  ["/", "Home"], ["/demo", "Live demo"], ["/results", "Results"], ["/benchmark", "Benchmark"], ["/method", "How it works"],
 ] as const;
 const GITHUB = "https://github.com/skypank-coder/Query2Diagnose";
 
@@ -82,7 +81,6 @@ export default function App() {
             <Route path="/results" element={<Page><Results /></Page>} />
             <Route path="/benchmark" element={<Page><Benchmark /></Page>} />
             <Route path="/method" element={<Page><Method /></Page>} />
-            <Route path="/paper" element={<Page><Paper /></Page>} />
           </Routes>
         </Suspense>
       </main>
@@ -90,7 +88,7 @@ export default function App() {
         <div className="container-page grid gap-6 py-8 text-xs text-slate-500 md:grid-cols-[1.4fr_1fr]">
           <div>
             <div className="font-serif text-sm font-semibold text-slate-800 dark:text-slate-100">Query2Diagnose</div>
-            <p className="mt-1">Saatwik Kumar Yadav · Rachana Bhaskar Gowda · Priyanshu Kumar Senapati · S Md Adil Ahmed</p>
+            <p className="mt-1">Saatwik Kumar Yadav (team lead) · Rachana Bhaskar Gowda · Priyanshu Kumar Senapati · S Md Adil Ahmed</p>
             <p className="mt-1">School of Computer Science and Engineering, RV University, Bengaluru, India</p>
             <p className="mt-3">Research prototype, not repair advice. Unsafe faults are always referred to a technician.</p>
           </div>

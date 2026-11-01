@@ -248,8 +248,8 @@ make api                    # http://localhost:8000  (Q2D_RETRIEVAL=tfidf for a 
 make web                    # http://localhost:5173
 ```
 
-The website has six pages: **Home** · **Live demo** (chat with a live belief panel; run B1, B2, B3 and Q2D on the
-same message) · **Benchmark** · **Results** (reads the saved run only) · **Method** · **Paper**.
+The website has five pages: **Home** · **Live demo** (chat with a live belief panel; run B1, B2, B3 and Q2D on the
+same message) · **Results** (reads the saved run only) · **Benchmark** · **How it works**.
 `make docker` serves the API and the built site together on port 8000.
 
 <details>
