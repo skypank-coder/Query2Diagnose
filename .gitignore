@@ -20,5 +20,9 @@ results/*
 # Web
 web/node_modules/
 web/dist/
-# Draft paper: local only, the repo is public.
+# Draft paper and manuscript: local only, the repo is public (publishing the
+# text before submission would trip the venue's similarity check).
 web/public/paper.pdf
+paper/main.*
+paper/references.bib
+paper/*.zip
