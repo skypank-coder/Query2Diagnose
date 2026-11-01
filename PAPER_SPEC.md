@@ -6,10 +6,10 @@
 
 | # | Name | Email |
 |---|---|---|
-| 1 | Saatwik Kumar Yadav | saatwikkumaryadav.btech24@rvu.edu.in |
-| 2 | Rachana Bhaskar Gowda | rachanabhaskargowda.btech24@rvu.edu.in |
-| 3 | Priyanshu Kumar Senapati | priyanshukumarsenapati.btech24@rvu.edu.in |
-| 4 | S Md Adil Ahmed | smdadilahmed.btech24@rvu.edu.in |
+| 1 | Saatwik Kumar Yadav | saatwikkumaryadavbtech24@rvu.edu.in |
+| 2 | Rachana Bhaskar Gowda | rachanabhaskargowdabtech24@rvu.edu.in |
+| 3 | Priyanshu Kumar Senapati | priyanshukumarsenapatibtech24@rvu.edu.in |
+| 4 | S Md Adil Ahmed | smdadilahmedbtech24@rvu.edu.in |
 
 **Affiliation (shared by all four):** School of Computer Science and Engineering, RV University, Bengaluru, India
 **Programme:** B.Tech Computer Science and Engineering
@@ -60,19 +60,29 @@ No other numbered sections. Allowed extras, unnumbered and only if I ask: `\sect
 
 ## 3. Author block — use exactly this
 
-All names on one line, comma separated, one shared affiliation, no USNs:
+One block per author, two authors per row (`\linebreakand` starts the second row; it is defined in the preamble). In each block: the name, then the author's own email directly below it, then the school, university and city. No USNs. (Changed on 2026-11-01 at the team's request; it replaced the earlier single-line block.)
 
 ```latex
-\author{\IEEEauthorblockN{Saatwik Kumar Yadav, Rachana Bhaskar Gowda, Priyanshu Kumar Senapati, S Md Adil Ahmed}
-\IEEEauthorblockA{\textit{School of Computer Science and Engineering} \\
+\author{
+\IEEEauthorblockN{Saatwik Kumar Yadav}
+\IEEEauthorblockA{saatwikkumaryadavbtech24@rvu.edu.in\\
+\textit{School of Computer Science and Engineering}\\
 \textit{RV University}\\
-Bengaluru, India \\
-\{saatwikkumaryadav, rachanabhaskargowda, priyanshukumarsenapati, smdadilahmed\}.btech24@rvu.edu.in}
+Bengaluru, India}
+\and
+\IEEEauthorblockN{Rachana Bhaskar Gowda}
+\IEEEauthorblockA{rachanabhaskargowdabtech24@rvu.edu.in\\ ... same three lines ...}
+\linebreakand
+\IEEEauthorblockN{Priyanshu Kumar Senapati}
+\IEEEauthorblockA{priyanshukumarsenapatibtech24@rvu.edu.in\\ ... same three lines ...}
+\and
+\IEEEauthorblockN{S Md Adil Ahmed}
+\IEEEauthorblockA{smdadilahmedbtech24@rvu.edu.in\\ ... same three lines ...}
 }
 ```
 
 - Name order is fixed as above.
-- Email pattern: full name in lower case with no spaces, followed by `.btech24@rvu.edu.in`.
+- Email pattern: full name in lower case with no spaces, followed by `btech24@rvu.edu.in`.
 - No `\thanks{}`, no funding footnote, no ORCID.
 
 ## 4. References — hard rules
