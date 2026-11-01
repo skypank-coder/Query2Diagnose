@@ -98,10 +98,7 @@ export default function Home() {
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/55" />
         <div className="container-page grid items-center gap-12 py-16 lg:grid-cols-[1.1fr_1fr] lg:py-24 [&>*]:min-w-0">
           <div className="text-white">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-slate-200 backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent-300" /> B.Tech CSE project · RV University, Bengaluru
-            </span>
-            <h1 className="mt-6 font-serif text-4xl font-semibold leading-[1.08] tracking-tight md:text-6xl">
+            <h1 className="font-serif text-4xl font-semibold leading-[1.08] tracking-tight md:text-6xl">
               When the message is messy,<br /><span className="text-accent-300">ask before you answer.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-300">
