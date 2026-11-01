@@ -2,23 +2,15 @@
 % LLM ollama/gpt-oss:20b; seeds [0, 1, 2]; 60 cases, 450 variants; simulator deterministic.
 \begin{tabular}{llcccc}
 \toprule
-System & Noise & $n$ & kn-en F1 & hi-en F1 & McNemar $p$ \\
+System & Noise & $n$ & kn-en & hi-en & McNemar $p$ \\
 \midrule
-B1 direct & codemixed & 180 & 0.21 & 0.23 & 0.098 \\
-B1 direct & combined & 180 & 0.11 & 0.19 & 0.791 \\
-B2 LLM questions & codemixed & 180 & 0.40 & 0.28 & 0.058 \\
-B2 LLM questions & combined & 180 & 0.33 & 0.37 & 0.088 \\
-B3 info-gain ($H_D$) & codemixed & 180 & 0.23 & 0.22 & 1.000 \\
-B3 info-gain ($H_D$) & combined & 180 & 0.14 & 0.14 & 1.000 \\
-Query2Diagnose & codemixed & 180 & 0.19 & 0.17 & 0.219 \\
-Query2Diagnose & combined & 180 & 0.15 & 0.16 & 1.000 \\
--- $H_L$ & codemixed & 180 & 0.23 & 0.22 & 1.000 \\
--- $H_L$ & combined & 180 & 0.14 & 0.14 & 1.000 \\
--- fault state & codemixed & 180 & 0.17 & 0.15 & 0.503 \\
--- fault state & combined & 180 & 0.18 & 0.17 & 0.359 \\
--- cost/clarity & codemixed & 180 & 0.19 & 0.17 & 0.219 \\
--- cost/clarity & combined & 180 & 0.15 & 0.16 & 1.000 \\
--- normalisation & codemixed & 180 & 0.20 & 0.19 & 0.607 \\
--- normalisation & combined & 180 & 0.13 & 0.15 & 0.791 \\
+B1 & code-mixed & 180 & 0.21 & 0.23 & 0.098 \\
+B1 & combined & 180 & 0.11 & 0.19 & 0.791 \\
+B2 & code-mixed & 180 & 0.40 & 0.28 & 0.058 \\
+B2 & combined & 180 & 0.33 & 0.37 & 0.088 \\
+B3 & code-mixed & 180 & 0.23 & 0.22 & 1.000 \\
+B3 & combined & 180 & 0.14 & 0.14 & 1.000 \\
+Q2D & code-mixed & 180 & 0.19 & 0.17 & 0.219 \\
+Q2D & combined & 180 & 0.15 & 0.16 & 1.000 \\
 \bottomrule
 \end{tabular}

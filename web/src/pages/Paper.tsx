@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 
 const BIBTEX = `@misc{yadav2026query2diagnose,
-  title  = {Query2Diagnose: Uncertainty-Aware Interactive Troubleshooting from
-            Noisy, Code-Mixed and Incomplete User Descriptions},
-  author = {Yadav, Saatwik Kumar and Gowda, Rachana Bhaskar and
-            Senapati, Priyanshu Kumar and Ahmed, S Md Adil},
-  year   = {2026},
-  note   = {School of Computer Science and Engineering, RV University, Bengaluru}
+  author = {Saatwik Kumar Yadav and Rachana Bhaskar Gowda and Priyanshu Kumar Senapati and S Md Adil Ahmed},
+  title  = {{Query2Diagnose}: Uncertainty-Aware Interactive Troubleshooting from Noisy, Code-Mixed and Incomplete User Descriptions},
+  note   = {School of Computer Science and Engineering, RV University, Bengaluru, India},
+  year   = {2026}
 }`;
 
 export default function Paper() {

@@ -32,6 +32,9 @@ NAMES = {"b1_direct": "B1 direct", "b2_llm_questions": "B2 LLM questions", "b3_i
          "q2d": "Query2Diagnose", "q2d_minus_hl": "-- $H_L$", "q2d_minus_fault_state": "-- fault state",
          "q2d_minus_cost_clarity": "-- cost/clarity", "q2d_minus_normalisation": "-- normalisation"}
 PLAIN = {k: v.replace("$", "").replace("_", "") for k, v in NAMES.items()}
+SHORT = {"b1_direct": "B1", "b2_llm_questions": "B2", "b3_infogain_dx": "B3", "q2d": "Q2D"}
+# Marker and line style per system, so the figures read in black and white.
+STYLE = {"b1_direct": ("o", "-"), "b2_llm_questions": ("s", "--"), "b3_infogain_dx": ("^", "-."), "q2d": ("D", ":")}
 COND = {"clean": "Clean", "spelling": "Spell.", "codemixed_kn": "CM-kn", "codemixed_hi": "CM-hi",
         "incomplete": "Incompl.", "combined_kn": "Comb-kn", "combined_hi": "Comb-hi", "all": "All"}
 MAIN_SYSTEMS = ["b1_direct", "b2_llm_questions", "b3_infogain_dx", "q2d"]
@@ -43,11 +46,16 @@ def latest_run() -> str | None:
     return json.loads(pointer.read_text(encoding="utf-8"))["run_id"] if pointer.exists() else None
 
 
-def _cell(block: dict) -> str:
+def _ci(block: dict, key: str = "macro_f1") -> str:
+    """Point estimate ± half-width of the 95 % case-level bootstrap interval."""
     if not block:
         return "--"
-    p, lo, hi = block["macro_f1"]
-    return f"{p:.2f}$\\pm${(hi - lo) / 2:.2f} ({block['turns']['mean']:.1f})"
+    p, lo, hi = block[key]
+    return f"{p:.2f}$\\pm${(hi - lo) / 2:.2f}"
+
+
+def _cell(block: dict) -> str:
+    return f"{_ci(block)} ({block['turns']['mean']:.1f})" if block else "--"
 
 
 def _note(summary: dict) -> str:
@@ -62,7 +70,7 @@ def table_main(summary: dict) -> str:
     rows = []
     for s in MAIN_SYSTEMS:
         if s in summary["main"]:
-            rows.append(f"{NAMES[s]} & " + " & ".join(_cell(summary["main"][s].get(c, {})) for c in conds) + r" \\")
+            rows.append(f"{NAMES[s]} & " + " & ".join(_ci(summary["main"][s].get(c, {})) for c in conds) + r" \\")
     return (_note(summary) + "\\begin{tabular}{l" + "c" * len(conds) + "}\n\\toprule\n"
             "System & " + " & ".join(COND[c] for c in conds) + " \\\\\n\\midrule\n" + "\n".join(rows) +
             "\n\\bottomrule\n\\end{tabular}\n")
@@ -80,30 +88,33 @@ def table_ablation(summary: dict) -> str:
         rows.append(f"{NAMES[s]} & {p:.2f}$\\pm${(hi - lo) / 2:.2f} & {cm_cell} & {m['all']['turns']['mean']:.1f} & "
                     f"{rel['ece']:.2f} & {summary['safety'][s]:.2f} \\\\")
     return (_note(summary) + "\\begin{tabular}{lccccc}\n\\toprule\n"
-            "Variant & Macro-F1 & Code-mixed F1 & Turns & ECE & Unsafe \\\\\n\\midrule\n" + "\n".join(rows) +
+            "Variant & Macro-F1 & CM F1 & Turns & ECE & Unsafe \\\\\n\\midrule\n" + "\n".join(rows) +
             "\n\\bottomrule\n\\end{tabular}\n")
 
 
 def table_reliability(summary: dict) -> str:
+    """Accuracy, interaction length, calibration, abstention, safety and retrieval per system."""
     rows = []
     for s in summary["systems"]:
-        rel, ret = summary["reliability"][s], summary["retrieval"][s]
-        rows.append(f"{NAMES[s]} & {rel['ece']:.2f} & {rel['smooth_ece']:.2f} & {rel['brier']:.2f} & "
+        m, rel, ret = summary["main"][s]["all"], summary["reliability"][s], summary["retrieval"][s]
+        rows.append(f"{NAMES[s]} & {_ci(m, 'accuracy')} & {m['fault_accuracy']:.2f} & {m['turns']['mean']:.1f} & "
+                    f"{rel['ece']:.2f} & {rel['smooth_ece']:.2f} & {rel['brier']:.2f} & "
                     f"{rel['abstention_precision']:.2f} & {rel['abstention_recall']:.2f} & {summary['safety'][s]:.2f} & "
                     f"{ret['recall@1']:.2f} & {ret['recall@5']:.2f} \\\\")
-    return (_note(summary) + "\\begin{tabular}{lcccccccc}\n\\toprule\n"
-            "System & ECE & smECE & Brier & Abst. P & Abst. R & Unsafe & R@1 & R@5 \\\\\n\\midrule\n" +
-            "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
+    return (_note(summary) + "\\begin{tabular}{lccccccccccc}\n\\toprule\n"
+            "System & Accuracy & Fault & Turns & ECE & smECE & Brier & Abst. P & Abst. R & Unsafe & R@1 & R@5 "
+            "\\\\\n\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
 
 
 def table_kn_vs_hi(summary: dict) -> str:
+    """Paired kn-en vs hi-en comparison for the four main systems."""
     rows = []
-    for s in summary["systems"]:
+    for s in MAIN_SYSTEMS:
         for noise, d in summary["kn_vs_hi"].get(s, {}).items():
-            rows.append(f"{NAMES[s]} & {noise} & {d['n']} & {d['kn_f1']:.2f} & {d['hi_f1']:.2f} & "
-                        f"{d['mcnemar']['p']:.3f} \\\\")
+            rows.append(f"{SHORT[s]} & {noise.replace('codemixed', 'code-mixed')} & {d['n']} & {d['kn_f1']:.2f} & "
+                        f"{d['hi_f1']:.2f} & {d['mcnemar']['p']:.3f} \\\\")
     return (_note(summary) + "\\begin{tabular}{llcccc}\n\\toprule\n"
-            "System & Noise & $n$ & kn-en F1 & hi-en F1 & McNemar $p$ \\\\\n\\midrule\n" + "\n".join(rows) +
+            "System & Noise & $n$ & kn-en & hi-en & McNemar $p$ \\\\\n\\midrule\n" + "\n".join(rows) +
             "\n\\bottomrule\n\\end{tabular}\n")
 
 
@@ -164,26 +175,49 @@ def table_dataset() -> str:
     kappa_file = BENCHMARK / "annotation" / "kappa.json"
     kappa = json.loads(kappa_file.read_text(encoding="utf-8")) if kappa_file.exists() else {}
     kappa_cell = ", ".join(f"{k.removeprefix('label_')} {v['kappa']:.2f} (n={v['n']})" for k, v in kappa.items()) \
-        or "not run yet"
+        or "not yet measured (one annotation per variant)"
     by_cond = Counter(v.condition for v in variants)
+    split_of = {cid: name for name in ("train", "val", "test") for cid in splits[name]}
+    by_split = Counter(split_of[v.case_id] for v in variants)
+    by_lang = Counter(v.lang_pair for v in variants)
+    lo, hi = min(per_fault.values()), max(per_fault.values())
+    test_cases = [c for c in cases if split_of.get(c.case_id) == "test"]
     lines = [
-        ("Underlying cases", f"{len(cases)} ({len(per_fault)} faults, {min(per_fault.values())}--{max(per_fault.values())} per fault)"),
-        ("Split (train / val / test)", f"{len(splits['train'])} / {len(splits['val'])} / {len(splits['test'])}"),
-        ("Variants", f"{len(variants)} + {len(stress)} stress"),
+        ("Underlying cases", f"{len(cases)} ({len(per_fault)} faults, {lo if lo == hi else f'{lo}--{hi}'} per fault)"),
+        ("Cases (train / val / test)", f"{len(splits['train'])} / {len(splits['val'])} / {len(splits['test'])}"),
+        ("Variants (train / val / test)", f"{by_split['train']} / {by_split['val']} / {by_split['test']}, "
+                                          f"plus {len(stress)} stress"),
         ("Per condition", ", ".join(f"{COND[c]} {by_cond[c]}" for c in CONDITIONS)),
+        ("Per language pair", ", ".join(f"{k} {by_lang[k]}" for k in ("kn-en", "hi-en", "none") if by_lang[k])),
         ("Provenance", ", ".join(f"{k} {v}" for k, v in sorted(prov.items()))),
         ("Gold action", f"identifiable {gold['identifiable']}, underdetermined {gold['underdetermined']}, "
                         f"unsafe {gold['unsafe_fault']}"),
+        ("Gold action (test)", f"answer {sum(c.gold_action != 'REFER' for c in test_cases)}, "
+                               f"refer {sum(c.gold_action == 'REFER' for c in test_cases)}"),
         ("Cohen's $\\kappa$", kappa_cell),
     ]
     body = "\n".join(f"{k} & {v} \\\\" for k, v in lines)
-    return ("% generated by eval/export_latex.py from data/benchmark/\n\\begin{tabular}{lp{0.62\\linewidth}}\n"
+    return ("% generated by eval/export_latex.py from data/benchmark/\n\\begin{tabular}{lp{0.5\\linewidth}}\n"
             "\\toprule\n" + body + "\n\\bottomrule\n\\end{tabular}\n")
 
 
-def _fig(width=3.5, height=2.4):
-    plt.rcParams.update({"font.size": 8, "font.family": "serif"})
+def _fig(width=3.4, height=2.2):
+    # IEEE: text at least 8 pt at column width (3.5 in), fonts embedded (Type 42).
+    plt.rcParams.update({"font.size": 8, "font.family": "serif", "legend.fontsize": 8, "pdf.fonttype": 42,
+                         "lines.markersize": 4.5, "lines.linewidth": 1.2})
     return plt.subplots(figsize=(width, height))
+
+
+def _save(fig, ax, path: Path, ncol: int = 2) -> None:
+    """Legend above the axes, so it never covers data or the axis labels."""
+    ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.01), ncol=ncol, frameon=False,
+              handlelength=2.6, columnspacing=1.2)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.02)
+
+
+def _plot(ax, s: str, xs, ys, **kw) -> None:
+    marker, line = STYLE[s]
+    ax.plot(xs, ys, marker=marker, linestyle=line, label=NAMES[s], **kw)
 
 
 def figures(summary: dict, out: Path) -> list[str]:
@@ -192,39 +226,33 @@ def figures(summary: dict, out: Path) -> list[str]:
     fig, ax = _fig()
     for s in MAIN_SYSTEMS:
         if s in summary["main"]:
-            ax.plot(range(len(conds)), [summary["main"][s][c]["macro_f1"][0] if summary["main"][s].get(c) else None
-                                        for c in conds], marker="o", label=PLAIN[s])
+            _plot(ax, s, range(len(conds)), [summary["main"][s][c]["macro_f1"][0] if summary["main"][s].get(c)
+                                             else None for c in conds])
     ax.set_xticks(range(len(conds)), [COND[c] for c in conds], rotation=30)
-    ax.set_ylabel("Macro-F1")
-    ax.legend(fontsize=6)
-    fig.tight_layout()
-    fig.savefig(out / "robustness_curve.pdf")
+    ax.set_xlabel("Input condition")
+    ax.set_ylabel("Action macro-F1")
+    _save(fig, ax, out / "robustness_curve.pdf")
     written.append("robustness_curve.pdf")
 
     fig, ax = _fig()
     for s, curve in summary["acc_vs_turns"].items():
         if s not in MAIN_SYSTEMS:
             continue
-        xs, ys = [p["turns"] for p in curve], [p["accuracy"] for p in curve]
-        ax.plot(xs, ys, marker="o" if len(xs) == 1 else ".", label=PLAIN[s])
-    ax.set_xlabel("Turn budget (B1/B2: mean turns used)")
+        _plot(ax, s, [p["turns"] for p in curve], [p["accuracy"] for p in curve])
+    ax.set_xlabel("Turn budget (questions; B1, B2 at mean turns used)")
     ax.set_ylabel("Action accuracy")
-    ax.legend(fontsize=6)
-    fig.tight_layout()
-    fig.savefig(out / "acc_vs_turns.pdf")
+    _save(fig, ax, out / "acc_vs_turns.pdf")
     written.append("acc_vs_turns.pdf")
 
     fig, ax = _fig()
-    ax.plot([0, 1], [0, 1], color="grey", linewidth=0.8, linestyle="--")
+    ax.plot([0, 1], [0, 1], color="grey", linewidth=0.8, linestyle=(0, (1, 2)))
     for s in MAIN_SYSTEMS:
         if s in summary["reliability"]:
             bins = summary["reliability"][s]["bins"]
-            ax.plot([b["conf"] for b in bins], [b["acc"] for b in bins], marker="o", label=PLAIN[s])
+            _plot(ax, s, [b["conf"] for b in bins], [b["acc"] for b in bins])
     ax.set_xlabel("Confidence in top fault")
     ax.set_ylabel("Top-fault accuracy")
-    ax.legend(fontsize=6)
-    fig.tight_layout()
-    fig.savefig(out / "calibration.pdf")
+    _save(fig, ax, out / "calibration.pdf")
     written.append("calibration.pdf")
 
     traj = summary["trajectory"].get("q2d")
@@ -232,13 +260,12 @@ def figures(summary: dict, out: Path) -> list[str]:
         fig, ax = _fig()
         for group, style in (("clean", "-"), ("codemixed", "--"), ("combined", ":")):
             if group in traj:
-                ax.plot(traj[group]["H_L"], style, marker="o", color="C0", label=f"$H_L$ {group}")
-                ax.plot(traj[group]["H_D"], style, marker="s", color="C3", label=f"$H_D$ {group}")
-        ax.set_xlabel("Turn")
+                name = group.replace("codemixed", "code-mixed")
+                ax.plot(traj[group]["H_L"], linestyle=style, marker="o", color="C0", label=f"$H_L$ {name}")
+                ax.plot(traj[group]["H_D"], linestyle=style, marker="s", color="C3", label=f"$H_D$ {name}")
+        ax.set_xlabel("Turn (questions asked)")
         ax.set_ylabel("Entropy (bits)")
-        ax.legend(fontsize=6, ncol=2)
-        fig.tight_layout()
-        fig.savefig(out / "hl_hd_trajectory.pdf")
+        _save(fig, ax, out / "hl_hd_trajectory.pdf")
         written.append("hl_hd_trajectory.pdf")
     plt.close("all")
     return written

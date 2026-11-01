@@ -50,7 +50,7 @@ export default function Home() {
         </div>
       </Section>
 
-      <Section title="Team" subtitle="School of Computer Science and Engineering, RV University, Bengaluru">
+      <Section title="Team" subtitle="B.Tech Computer Science and Engineering · School of Computer Science and Engineering, RV University, Bengaluru, India">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {TEAM.map((name) => (
             <div key={name} className="card flex items-center gap-3">

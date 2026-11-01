@@ -2,8 +2,18 @@
 
 Research prototype, benchmark and website for *Query2Diagnose: Uncertainty-Aware
 Interactive Troubleshooting from Noisy, Code-Mixed and Incomplete User
-Descriptions* (Saatwik Kumar Yadav, Rachana Bhaskar Gowda, Priyanshu Kumar
-Senapati, S Md Adil Ahmed — School of CSE, RV University, Bengaluru).
+Descriptions* by Saatwik Kumar Yadav, Rachana Bhaskar Gowda, Priyanshu Kumar
+Senapati and S Md Adil Ahmed (B.Tech Computer Science and Engineering, School of
+Computer Science and Engineering, RV University, Bengaluru, India).
+
+```bibtex
+@misc{yadav2026query2diagnose,
+  author = {Saatwik Kumar Yadav and Rachana Bhaskar Gowda and Priyanshu Kumar Senapati and S Md Adil Ahmed},
+  title  = {{Query2Diagnose}: Uncertainty-Aware Interactive Troubleshooting from Noisy, Code-Mixed and Incomplete User Descriptions},
+  note   = {School of Computer Science and Engineering, RV University, Bengaluru, India},
+  year   = {2026}
+}
+```
 
 A refrigerator complaint such as `fridge cooling agalla compressor sound ide`
 is read as K sampled interpretations; the system keeps a joint belief over

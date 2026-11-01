@@ -23,6 +23,7 @@ web/dist/
 # Draft paper and manuscript: local only, the repo is public (publishing the
 # text before submission would trip the venue's similarity check).
 web/public/paper.pdf
+paper/query2diagnose_paper.*
 paper/main.*
 paper/references.bib
 paper/*.zip
