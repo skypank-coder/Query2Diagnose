@@ -50,7 +50,7 @@ make test                   # 80+ tests, offline (mock LLM, TF-IDF retrieval)
 | Key | Meaning |
 |---|---|
 | `LLM_PROVIDER` | `groq`, `openai`, `anthropic`, `ollama` or `mock` (offline, tests only) |
-| `LLM_MODEL` | e.g. `openai/gpt-oss-20b` on Groq. B2, B3 and Q2D always share this model |
+| `LLM_MODEL` | `gpt-oss:20b` on Ollama (the reported runs) or `openai/gpt-oss-20b` on Groq. B2, B3 and Q2D always share this model |
 | `GROQ_API_KEY` / `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` | Key for the chosen provider; `.env` is git-ignored and a test fails if a key-shaped string appears in any committed file |
 | `MAX_USD_PER_RUN` | Hard stop for paid calls in one process (cached calls are free) |
 | `LLM_RPM`, `LLM_TPM` | Client-side throttle; defaults suit Groq's free tier |
@@ -80,6 +80,9 @@ writing), then `make annotations`. Two annotators fill copies of
 writes Cohen's κ. Details: `data/benchmark/README.md`.
 
 ## Experiments
+
+The reported numbers come from local `gpt-oss:20b` runs (full grid, tuning,
+sensitivity); `REPRODUCE.md` lists each run and the commit it ran on.
 
 Every experiment command prints the estimated LLM calls, tokens, cost and (on
 Groq) days of free-tier quota, and asks before running. On Groq's free tier the

@@ -60,11 +60,37 @@ repository so it can be checked.
   A first estimate was inflated for the compartment question by an answer
   parser bug; it was fixed and A(q) re-estimated before the pilot.
 
+## What the full run shows about the method
+From `results/runs/20261029T170525Z` (all 7 conditions, 3 seeds; see
+`REPRODUCE.md`). These are properties of the method with this LLM, simulator
+and hypothesis model, not code errors.
+- **Over-referral.** Q2D's abstention recall is 0.97 but its precision is
+  0.48: about half of its referrals were cases it could have answered. Most
+  dialogues end at T_max = 6 with the correct fault on top but below τ = 0.75,
+  so its action macro-F1 (0.19) is the lowest of the four main systems even
+  though its fault top-1 (0.65) is far above B2's (0.36).
+- **Calibration has two sides.** In the confidence bins from 0.25 to 0.84
+  accuracy exceeds confidence (under-confident), while the top bin
+  (confidence 0.96, 79 dialogues) has accuracy 0.53 (over-confident).
+- **No measurable gain from H_L, cost/clarity or normalisation here.**
+  Removing H_L scores 0.22 against 0.19 with overlapping intervals; λ = μ = 0
+  won the validation grid, so cost/clarity is inactive; removing
+  normalisation changes nothing. Q2D also asks more questions than B3 and B2
+  (5.7 against 5.5 and 5.2 mean turns; Wilcoxon p < 0.001).
+- **Hypothesis weights dominate.** With the `sharp` weight set, Q2D reaches
+  0.42 macro-F1 and B3 0.41 (seed 0), above B2's 0.37, but that set was
+  compared on the test split, so it cannot be claimed as a result. Choosing
+  the weights or τ on validation would have to be declared and rerun.
+- **Retrieval is weak.** Recall@5 of the gold passage is 0.28 for Q2D and
+  0.12 for B1/B2, so many answers are grounded in a related rather than the
+  source passage.
+
 ## Compute
-- One system LLM (`openai/gpt-oss-20b` on Groq). The free tier's 200,000
-  tokens/day limits what can be run per day; the reported pilot uses 15
-  test cases, one seed and K = 4, and is labelled as a pilot. Conclusions need
-  the full grid (3 seeds, K = 8, all ablations) and ideally a second model.
+- One system LLM: `gpt-oss-20b` (open weights) run locally under Ollama on a
+  12 GB laptop GPU. Results with a second, different model would show
+  whether the comparison holds across LLMs.
+- No noisy-simulator run yet; every reported number uses the deterministic
+  simulator.
 - iFixit's Terms of Use prohibit training ML models on its content. No model
   is trained here; λ and μ are two scalars grid-searched on validation.
   Confirmation from iFixit was requested by the team.

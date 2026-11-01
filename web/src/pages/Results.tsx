@@ -34,7 +34,7 @@ export default function Results() {
   if (state === "none" || !s) return (
     <Empty title="No finished run yet">
       Results appear here only after an experiment run completes; nothing is shown from placeholders.
-      Run <code>make pilot</code> (fits the Groq free tier) or <code>make experiments</code>, then reload.
+      Run <code>make experiments</code> (see REPRODUCE.md), then reload.
     </Empty>
   );
 
