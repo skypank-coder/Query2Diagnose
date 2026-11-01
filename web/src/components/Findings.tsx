@@ -1,4 +1,5 @@
 import { f2, pct, pval, type Summary } from "../api";
+import { CountUp } from "./Animated";
 
 // Headline numbers and findings, computed from the run summary on every load.
 
@@ -24,10 +25,10 @@ function pick(s: Summary) {
 export function KeyStats({ s }: { s: Summary }) {
   const v = pick(s);
   const cards = [
-    { k: pct(v.unsafe("q2d")), label: "unsafe DIY advice", vs: `vs ${pct(v.unsafe("b1_direct"))} and ${pct(v.unsafe("b2_llm_questions"))} for the LLM baselines` },
-    { k: f2(v.ece("q2d")), label: "calibration error (ECE)", vs: `vs ${f2(v.ece("b2_llm_questions"))} and ${f2(v.ece("b1_direct"))}; lower is better` },
-    { k: pct(v.fault("q2d")), label: "right fault ranked first", vs: `vs ${pct(v.fault("b2_llm_questions"))} for the LLM that asks questions` },
-    { k: v.dialogues.toLocaleString(), label: "simulated dialogues", vs: `${s.seeds.length} seeds · ${s.systems.length} systems · ${s.llm}` },
+    { k: <CountUp value={(v.unsafe("q2d") ?? 0) * 100} decimals={1} suffix="%" />, label: "unsafe DIY advice", vs: `vs ${pct(v.unsafe("b1_direct"))} and ${pct(v.unsafe("b2_llm_questions"))} for the LLM baselines` },
+    { k: <CountUp value={v.ece("q2d") ?? 0} decimals={2} />, label: "calibration error (ECE)", vs: `vs ${f2(v.ece("b2_llm_questions"))} and ${f2(v.ece("b1_direct"))}; lower is better` },
+    { k: <CountUp value={(v.fault("q2d") ?? 0) * 100} decimals={1} suffix="%" />, label: "right fault ranked first", vs: `vs ${pct(v.fault("b2_llm_questions"))} for the LLM that asks questions` },
+    { k: <CountUp value={v.dialogues} grouping />, label: "simulated dialogues", vs: `${s.seeds.length} seeds · ${s.systems.length} systems · ${s.llm}` },
   ];
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

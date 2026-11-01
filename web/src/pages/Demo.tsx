@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { api, pretty, SYSTEM_LABEL, type FaultNames, type Hit, type Result, type Turn } from "../api";
+import { useSearchParams } from "react-router-dom";
+import { api, pretty, SYSTEM_LABEL, type FaultNames, type Hit, type Recording, type RecordingInfo, type Result, type Turn } from "../api";
 import { Bar } from "../components/ui";
 
-const EXAMPLES: [string, string][] = [
+// Messages rehearsed against the live API: their LLM calls are cached, so they answer instantly.
+const INSTANT = [
+  ["Kannada–English", "freezer alli frost jaasti aagide, compressor run aagtide, door rubber sari ide"],
   ["Kannada–English", "fridge cooling agalla compressor sound ide"],
-  ["Kannada–English", "freezer alli tumba frost katkondide, hinde gode mele frost ide"],
-  ["Hindi–English", "fridge mein cooling nahi ho rahi, compressor ki awaaz aa rahi hai"],
-  ["Hindi–English", "fridge ke neeche paani aa raha hai"],
-  ["English", "My fridge is not cooling and it makes a clicking sound every few minutes"],
-  ["Typos", "fridg coolong agalla, olagr light bartice"],
-];
+  ["Hindi–English", "fridge bilkul band pada hai, na light hai na display"],
+] as const;
 const STATUS_STYLE = {
   confirmed: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
   uncertain: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
@@ -22,6 +21,7 @@ const KIND_STYLE: Record<string, string> = {
 };
 
 type Msg = { role: "user" | "system"; text: string; kind?: string; result?: Result };
+type Mode = "checking" | "live" | "replay";
 
 function Passage({ hit }: { hit: Hit }) {
   return (
@@ -37,7 +37,7 @@ function ResultCard({ result, names }: { result: Result; names: FaultNames }) {
   const refer = result.predicted === "REFER";
   const top = result.top_fault ? names[result.top_fault]?.name ?? pretty(result.top_fault) : null;
   return (
-    <div className={`mt-2 rounded-xl border p-4 ${refer ? "border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950/30" : "border-emerald-300 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-950/30"}`}>
+    <div className={`animate-fade-up rounded-xl border p-4 ${refer ? "border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950/30" : "border-emerald-300 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-950/30"}`}>
       <div className="text-xs font-semibold uppercase tracking-wide">{refer ? "Referral to a technician" : "Likely cause"}</div>
       <div className="mt-1 font-serif text-lg font-semibold">{refer ? (top ? `Most likely: ${top}` : "No safe conclusion") : top}</div>
       <div className="mt-1 text-xs muted">confidence {result.confidence.toFixed(2)} · {result.turns} question(s) · {pretty(result.reason)}</div>
@@ -54,7 +54,75 @@ function ResultCard({ result, names }: { result: Result; names: FaultNames }) {
   );
 }
 
+function BeliefPanel({ turn, first, names }: { turn: Turn | null; first: Turn | null; names: FaultNames }) {
+  const belief = turn?.belief;
+  const understanding = first?.understanding;
+  if (!belief) {
+    return (
+      <div className="card text-sm muted">
+        {turn ? "This baseline keeps no structured belief, so there is nothing to show here." : "The belief over interpretations and faults appears here as the conversation goes."}
+        {turn?.hits && turn.hits.length > 0 && <div className="mt-3 space-y-2">{turn.hits.slice(0, 3).map((h) => <Passage key={h.passage_id} hit={h} />)}</div>}
+      </div>
+    );
+  }
+  return (
+    <>
+      <div className="card space-y-3">
+        <div className="flex items-baseline justify-between">
+          <h3 className="font-semibold">Uncertainty (bits)</h3>
+          <span className="text-xs muted">turn {turn!.t} · {belief.n_interpretations} reading(s) kept</span>
+        </div>
+        <Bar value={belief.H_L} max={3} color="bg-amber-500" label={<><span>Linguistic H<sub>L</sub>: what was said?</span><span>{belief.H_L.toFixed(2)}</span></>} />
+        <Bar value={belief.H_D} max={Math.log2(15)} color="bg-accent-500" label={<><span>Diagnostic H<sub>D</sub>: which fault?</span><span>{belief.H_D.toFixed(2)}</span></>} />
+      </div>
+      <div className="card space-y-2">
+        <h3 className="font-semibold">Top faults</h3>
+        {belief.top.map(([z, p]) => (
+          <Bar key={z} value={p} max={1} color={names[z]?.user_safe === false ? "bg-red-400" : "bg-accent-500"}
+            label={<><span>{names[z]?.name ?? pretty(z)}{names[z]?.user_safe === false && <span className="ml-1 text-[10px] font-semibold text-red-600">REFER</span>}</span><span>{p.toFixed(2)}</span></>} />
+        ))}
+      </div>
+      {understanding && (
+        <div className="card">
+          <h3 className="font-semibold">How the message was read</h3>
+          {understanding.changes.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {understanding.changes.slice(0, 8).map((c, i) => (
+                <span key={i} className="rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 font-mono text-[11px] text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300">{c.original} → {c.normalized}</span>
+              ))}
+            </div>
+          )}
+          <div className="mt-3 space-y-2">
+            {understanding.interpretations.slice(0, 3).map((it, i) => (
+              <div key={i} className="text-xs">
+                <span className="font-mono font-semibold">p(s|x) = {it.p.toFixed(2)}</span>
+                <div className="mt-0.5 flex flex-wrap gap-1">{Object.entries(it.s).map(([a, v]) => <span key={a} className="rounded bg-slate-100 px-1.5 py-0.5 dark:bg-slate-800">{pretty(a)}: {pretty(v)}</span>)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {turn?.fault_state && (
+        <details className="card">
+          <summary className="cursor-pointer font-semibold">Fault state <span className="text-xs font-normal muted">(every attribute: confirmed, uncertain or unknown)</span></summary>
+          <table className="mt-2 w-full text-xs">
+            <tbody>
+              {Object.entries(turn.fault_state).filter(([a]) => a !== "device").map(([a, s]) => (
+                <tr key={a} className="border-b border-slate-100 dark:border-slate-800">
+                  <td className="py-1 pr-2">{pretty(a)}</td>
+                  <td className="py-1 text-right"><span className={`rounded px-1.5 py-0.5 ${STATUS_STYLE[s.status]}`}>{s.status === "confirmed" ? pretty(s.value ?? "") : s.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </details>
+      )}
+    </>
+  );
+}
+
 export default function Demo() {
+  const [mode, setMode] = useState<Mode>("checking");
   const [systems, setSystems] = useState<{ id: string; description: string }[]>([]);
   const [llm, setLlm] = useState("");
   const [system, setSystem] = useState("q2d");
@@ -67,17 +135,38 @@ export default function Demo() {
   const [first, setFirst] = useState<Turn | null>(null);
   const [names, setNames] = useState<FaultNames>({});
   const [busy, setBusy] = useState(false);
+  const [waited, setWaited] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const bottom = useRef<HTMLDivElement>(null);
+  const [recs, setRecs] = useState<RecordingInfo[]>([]);
+  const [rec, setRec] = useState<Recording | null>(null);
+  const [step, setStep] = useState(0);
+  const [autoplay, setAutoplay] = useState(false);
+  const [params] = useSearchParams();
+  const scroller = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { api.systems().then((s) => { setSystems(s.systems); setLlm(s.llm); }).catch(() => setError("The API is not reachable. Start it with `make api`.")); }, []);
-  useEffect(() => { bottom.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, [msgs]);
+  useEffect(() => {
+    api.live().then((live) => {
+      setMode(live ? "live" : "replay");
+      api.systems().then((s) => { setSystems(s.systems); setLlm(s.llm); }).catch(() => undefined);
+      if (!live) api.recordings().then(setRecs).catch(() => setError("No recorded dialogues found."));
+    });
+  }, []);
+  useEffect(() => {
+    const el = scroller.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  }, [msgs, busy]);
+  useEffect(() => {
+    if (!busy) { setWaited(0); return; }
+    const id = setInterval(() => setWaited((w) => w + 1), 1000);
+    return () => clearInterval(id);
+  }, [busy]);
 
   const show = (t: Turn) => {
     setTurn(t);
     if (t.question) setMsgs((m) => [...m, { role: "system", text: t.question!.text, kind: t.question!.kind }]);
     if (t.result) setMsgs((m) => [...m, { role: "system", text: "", kind: "final", result: t.result }]);
   };
+  const reset = () => { setAutoplay(false); setMsgs([]); setTurn(null); setFirst(null); setSession(null); setRec(null); setStep(0); setError(null); };
 
   async function start(text: string, sys = system) {
     if (!text.trim()) return;
@@ -97,139 +186,164 @@ export default function Demo() {
     catch (e) { setError((e as Error).message); } finally { setBusy(false); }
   }
 
+  async function play(id: string) {
+    reset();
+    const r = await api.recording(id);
+    setRec(r); setNames(r.fault_names); setMessage(r.message); setSystem(r.system); setStep(0);
+    setMsgs([{ role: "user", text: r.message }]);
+    setFirst(r.steps[0].turn); show(r.steps[0].turn);
+  }
+
+  function advance() {
+    if (!rec) return;
+    const answer = rec.steps[step].answer;
+    if (!answer) return;
+    setMsgs((m) => [...m, { role: "user", text: answer.text }]);
+    show(rec.steps[step + 1].turn);
+    setStep(step + 1);
+  }
+
+  useEffect(() => {
+    const id = params.get("play");
+    if (mode === "replay" && id && recs.some((r) => r.id === id) && !rec) { play(id).then(() => setAutoplay(true)); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, recs]);
+  useEffect(() => {
+    if (!autoplay || !rec || turn?.action !== "ask" || !rec.steps[step]?.answer) return;
+    const id = setTimeout(advance, 1400);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoplay, rec, step, turn]);
+
   const asking = turn?.action === "ask";
   const done = !!turn?.result;
-  const belief = turn?.belief;
-  const understanding = first?.understanding;
+  const expected = rec?.steps[step]?.answer?.value;
+  const siblings = rec ? recs.filter((r) => r.message === rec.message && r.id !== rec.id) : [];
 
   return (
     <div>
-      <div className="mb-5 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-200">
-        <strong>Research prototype, not repair advice.</strong> Faults involving refrigerant, the sealed system, the compressor, its relays or live electrics are always referred to a technician. Unplug the fridge before touching anything inside.
+      <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-200">
+        <span><strong>Research prototype, not repair advice.</strong> Refrigerant, sealed-system, compressor and live-electric faults are always referred to a technician.</span>
+        {mode === "replay" && <span className="rounded-full bg-amber-200 px-2.5 py-0.5 text-xs font-semibold text-amber-900 dark:bg-amber-800 dark:text-amber-100">Replay mode · recorded real dialogues</span>}
+        {mode === "live" && <span className="rounded-full bg-emerald-200 px-2.5 py-0.5 text-xs font-semibold text-emerald-900 dark:bg-emerald-800 dark:text-emerald-100">Live · {llm || "connecting…"}</span>}
       </div>
-      <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr]">
-        <div className="card flex min-h-[560px] flex-col">
-          <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3 dark:border-slate-800">
-            <select value={system} onChange={(e) => setSystem(e.target.value)} className="rounded-lg border border-slate-300 bg-transparent px-2 py-1.5 text-sm dark:border-slate-700" aria-label="System">
-              {systems.map((s) => <option key={s.id} value={s.id} className="text-slate-900">{SYSTEM_LABEL[s.id] ?? s.id}</option>)}
-            </select>
-            <select value={lang} onChange={(e) => setLang(e.target.value)} className="rounded-lg border border-slate-300 bg-transparent px-2 py-1.5 text-sm dark:border-slate-700" aria-label="Question language">
-              <option value="en" className="text-slate-900">Questions in English</option>
-              <option value="kn" className="text-slate-900">Kannada–English</option>
-              <option value="hi" className="text-slate-900">Hindi–English</option>
-            </select>
-            {llm && <span className="ml-auto text-xs muted">LLM: {llm}</span>}
-          </div>
-          <p className="mt-2 text-xs muted">{systems.find((s) => s.id === system)?.description}</p>
 
-          <div className="mt-3 flex-1 space-y-3 overflow-y-auto">
-            {msgs.length === 0 && (
-              <div className="py-6">
-                <p className="text-sm muted">Describe a refrigerator problem the way you would text it, or try an example:</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {EXAMPLES.map(([tag, text]) => (
-                    <button key={text} className="chip border-slate-300 text-left hover:border-accent-500 hover:text-accent-700 dark:border-slate-700" onClick={() => start(text)}>
+      <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr] [&>*]:min-w-0">
+        {/* chat: fixed height, scrolls inside, controls pinned at the bottom */}
+        <div className="card flex h-[75vh] min-h-[480px] flex-col p-0 lg:sticky lg:top-20 lg:h-[calc(100vh-8.5rem)]">
+          <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 px-5 py-3 dark:border-slate-800">
+            {mode === "live" ? (
+              <>
+                <select value={system} onChange={(e) => setSystem(e.target.value)} className="rounded-lg border border-slate-300 bg-transparent px-2 py-1.5 text-sm dark:border-slate-700" aria-label="System">
+                  {systems.map((s) => <option key={s.id} value={s.id} className="text-slate-900">{SYSTEM_LABEL[s.id] ?? s.id}</option>)}
+                </select>
+                <select value={lang} onChange={(e) => setLang(e.target.value)} className="rounded-lg border border-slate-300 bg-transparent px-2 py-1.5 text-sm dark:border-slate-700" aria-label="Question language">
+                  <option value="en" className="text-slate-900">Questions in English</option>
+                  <option value="kn" className="text-slate-900">Kannada–English</option>
+                  <option value="hi" className="text-slate-900">Hindi–English</option>
+                </select>
+              </>
+            ) : (
+              <span className="text-sm font-medium">{rec ? SYSTEM_LABEL[rec.system] : "Pick a recorded dialogue"}</span>
+            )}
+            {msgs.length > 0 && <button className="btn-ghost ml-auto px-3 py-1 text-xs" onClick={reset}>New</button>}
+          </div>
+
+          <div ref={scroller} className="min-h-0 flex-1 space-y-3 overflow-y-auto px-5 py-4">
+            {msgs.length === 0 && mode === "live" && (
+              <div className="py-2">
+                <p className="text-sm muted">Describe a refrigerator problem the way you would text it. These examples answer instantly:</p>
+                <div className="mt-3 flex flex-col gap-2">
+                  {INSTANT.map(([tag, text]) => (
+                    <button key={text} className="rounded-xl border border-slate-200 px-3 py-2 text-left text-sm transition hover:border-accent-500 hover:bg-accent-50 dark:border-slate-700 dark:hover:bg-accent-700/10" onClick={() => start(text)}>
+                      <span className="mr-2 rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">instant</span>
                       <span className="mr-1.5 text-[10px] uppercase muted">{tag}</span>{text}
                     </button>
                   ))}
                 </div>
+                <p className="mt-4 text-xs muted">A new message of your own takes about a minute: the model reads it eight times on a free API tier.</p>
+              </div>
+            )}
+            {msgs.length === 0 && mode === "replay" && (
+              <div className="py-2">
+                <p className="text-sm muted">This hosted copy replays real dialogues recorded from the system; nothing here is scripted by hand. Pick one and click the highlighted answer to continue:</p>
+                <div className="mt-3 flex flex-col gap-2">
+                  {recs.map((r) => (
+                    <button key={r.id} className="rounded-xl border border-slate-200 px-3 py-2 text-left text-sm transition hover:border-accent-500 hover:bg-accent-50 dark:border-slate-700 dark:hover:bg-accent-700/10" onClick={() => play(r.id)}>
+                      <div className="text-[11px] font-semibold uppercase tracking-wide text-accent-600 dark:text-accent-400">{SYSTEM_LABEL[r.system]} · {r.label}</div>
+                      <div className="mt-0.5 font-mono text-[13px]">{r.message}</div>
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-4 text-xs muted">To type your own messages, run the project locally (see the README on GitHub).</p>
               </div>
             )}
             {msgs.map((m, i) => m.role === "user" ? (
-              <div key={i} className="flex justify-end"><div className="max-w-[85%] rounded-2xl rounded-br-sm bg-accent-600 px-4 py-2 text-sm text-white">{m.text}</div></div>
+              <div key={i} className="flex animate-fade-up justify-end"><div className="max-w-[85%] rounded-2xl rounded-br-sm bg-accent-600 px-4 py-2 text-sm text-white">{m.text}</div></div>
             ) : m.result ? (
               <ResultCard key={i} result={m.result} names={names} />
             ) : (
-              <div key={i} className="max-w-[90%]">
+              <div key={i} className="max-w-[90%] animate-fade-up">
                 <span className={`mb-1 inline-block rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${KIND_STYLE[m.kind ?? "llm"]}`}>
-                  {m.kind === "llm" ? "LLM question" : m.kind}
+                  {m.kind === "llm" ? "LLM question" : `${m.kind} question`}
                 </span>
                 <div className="rounded-2xl rounded-tl-sm bg-slate-100 px-4 py-2 text-sm dark:bg-slate-800">{m.text}</div>
               </div>
             ))}
-            {busy && <div className="text-sm muted animate-pulse">thinking…</div>}
-            <div ref={bottom} />
+            {busy && (
+              <div className="flex items-center gap-2 text-sm muted">
+                <span className="inline-flex gap-1"><span className="h-2 w-2 animate-bounce rounded-full bg-accent-500" /><span className="h-2 w-2 animate-bounce rounded-full bg-accent-500 [animation-delay:150ms]" /><span className="h-2 w-2 animate-bounce rounded-full bg-accent-500 [animation-delay:300ms]" /></span>
+                {turn ? "Updating the belief…" : `Reading the message eight ways… ${waited}s`}
+              </div>
+            )}
           </div>
 
-          {asking && turn?.question?.options && turn.question.options.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {turn.question.options.map((o) => (
-                <button key={o.value} disabled={busy} onClick={() => reply(o.label, o.value)}
-                  className="chip border-accent-400 text-accent-700 hover:bg-accent-50 dark:text-accent-400 dark:hover:bg-accent-700/20">{o.label}</button>
-              ))}
-            </div>
-          )}
-          {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
-          <form className="mt-3 flex gap-2" onSubmit={(e) => { e.preventDefault(); session && asking ? reply(input) : start(input); }}>
-            <input value={input} onChange={(e) => setInput(e.target.value)} disabled={busy}
-              placeholder={asking ? "Answer in your own words (any language)…" : "fridge cooling agalla, compressor sound ide…"}
-              className="flex-1 rounded-lg border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-accent-500 dark:border-slate-700" />
-            <button className="btn-primary" disabled={busy || !input.trim()}>{asking ? "Answer" : "Diagnose"}</button>
-          </form>
-          {done && (
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
-              <span className="muted">Same message with:</span>
-              {["q2d", "b3_infogain_dx", "b2_llm_questions", "b1_direct"].filter((s) => s !== system).map((s) => (
-                <button key={s} className="btn-ghost px-3 py-1" onClick={() => start(message, s)}>{SYSTEM_LABEL[s]}</button>
-              ))}
-              <button className="btn-ghost px-3 py-1" onClick={() => { setMsgs([]); setTurn(null); setSession(null); }}>New</button>
-            </div>
-          )}
+          {/* pinned controls */}
+          <div className="border-t border-slate-200 px-5 py-3 dark:border-slate-800">
+            {asking && turn?.question?.options && turn.question.options.length > 0 && (
+              <div className="mb-3">
+                <div className="mb-1.5 flex items-center justify-between gap-2 text-[11px] font-medium uppercase tracking-wide muted">
+                  <span>{mode === "replay" ? "Click the highlighted answer" : "Tap an answer, or type your own"}</span>
+                  {mode === "replay" && !autoplay && <button className="btn-ghost px-2 py-0.5 text-[11px] normal-case" onClick={() => setAutoplay(true)}>▶ Play the rest</button>}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {turn.question.options.map((o) => {
+                    const isNext = mode === "replay" && o.value === expected;
+                    return (
+                      <button key={o.value} disabled={busy || (mode === "replay" && !isNext)}
+                        onClick={() => (mode === "replay" ? advance() : reply(o.label, o.value))}
+                        className={`chip ${isNext ? "border-accent-600 bg-accent-600 text-white ring-4 ring-accent-200 dark:ring-accent-700/40" : "border-accent-400 text-accent-700 hover:bg-accent-50 disabled:opacity-40 dark:text-accent-400 dark:hover:bg-accent-700/20"}`}>
+                        {o.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            {done && (
+              <div className="mb-3 flex flex-wrap items-center gap-2 text-sm">
+                <span className="muted">Same message with:</span>
+                {mode === "live"
+                  ? ["q2d", "b3_infogain_dx", "b2_llm_questions", "b1_direct"].filter((s) => s !== system).map((s) => (
+                      <button key={s} className="btn-ghost px-3 py-1" onClick={() => start(message, s)}>{SYSTEM_LABEL[s]}</button>
+                    ))
+                  : siblings.map((r) => <button key={r.id} className="btn-ghost px-3 py-1" onClick={() => play(r.id)}>{SYSTEM_LABEL[r.system]}</button>)}
+                <button className="btn-ghost px-3 py-1" onClick={reset}>Another example</button>
+              </div>
+            )}
+            {error && <div className="mb-2 text-sm text-red-600">{error}</div>}
+            <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); session && asking ? reply(input) : start(input); }}>
+              <input value={input} onChange={(e) => setInput(e.target.value)} disabled={busy || mode !== "live"}
+                placeholder={mode !== "live" ? "Typing needs the local server; pick a recorded dialogue above" : asking ? "Answer in your own words (any language)…" : "fridge cooling agalla, compressor sound ide…"}
+                className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-accent-500 disabled:opacity-60 dark:border-slate-700" />
+              <button className="btn-primary" disabled={busy || mode !== "live" || !input.trim()}>{asking ? "Answer" : "Diagnose"}</button>
+            </form>
+          </div>
         </div>
 
-        <aside className="space-y-4">
-          {!belief && (
-            <div className="card text-sm muted">
-              {turn ? "This baseline keeps no structured belief, so there is nothing to show here." : "The belief over interpretations and faults appears here as the conversation goes."}
-              {turn?.hits && turn.hits.length > 0 && <div className="mt-3 space-y-2">{turn.hits.slice(0, 3).map((h) => <Passage key={h.passage_id} hit={h} />)}</div>}
-            </div>
-          )}
-          {belief && (
-            <>
-              <div className="card space-y-3">
-                <h3 className="font-semibold">Uncertainty (bits)</h3>
-                <Bar value={belief.H_L} max={3} color="bg-amber-500" label={<><span>Linguistic H<sub>L</sub></span><span>{belief.H_L.toFixed(2)}</span></>} />
-                <Bar value={belief.H_D} max={Math.log2(15)} color="bg-accent-500" label={<><span>Diagnostic H<sub>D</sub></span><span>{belief.H_D.toFixed(2)}</span></>} />
-                <p className="text-xs muted">Turn {turn!.t} · {belief.n_interpretations} interpretation(s) kept</p>
-              </div>
-              <div className="card space-y-2">
-                <h3 className="font-semibold">Top faults</h3>
-                {belief.top.map(([z, p]) => (
-                  <Bar key={z} value={p} max={1} color={names[z]?.user_safe === false ? "bg-red-400" : "bg-accent-500"}
-                    label={<><span>{names[z]?.name ?? pretty(z)}{names[z]?.user_safe === false && <span className="ml-1 text-[10px] font-semibold text-red-600">REFER</span>}</span><span>{p.toFixed(2)}</span></>} />
-                ))}
-              </div>
-              {understanding && (
-                <div className="card">
-                  <h3 className="font-semibold">How the message was read</h3>
-                  {understanding.normalized && <p className="mt-1 text-xs muted">Gloss: <span className="font-mono">{understanding.normalized}</span></p>}
-                  <div className="mt-2 space-y-2">
-                    {understanding.interpretations.slice(0, 4).map((it, i) => (
-                      <div key={i} className="text-xs">
-                        <span className="font-mono font-semibold">p(s|x) = {it.p.toFixed(2)}</span>
-                        <div className="mt-0.5 flex flex-wrap gap-1">{Object.entries(it.s).map(([a, v]) => <span key={a} className="rounded bg-slate-100 px-1.5 py-0.5 dark:bg-slate-800">{pretty(a)}: {pretty(v)}</span>)}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {turn?.fault_state && (
-                <div className="card">
-                  <h3 className="font-semibold">Fault state</h3>
-                  <table className="mt-2 w-full text-xs">
-                    <tbody>
-                      {Object.entries(turn.fault_state).filter(([a]) => a !== "device").map(([a, s]) => (
-                        <tr key={a} className="border-b border-slate-100 dark:border-slate-800">
-                          <td className="py-1 pr-2">{pretty(a)}</td>
-                          <td className="py-1 text-right"><span className={`rounded px-1.5 py-0.5 ${STATUS_STYLE[s.status]}`}>{s.status === "confirmed" ? pretty(s.value ?? "") : s.status}</span></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </>
-          )}
+        {/* belief: sticky beside the chat, scrolls on its own */}
+        <aside className="space-y-4 lg:sticky lg:top-20 lg:max-h-[calc(100vh-8.5rem)] lg:overflow-y-auto lg:pr-1">
+          <BeliefPanel turn={turn} first={first} names={names} />
         </aside>
       </div>
     </div>

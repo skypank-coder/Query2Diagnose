@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { CartesianGrid, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api, CONDITION_LABEL, SYSTEM_COLOR, SYSTEM_LABEL, type Block, type SensitivityRun, type Summary } from "../api";
+import { InView, REDUCED_MOTION } from "../components/Animated";
 import { Findings, KeyStats } from "../components/Findings";
 import { Empty, Loading, Section, Stat } from "../components/ui";
 
@@ -19,8 +20,9 @@ function Cell({ b }: { b?: Block }) {
   );
 }
 
+// Charts mount when scrolled into view, so their drawing animation plays when seen.
 function Chart({ children, height = 280 }: { children: React.ReactElement; height?: number }) {
-  return <div className="card" style={{ height }}><ResponsiveContainer>{children}</ResponsiveContainer></div>;
+  return <div className="card" style={{ height }}><InView>{() => <ResponsiveContainer>{children}</ResponsiveContainer>}</InView></div>;
 }
 
 export default function Results() {
@@ -49,6 +51,30 @@ export default function Results() {
     t, ...Object.fromEntries(Object.entries(traj).flatMap(([g, v]) => [[`H_L ${g}`, v.H_L[t]], [`H_D ${g}`, v.H_D[t]]])),
   }));
   const sig = s.significance.all ?? {};
+  const row = (metric: string, get: (x: string) => number | undefined) =>
+    ({ metric, ...Object.fromEntries(main.map((x) => [x, get(x)])) });
+  const higher = [
+    row("Right fault first", (x) => s.main[x].all.fault_accuracy),
+    row("Action accuracy", (x) => s.main[x].all.accuracy[0]),
+    row("Action macro-F1", (x) => s.main[x].all.macro_f1[0]),
+  ];
+  const lower = [
+    row("Unsafe DIY advice", (x) => s.safety[x]),
+    row("Calibration error (ECE)", (x) => s.reliability[x]?.ece),
+  ];
+  const bars = (data: Record<string, number | string | undefined>[]) => (
+    <BarChart data={data} margin={{ right: 8 }} barCategoryGap="22%">
+      <CartesianGrid strokeDasharray="3 3" opacity={0.3} vertical={false} />
+      <XAxis dataKey="metric" tick={{ fontSize: 11 }} interval={0} />
+      <YAxis domain={[0, 1]} tick={{ fontSize: 11 }} />
+      <Tooltip formatter={(v: number) => v?.toFixed(3)} cursor={{ fillOpacity: 0.08 }} />
+      <Legend wrapperStyle={{ fontSize: 11 }} />
+      {main.map((x, i) => (
+        <Bar isAnimationActive={!REDUCED_MOTION} key={x} dataKey={x} name={SYSTEM_LABEL[x]} fill={SYSTEM_COLOR[x]} radius={[4, 4, 0, 0]}
+          animationDuration={1100} animationBegin={i * 180} />
+      ))}
+    </BarChart>
+  );
 
   return (
     <div>
@@ -69,6 +95,13 @@ export default function Results() {
         <div className="mt-5"><Findings s={s} /></div>
       </Section>
 
+      <Section title="Head to head" subtitle="The four main systems over all conditions. Left: higher is better. Right: lower is better.">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Chart height={300}>{bars(higher)}</Chart>
+          <Chart height={300}>{bars(lower)}</Chart>
+        </div>
+      </Section>
+
       <Section title="Main results" subtitle="Action macro-F1 (REFER is a class) ± half-width of the 95% case-level bootstrap CI; mean turns below.">
         <div className="card overflow-x-auto">
           <table className="tbl">
@@ -87,7 +120,7 @@ export default function Results() {
               <YAxis domain={[0, "auto"]} tick={{ fontSize: 11 }} />
               <Tooltip formatter={(v: number) => v?.toFixed(3)} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              {main.map((x) => <Line key={x} dataKey={x} name={SYSTEM_LABEL[x]} stroke={SYSTEM_COLOR[x]} strokeWidth={x === "q2d" ? 3 : 1.5} dot />)}
+              {main.map((x) => <Line isAnimationActive={!REDUCED_MOTION} animationDuration={1300} key={x} dataKey={x} name={SYSTEM_LABEL[x]} stroke={SYSTEM_COLOR[x]} strokeWidth={x === "q2d" ? 3 : 1.5} dot />)}
             </LineChart>
           </Chart>
         </Section>
@@ -99,7 +132,7 @@ export default function Results() {
               <YAxis domain={[0, "auto"]} tick={{ fontSize: 11 }} />
               <Tooltip formatter={(v: number) => v?.toFixed(3)} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              {main.filter((x) => s.acc_vs_turns[x]).map((x) => <Line key={x} data={s.acc_vs_turns[x]} dataKey="accuracy" name={SYSTEM_LABEL[x]} stroke={SYSTEM_COLOR[x]} strokeWidth={x === "q2d" ? 3 : 1.5} dot={{ r: 4 }} />)}
+              {main.filter((x) => s.acc_vs_turns[x]).map((x) => <Line isAnimationActive={!REDUCED_MOTION} animationDuration={1300} key={x} data={s.acc_vs_turns[x]} dataKey="accuracy" name={SYSTEM_LABEL[x]} stroke={SYSTEM_COLOR[x]} strokeWidth={x === "q2d" ? 3 : 1.5} dot={{ r: 4 }} />)}
             </LineChart>
           </Chart>
         </Section>
@@ -112,7 +145,7 @@ export default function Results() {
               <ReferenceLine segment={[{ x: 0, y: 0 }, { x: 1, y: 1 }]} stroke="#94a3b8" strokeDasharray="4 4" />
               <Tooltip formatter={(v: number) => v?.toFixed(3)} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              {main.map((x) => <Line key={x} data={s.reliability[x].bins} dataKey="acc" name={SYSTEM_LABEL[x]} stroke={SYSTEM_COLOR[x]} dot />)}
+              {main.map((x) => <Line isAnimationActive={!REDUCED_MOTION} animationDuration={1300} key={x} data={s.reliability[x].bins} dataKey="acc" name={SYSTEM_LABEL[x]} stroke={SYSTEM_COLOR[x]} dot />)}
             </LineChart>
           </Chart>
         </Section>
@@ -126,8 +159,8 @@ export default function Results() {
                 <Tooltip formatter={(v: number) => v?.toFixed(3)} />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
                 {Object.keys(traj).flatMap((g, i) => [
-                  <Line key={`l${g}`} dataKey={`H_L ${g}`} stroke="#d97706" strokeDasharray={["", "6 3", "2 3"][i]} dot />,
-                  <Line key={`d${g}`} dataKey={`H_D ${g}`} stroke="#1f6f6a" strokeDasharray={["", "6 3", "2 3"][i]} dot />,
+                  <Line isAnimationActive={!REDUCED_MOTION} animationDuration={1300} key={`l${g}`} dataKey={`H_L ${g}`} stroke="#d97706" strokeDasharray={["", "6 3", "2 3"][i]} dot />,
+                  <Line isAnimationActive={!REDUCED_MOTION} animationDuration={1300} key={`d${g}`} dataKey={`H_D ${g}`} stroke="#1f6f6a" strokeDasharray={["", "6 3", "2 3"][i]} dot />,
                 ])}
               </LineChart>
             </Chart>

@@ -58,22 +58,55 @@ export type Example = {
   predicted: string; fault_name: string | null; confidence: number | null; passages: Hit[];
 };
 
+export type Recording = {
+  id: string; label: string; message: string; system: string; llm: string; fault_names: FaultNames;
+  steps: { turn: Turn; answer: { text: string; value: string | null } | null }[];
+};
+export type RecordingInfo = Pick<Recording, "id" | "label" | "message" | "system">;
+
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, { headers: { "Content-Type": "application/json" }, ...init });
   if (!res.ok) throw Object.assign(new Error(await res.text()), { status: res.status });
   return res.json() as Promise<T>;
 }
 
+// Snapshot written by `python -m eval.export_site` for static hosting (Vercel):
+// read only when the live API is not reachable.
+const SNAPSHOT: Record<string, string> = {
+  "/results/latest": "summary.json", "/results/sensitivity": "sensitivity.json", "/results/example": "example.json",
+  "/benchmark/stats": "stats.json", "/systems": "systems.json",
+};
+const isJson = (r: Response) => r.ok && (r.headers.get("content-type") ?? "").includes("json");
+
+async function read<T>(path: string): Promise<T> {
+  try {
+    const res = await fetch(`/api${path}`);
+    if (isJson(res)) return res.json() as Promise<T>;
+  } catch { /* no live API: fall back to the snapshot */ }
+  const snap = await fetch(`/data/${SNAPSHOT[path]}`);
+  if (!isJson(snap)) throw Object.assign(new Error("not available"), { status: 404 });
+  return snap.json() as Promise<T>;
+}
+
+async function readData<T>(file: string): Promise<T> {
+  const res = await fetch(`/data/${file}`);
+  if (!isJson(res)) throw new Error(`missing ${file}`);
+  return res.json() as Promise<T>;
+}
+
 export const api = {
-  systems: () => call<{ default: string; llm: string; systems: { id: string; description: string }[] }>("/systems"),
+  live: () => fetch("/api/health").then(isJson).catch(() => false),
+  systems: () => read<{ default: string; llm: string; systems: { id: string; description: string }[] }>("/systems"),
   start: (message: string, system: string, lang: string) =>
     call<{ session_id: string; turn: Turn; fault_names: FaultNames }>("/session", { method: "POST", body: JSON.stringify({ message, system, lang }) }),
   answer: (id: string, text: string, value?: string) =>
     call<{ turn: Turn }>(`/session/${id}/answer`, { method: "POST", body: JSON.stringify({ text, value }) }),
-  results: () => call<Summary>("/results/latest"),
-  sensitivity: () => call<SensitivityRun[]>("/results/sensitivity"),
-  example: () => call<Example>("/results/example"),
-  stats: () => call<Stats>("/benchmark/stats"),
+  results: () => read<Summary>("/results/latest"),
+  sensitivity: () => read<SensitivityRun[]>("/results/sensitivity"),
+  example: () => read<Example>("/results/example"),
+  stats: () => read<Stats>("/benchmark/stats"),
+  recordings: () => readData<RecordingInfo[]>("demo/index.json"),
+  recording: (id: string) => readData<Recording>(`demo/${id}.json`),
 };
 
 export const pct = (x: number | null | undefined) => (x == null ? "—" : `${(x * 100).toFixed(1)}%`);

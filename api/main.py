@@ -18,6 +18,7 @@ import os
 import threading
 import uuid
 from collections import Counter
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any
@@ -144,7 +145,16 @@ def _b2_step(session: Session) -> dict:
             "result": result, "hits": [_hit_view(h.to_dict()) for h in session.hits]}
 
 
-app = FastAPI(title="Query2Diagnose API", version="0.1.0")
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # Load the hypothesis model, the retriever and the LLM client before the
+    # first request, so the first demo message does not wait for them.
+    if os.getenv("Q2D_WARMUP", "1") == "1":
+        resources()
+    yield
+
+
+app = FastAPI(title="Query2Diagnose API", version="0.1.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
                    allow_methods=["*"], allow_headers=["*"])
 
