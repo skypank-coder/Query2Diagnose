@@ -50,6 +50,18 @@ export type Stats = {
   kappa: Record<string, { kappa: number; n: number }> | null;
 };
 
+export type PaperInfo = {
+  title: string | null; authors: string[]; abstract: string | null; keywords: string[];
+  sections: { level: number; title: string }[];
+};
+export type SensitivityRun = { weights: string; run_id: string; seeds: number[]; systems: Record<string, Block> };
+export type Example = {
+  run_id: string; variant_id: string; seed: number; system: string; message: string | null; condition: string | null;
+  changes: { original: string; normalized: string; source: string }[];
+  turns: { kind: string | null; question: string | null; answer: string | null }[];
+  predicted: string; fault_name: string | null; confidence: number | null; passages: Hit[];
+};
+
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, { headers: { "Content-Type": "application/json" }, ...init });
   if (!res.ok) throw Object.assign(new Error(await res.text()), { status: res.status });
@@ -63,8 +75,16 @@ export const api = {
   answer: (id: string, text: string, value?: string) =>
     call<{ turn: Turn }>(`/session/${id}/answer`, { method: "POST", body: JSON.stringify({ text, value }) }),
   results: () => call<Summary>("/results/latest"),
+  sensitivity: () => call<SensitivityRun[]>("/results/sensitivity"),
+  example: () => call<Example>("/results/example"),
   stats: () => call<Stats>("/benchmark/stats"),
+  paper: () => call<PaperInfo>("/paper"),
 };
+
+export const pct = (x: number | null | undefined) => (x == null ? "—" : `${(x * 100).toFixed(1)}%`);
+export const f2 = (x: number | null | undefined) => (x == null ? "—" : x.toFixed(2));
+export const pval = (p: number | null | undefined) =>
+  p == null ? "—" : p === 0 || p < 1e-4 ? "p < 0.0001" : `p = ${p.toFixed(p < 0.01 ? 4 : 2)}`;
 
 export const SYSTEM_LABEL: Record<string, string> = {
   q2d: "Query2Diagnose", b1_direct: "B1 · direct", b2_llm_questions: "B2 · LLM questions", b3_infogain_dx: "B3 · info-gain (H_D)",

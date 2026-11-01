@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import threading
 import uuid
 from collections import Counter
@@ -220,16 +221,92 @@ def trace(sid: str) -> dict:
     return {"session_id": sid, "system": session.system, "message": session.message, "turns": session.turns}
 
 
-@app.get("/api/results/latest")
-def results_latest() -> dict:
+def _latest_run_dir():
     pointer = RESULTS / "latest.json"
     if not pointer.exists():
         raise HTTPException(404, "no finished run yet")
-    run_id = json.loads(pointer.read_text(encoding="utf-8"))["run_id"]
-    path = RESULTS / "runs" / run_id / "summary.json"
-    if not path.exists():
+    run_dir = RESULTS / "runs" / json.loads(pointer.read_text(encoding="utf-8"))["run_id"]
+    if not (run_dir / "summary.json").exists():
         raise HTTPException(404, "no finished run yet")
-    return json.loads(path.read_text(encoding="utf-8"))
+    return run_dir
+
+
+@app.get("/api/results/latest")
+def results_latest() -> dict:
+    return json.loads((_latest_run_dir() / "summary.json").read_text(encoding="utf-8"))
+
+
+@app.get("/api/results/sensitivity")
+def results_sensitivity() -> list[dict]:
+    """B3 and Q2D under each hypothesis weight set (finished sensitivity runs only)."""
+    from eval.export_latex import side_runs
+    order = ["base", "flat", "sharp", "soft_atypical", "hard_atypical"]
+    runs = sorted(side_runs("weights"),
+                  key=lambda s: order.index(s["hypothesis_weights"]) if s["hypothesis_weights"] in order else 99)
+    return [{"weights": s["hypothesis_weights"], "run_id": s["run_id"], "seeds": s["seeds"],
+             "systems": {k: s["main"][k]["all"] for k in ("b3_infogain_dx", "q2d") if k in s["main"]}} for s in runs]
+
+
+EXAMPLE_VARIANT = "c0179-codemixed_kn"   # the Kannada-English dialogue replayed on the home page
+
+
+@app.get("/api/results/example")
+def results_example(variant_id: str = EXAMPLE_VARIANT, system: str = "q2d", seed: int = 0) -> dict:
+    """One saved dialogue from the latest run, exactly as logged."""
+    run_dir = _latest_run_dir()
+    path = run_dir / f"{system}.jsonl"
+    record = None
+    if path.exists():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            r = json.loads(line)
+            if r["variant_id"] == variant_id and r["seed"] == seed:
+                record = r
+                break
+    if record is None:
+        raise HTTPException(404, "no such dialogue in the latest run")
+    variant = next((v for v in read_jsonl(VARIANTS_FILE, Variant) if v.variant_id == variant_id), None)
+    understanding = record.get("extras", {}).get("understanding") or {}
+    return {
+        "run_id": run_dir.name, "variant_id": variant_id, "seed": seed, "system": system,
+        "message": variant.text if variant else None, "condition": variant.condition if variant else None,
+        "changes": understanding.get("changes", []),
+        "turns": [{"kind": (t.get("question") or {}).get("kind"), "question": (t.get("question") or {}).get("text"),
+                   "answer": t.get("answer_text")} for t in record["transcript"] if t.get("action") == "ask"],
+        "predicted": record["predicted"], "fault_name": _fault_names().get(record["predicted"], {}).get("name"),
+        "confidence": record.get("confidence"),
+        "passages": [_hit_view({"passage_id": p, "score": None, "faults": []}) for p in record.get("passage_ids", [])[:1]],
+    }
+
+
+PAPER_TEX = ROOT / "paper" / "query2diagnose_paper.tex"   # local only: the manuscript is git-ignored
+
+
+def _plain(tex: str) -> str:
+    """LaTeX snippet -> readable text (enough for the title, abstract and headings)."""
+    s = re.sub(r"~?\\cite\{[^}]*\}", "", tex)
+    s = re.sub(r"\\(?:textit|textbf|emph|texttt)\{([^}]*)\}", r"\1", s)
+    s = re.sub(r"\$([^$]*)\$", lambda m: m.group(1).replace("\\", ""), s)
+    s = s.replace("---", "—").replace("--", "–").replace("``", "“").replace("''", "”").replace("\\%", "%")
+    s = s.replace("~", " ").replace("\\,", " ")
+    return re.sub(r"\s+", " ", s).strip()
+
+
+@app.get("/api/paper")
+def paper() -> dict:
+    if not PAPER_TEX.exists():
+        raise HTTPException(404, "the paper source is not on this machine")
+    tex = PAPER_TEX.read_text(encoding="utf-8")
+    title = re.search(r"\\title\{(.*?)\}\s*\n", tex)
+    abstract = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", tex, re.S)
+    keywords = re.search(r"\\begin\{IEEEkeywords\}(.*?)\\end\{IEEEkeywords\}", tex, re.S)
+    return {
+        "title": _plain(title.group(1)) if title else None,
+        "authors": re.findall(r"\\IEEEauthorblockN\{([^}]+)\}", tex),
+        "abstract": _plain(abstract.group(1)) if abstract else None,
+        "keywords": [k.strip() for k in _plain(keywords.group(1)).split(",")] if keywords else [],
+        "sections": [{"level": 1 if kind == "section" else 2, "title": _plain(name)}
+                     for kind, name in re.findall(r"\\(section|subsection)\{([^}]*)\}", tex)],
+    }
 
 
 @lru_cache(maxsize=1)

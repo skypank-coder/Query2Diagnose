@@ -67,3 +67,28 @@ def test_baseline_sessions(client, system):
 def test_unknown_session_and_system(client):
     assert client.post("/api/session/nope/answer", json={"text": "x"}).status_code == 404
     assert client.post("/api/session", json={"message": "x", "system": "gpt"}).status_code == 400
+
+
+def test_paper_endpoint_reads_the_local_manuscript_only(client, tmp_path, monkeypatch):
+    monkeypatch.setattr(api, "PAPER_TEX", tmp_path / "missing.tex")
+    assert client.get("/api/paper").status_code == 404
+    tex = tmp_path / "paper.tex"
+    tex.write_text(r"\title{A Title with $H_L$}" "\n" r"\IEEEauthorblockN{Saatwik Kumar Yadav}" "\n"
+                   r"\begin{abstract}We ask~\cite{x} before 42.9\% ``answers''.\end{abstract}" "\n"
+                   r"\begin{IEEEkeywords}abstention, code-mixed text\end{IEEEkeywords}" "\n"
+                   r"\section{Introduction}\subsection{Why $H_L$}" "\n", encoding="utf-8")
+    monkeypatch.setattr(api, "PAPER_TEX", tex)
+    p = client.get("/api/paper").json()
+    assert p["title"] == "A Title with H_L" and p["authors"] == ["Saatwik Kumar Yadav"]
+    assert p["abstract"] == "We ask before 42.9% “answers”." and p["keywords"] == ["abstention", "code-mixed text"]
+    assert p["sections"] == [{"level": 1, "title": "Introduction"}, {"level": 2, "title": "Why H_L"}]
+
+
+def test_results_side_endpoints_follow_the_saved_runs(client):
+    if not (api.RESULTS / "latest.json").exists():
+        assert client.get("/api/results/example").status_code == 404
+        return
+    ex = client.get("/api/results/example")
+    assert ex.status_code == 200 and ex.json()["message"] and ex.json()["turns"]
+    for row in client.get("/api/results/sensitivity").json():
+        assert row["weights"] and "q2d" in row["systems"]

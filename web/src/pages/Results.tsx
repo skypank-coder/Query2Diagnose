@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { CartesianGrid, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { api, CONDITION_LABEL, SYSTEM_COLOR, SYSTEM_LABEL, type Block, type Summary } from "../api";
+import { api, CONDITION_LABEL, SYSTEM_COLOR, SYSTEM_LABEL, type Block, type SensitivityRun, type Summary } from "../api";
+import { Findings, KeyStats } from "../components/Findings";
 import { Empty, Loading, Section, Stat } from "../components/ui";
 
 const MAIN = ["b1_direct", "b2_llm_questions", "b3_infogain_dx", "q2d"];
@@ -25,9 +26,11 @@ function Chart({ children, height = 280 }: { children: React.ReactElement; heigh
 export default function Results() {
   const [s, setS] = useState<Summary | null>(null);
   const [state, setState] = useState<"loading" | "none" | "error" | "ok">("loading");
+  const [sens, setSens] = useState<SensitivityRun[]>([]);
   useEffect(() => {
     api.results().then((r) => { setS(r); setState("ok"); })
       .catch((e: { status?: number }) => setState(e.status === 404 ? "none" : "error"));
+    api.sensitivity().then(setSens).catch(() => setSens([]));
   }, []);
   if (state === "loading") return <Loading what="Loading results" />;
   if (state === "error") return <Empty title="Results unavailable">The API is not reachable. Start it with <code>make api</code>.</Empty>;
@@ -58,8 +61,13 @@ export default function Results() {
         <Stat label="Cases / variants" value={`${s.n_cases} / ${s.n_variants}`} hint={`test split · seeds ${s.seeds.join(", ")}`} />
         <Stat label="Simulator" value={s.simulator} hint="rule-based, answers from hidden ground truth" />
         <Stat label="λ / μ" value={`${s.agent_config.lambda_} / ${s.agent_config.mu}`} hint={s.tuned.lambda_ !== undefined ? "tuned on validation" : "defaults (not tuned)"} />
-        <Stat label="Cost" value={`$${(s.cost_usd ?? 0).toFixed(2)}`} hint={`paid-tier estimate · A(q) by ${s.clarity_llm ?? s.llm}`} />
+        <Stat label="Cost" value={`$${(s.cost_usd ?? 0).toFixed(2)}`} hint={`${s.llm.startsWith("ollama/") ? "run locally" : "API spend"} · A(q) by ${s.clarity_llm ?? s.llm}`} />
       </div>
+
+      <Section title="Headline" subtitle="All seven input conditions pooled; the trilingual stress items are reported separately below.">
+        <KeyStats s={s} />
+        <div className="mt-5"><Findings s={s} /></div>
+      </Section>
 
       <Section title="Main results" subtitle="Action macro-F1 (REFER is a class) ± half-width of the 95% case-level bootstrap CI; mean turns below.">
         <div className="card overflow-x-auto">
@@ -76,7 +84,7 @@ export default function Results() {
             <LineChart data={robustness} margin={{ right: 16 }}>
               <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
               <XAxis dataKey="c" tick={{ fontSize: 10 }} interval={0} angle={-20} textAnchor="end" height={50} />
-              <YAxis domain={[0, 1]} tick={{ fontSize: 11 }} />
+              <YAxis domain={[0, "auto"]} tick={{ fontSize: 11 }} />
               <Tooltip formatter={(v: number) => v?.toFixed(3)} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
               {main.map((x) => <Line key={x} dataKey={x} name={SYSTEM_LABEL[x]} stroke={SYSTEM_COLOR[x]} strokeWidth={x === "q2d" ? 3 : 1.5} dot />)}
@@ -88,7 +96,7 @@ export default function Results() {
             <LineChart margin={{ right: 16 }}>
               <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
               <XAxis type="number" dataKey="turns" domain={[0, "dataMax"]} tick={{ fontSize: 11 }} />
-              <YAxis domain={[0, 1]} tick={{ fontSize: 11 }} />
+              <YAxis domain={[0, "auto"]} tick={{ fontSize: 11 }} />
               <Tooltip formatter={(v: number) => v?.toFixed(3)} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
               {main.filter((x) => s.acc_vs_turns[x]).map((x) => <Line key={x} data={s.acc_vs_turns[x]} dataKey="accuracy" name={SYSTEM_LABEL[x]} stroke={SYSTEM_COLOR[x]} strokeWidth={x === "q2d" ? 3 : 1.5} dot={{ r: 4 }} />)}
@@ -179,6 +187,38 @@ export default function Results() {
               <tbody>{Object.entries(sig).map(([b, t]) => (
                 <tr key={b} className="tabular-nums"><td>{SYSTEM_LABEL[b]}</td><td>{t.n}</td><td>{t.mcnemar.a_only}</td><td>{t.mcnemar.b_only}</td><td>{t.p_holm.toFixed(4)}</td><td>{t.wilcoxon_turns.p.toFixed(4)}</td></tr>
               ))}</tbody>
+            </table>
+          </div>
+        </Section>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Section title="Sensitivity to the hypothesis weights" subtitle="Separate runs, seed 0. Compared on the test split, so read them as a diagnosis, not as results.">
+          {sens.length ? (
+            <div className="card overflow-x-auto">
+              <table className="tbl">
+                <thead><tr><th>Weight set</th><th className="text-center">{SYSTEM_LABEL.b3_infogain_dx}</th><th className="text-center">{SYSTEM_LABEL.q2d}</th></tr></thead>
+                <tbody>{sens.map((r) => (
+                  <tr key={r.run_id} className={r.weights === "base" ? "bg-accent-50/60 dark:bg-accent-700/10" : ""}>
+                    <td className="font-medium">{r.weights.replace(/_/g, " ")}{r.weights === "base" ? " (main run)" : ""}</td>
+                    <Cell b={r.systems.b3_infogain_dx} /><Cell b={r.systems.q2d} />
+                  </tr>
+                ))}</tbody>
+              </table>
+            </div>
+          ) : <div className="card text-sm muted">No sensitivity runs found.</div>}
+        </Section>
+        <Section title="Trilingual stress set" subtitle="Kannada, Hindi and English in one message; kept out of the main tables.">
+          <div className="card overflow-x-auto">
+            <table className="tbl">
+              <thead><tr><th>System</th><th className="text-center">Macro-F1</th><th className="text-center">Accuracy</th><th className="text-center">Right fault first</th><th className="text-center">n</th></tr></thead>
+              <tbody>{MAIN.filter((x) => s.stress?.[x]).map((x) => {
+                const b = s.stress[x];
+                return (
+                  <tr key={x} className="tabular-nums"><td className="font-medium">{SYSTEM_LABEL[x]}</td><Cell b={b} />
+                    <td className="text-center">{f2(b.accuracy[0])}</td><td className="text-center">{f2(b.fault_accuracy)}</td><td className="text-center">{b.n}</td></tr>
+                );
+              })}</tbody>
             </table>
           </div>
         </Section>

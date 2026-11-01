@@ -1,8 +1,8 @@
 // Fig. 1 of the paper: the Query2Diagnose interaction pipeline.
 const STEPS = [
   ["User description", "noisy, code-mixed, incomplete"],
-  ["Input understanding", "sample K interpretations: device, symptoms, observations, negation"],
-  ["Structured fault state", "confirmed facts, uncertain readings, missing attributes"],
+  ["Input understanding", "normalise, then sample K = 8 readings over 20 attributes"],
+  ["Structured fault state", "confirmed, uncertain and unknown attributes"],
   ["Question selection", "score clarification and diagnostic questions by gain, effort, clarity"],
 ] as const;
 
@@ -42,7 +42,7 @@ export default function PipelineDiagram() {
       <text x={x + bw / 2 + 8} y={decisionY + 76} className="fill-slate-500 text-[11px]">yes</text>
       <rect x={x} y={outY} width={bw} height={boxH} rx="10" className="fill-slate-900 dark:fill-accent-600" />
       <text x={x + bw / 2} y={outY + 22} textAnchor="middle" className="fill-white text-[14px] font-semibold">Evidence-grounded output</text>
-      <text x={x + bw / 2} y={outY + 40} textAnchor="middle" className="fill-slate-300 text-[11px] dark:fill-accent-50">fault category, cited manual passages, safe next steps, or referral</text>
+      <text x={x + bw / 2} y={outY + 40} textAnchor="middle" className="fill-slate-300 text-[11px] dark:fill-accent-50">fault with a cited iFixit passage, or referral to a technician</text>
     </svg>
   );
 }

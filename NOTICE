@@ -47,4 +47,11 @@ Files that contain third-party text are NOT covered by the MIT License:
    https://huggingface.co/datasets/LingoIITGN/COMI-LINGUA). Only individual
    word spellings are stored; the datasets themselves are not redistributed.
 
+4. Photographs in web/public/images (Unsplash License, https://unsplash.com/license)
+   Resized copies of free photos from Unsplash, credited on every page of the site:
+     - hero-fridge.jpg: Zhen Yao, https://unsplash.com/photos/_iiZXwwYFpQ
+     - freezer-dial.jpg: S. Laiba Ali, https://unsplash.com/photos/ohynLBdsU9Y
+     - technician.jpg: Caleb Woods, https://unsplash.com/photos/-Ifr1HGFeW8
+   The photographers do not endorse this project.
+
 No manufacturer manuals or service guides are used, stored or redistributed.
