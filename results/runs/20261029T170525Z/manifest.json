@@ -1,0 +1,106 @@
+{
+ "run_id": "20261029T170525Z",
+ "created": "2026-10-29T17:05:25+00:00",
+ "config": {
+  "split": "test",
+  "systems": [
+   "b1_direct",
+   "b2_llm_questions",
+   "b3_infogain_dx",
+   "q2d",
+   "q2d_minus_hl",
+   "q2d_minus_fault_state",
+   "q2d_minus_cost_clarity",
+   "q2d_minus_normalisation"
+  ],
+  "conditions": [
+   "clean",
+   "spelling",
+   "codemixed_kn",
+   "codemixed_hi",
+   "incomplete",
+   "combined_kn",
+   "combined_hi"
+  ],
+  "seeds": [
+   0,
+   1,
+   2
+  ],
+  "max_cases": null,
+  "include_stress": true,
+  "simulator": {
+   "mode": "deterministic"
+  },
+  "overrides": {},
+  "hypothesis_weights": null,
+  "clarity_provider": "groq",
+  "clarity_model": "openai/gpt-oss-120b"
+ },
+ "llm": "ollama/gpt-oss:20b",
+ "clarity_llm": "groq/openai/gpt-oss-120b",
+ "git": {
+  "commit": "be6c50d9d8adb2cc9f377842c867c3869447850b",
+  "dirty": true
+ },
+ "tuned": {
+  "lambda_": 0.0,
+  "mu": 0.0,
+  "macro_f1": 0.2332,
+  "mean_turns": 5.767,
+  "llm": "ollama/gpt-oss:20b"
+ },
+ "agent_config": {
+  "K": 8,
+  "temperature": 0.7,
+  "use_normalization": true,
+  "epsilon": 0.05,
+  "eta": 0.05,
+  "confirmed": 0.8,
+  "unknown": 0.8,
+  "lambda_": 0.0,
+  "mu": 0.0,
+  "min_gain_bits": 0.01,
+  "discriminate_min": 0.05,
+  "tau": 0.75,
+  "T_max": 6,
+  "top_k": 5,
+  "lang": "en",
+  "allow_clarification": true,
+  "raw_state": false
+ },
+ "n_variants": 450,
+ "n_cases": 60,
+ "estimate": {
+  "calls": {
+   "direct": 450,
+   "b2_turn": 1800,
+   "understand": 18858,
+   "state_tracker": 3150
+  },
+  "total_calls": 24258,
+  "input_tokens": 23272200,
+  "output_tokens": 6177000,
+  "usd_if_paid": 0.0
+ },
+ "ledger": [
+  {
+   "at": "2026-11-01T06:14:49+00:00",
+   "workers": 4,
+   "calls": 11742,
+   "cache_hits": 14037,
+   "input_tokens": 12141614,
+   "output_tokens": 435014,
+   "cost_usd": 0.0,
+   "by_task": {
+    "understand": 16646,
+    "state_tracker": 3877,
+    "direct": 638,
+    "b2_turn": 3994,
+    "parse_answer": 624
+   }
+  }
+ ],
+ "status": "complete",
+ "cost_usd": 0.0
+}
