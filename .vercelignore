@@ -1,0 +1,8 @@
+# Vercel deploys only the website in web/ (with its data snapshot in
+# web/public/data). Everything else stays out of the upload, in particular
+# api/, whose .py files Vercel would otherwise try to turn into functions.
+/*
+!/web
+!/vercel.json
+/web/node_modules
+/web/dist
