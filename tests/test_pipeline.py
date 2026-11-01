@@ -168,3 +168,10 @@ def test_local_model_is_free_and_reuses_the_saved_clarity_estimate(monkeypatch):
     clarity = rx.clarity_client(rx.load_experiment("pilot"), llm)
     assert clarity.name == "groq/openai/gpt-oss-120b"
     assert core.clarity.load_clarity(clarity.name), "A(q) estimate missing from data/clarity/"
+
+
+def test_pasted_api_key_is_cleaned(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", ' "gsk_test123"\r\n')
+    assert core.llm.Settings.from_env(provider="groq", model="m").api_key == "gsk_test123"
+    monkeypatch.setenv("GROQ_API_KEY", "  \n")
+    assert core.llm.Settings.from_env(provider="groq", model="m").api_key is None

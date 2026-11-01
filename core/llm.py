@@ -75,11 +75,14 @@ class Settings:
         model = model or os.getenv("LLM_MODEL") or cfg["defaults"]["model"]
         key_var = {"groq": "GROQ_API_KEY", "openai": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY"}.get(provider)
         base = os.getenv("OLLAMA_BASE_URL") if provider == "ollama" else None
+        # Keys pasted into a hosting dashboard often carry a newline, a space or
+        # quotes, which requests rejects as an invalid Authorization header.
+        api_key = (os.getenv(key_var) or "").strip().strip("\"'").strip() if key_var else ""
         return cls(
             provider=provider,
             model=model,
             base_url=base or cfg["base_urls"].get(provider),
-            api_key=os.getenv(key_var) if key_var else None,
+            api_key=api_key or None,
             max_usd=float(os.getenv("MAX_USD_PER_RUN", "1.0")),
             rpm=int(os.getenv("LLM_RPM", cfg["rate_limits"]["rpm"])),
             tpm=int(os.getenv("LLM_TPM", cfg["rate_limits"]["tpm"])),
